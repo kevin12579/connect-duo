@@ -1,6 +1,6 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import MainScreen from './connect_duo/Main/MainScreen.jsx';
+import MainScreen from './connect_duo/pages/Main/MainPage';
 function App() {
     return (
         <BrowserRouter>
