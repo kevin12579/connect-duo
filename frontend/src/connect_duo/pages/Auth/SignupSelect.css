@@ -1,0 +1,182 @@
+/* src/pages/Auth/SignupSelect.css */
+
+/* 로그인 화면과 동일한 배경/정렬/패딩 */
+.signup-root {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9edf3; /*  Login과 동일 */
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/*  로그인 카드 크기/느낌 맞춤 */
+.signup-card {
+    background: #fff;
+    border-radius: 22px;
+
+    /* 그림자 제거 */
+    box-shadow: none;
+
+    /*  Login과 동일하게 크게 */
+    width: min(720px, 92vw);
+    padding: 56px 52px 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* 테두리로만 구분 */
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/*  타이틀도 Login처럼 크게 */
+.signup-title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    margin: 0 0 28px 0;
+    color: #111;
+}
+
+/* 탭 영역 */
+.signup-tabs {
+    width: 100%;
+    display: flex;
+    gap: clamp(30px, 6vw, 60px);
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.signup-tab {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    padding: 12px 26px;
+    border-radius: 999px;
+    background: #f0e9ea;
+    color: #111;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.signup-tab.active {
+    background: #ffb74d;
+    border-color: transparent;
+}
+
+/* 폼 */
+.signup-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/*  입력 박스도 Login input-box처럼 크게 */
+.signup-input-box {
+    background: #f2f3f7;
+    border-radius: 18px;
+    padding: 34px 28px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+/*  input 글씨 보이게 + 높이 키움 */
+.signup-input {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    outline: none;
+    background: #fff;
+    border-radius: 999px;
+
+    height: 60px; /*  Login처럼 */
+    padding: 0 22px;
+    font-size: 1.1rem;
+
+    color: #222; /*  글씨 진하게 */
+    caret-color: #222; /*  커서도 */
+    font-weight: 500;
+
+    box-shadow: none;
+}
+
+.signup-input::placeholder {
+    color: #8a94a6;
+    opacity: 1;
+}
+
+/*  크롬 자동완성 글씨색 꼬임 방지 */
+.signup-input:-webkit-autofill,
+.signup-input:-webkit-autofill:hover,
+.signup-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #222;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+/* 버튼: input보다 좁게 + 중앙 */
+.signup-btn {
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+
+    height: 62px; /*  Login btn처럼 */
+    font-size: 1.15rem;
+    font-weight: 800;
+
+    background: #5f86b5;
+    color: #fff;
+
+    width: 72%;
+    margin: 6px auto 0;
+}
+
+.signup-btn:hover {
+    filter: brightness(0.95);
+}
+
+/* 하단 로그인 링크 */
+.signup-footer {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 0.95rem;
+    color: #111;
+}
+
+.signup-footer-link {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 800;
+}
+
+/*  반응형도 Login이랑 맞춤 */
+@media (max-width: 520px) {
+    .signup-card {
+        width: 94vw;
+        padding: 40px 18px 28px;
+    }
+
+    .signup-title {
+        font-size: 2.1rem;
+    }
+
+    .signup-input-box {
+        padding: 26px 16px 20px;
+    }
+
+    .signup-input {
+        height: 54px;
+        font-size: 1rem;
+    }
+
+    .signup-btn {
+        width: 82%;
+        height: 56px;
+        font-size: 1.05rem;
+    }
+}
