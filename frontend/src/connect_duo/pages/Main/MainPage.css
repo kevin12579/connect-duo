@@ -1,0 +1,264 @@
+/* ===== reset ===== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans KR', 'Segoe UI', Arial, sans-serif;
+    background: #f7f8fa;
+    color: #111;
+}
+
+/* ===== layout wrapper ===== */
+.mainpage-root {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+
+    /* 여기 padding이 있으면 전체가 안쪽으로 들어가니까 root에는 주지 않음 */
+    padding: 0;
+    margin: 0;
+}
+
+/* 상단/중단/하단 공통으로 쓰는 “중앙 컨테이너” */
+.mainpage-container {
+    width: min(1700px, 96%);
+    margin: 0 auto;
+}
+
+/* ===== Top (챗봇 영역) ===== */
+/* "상단 양옆 끝까지" 느낌은 container 폭을 96%로 크게 + 배경/그림자로 구현 */
+.mainpage-top-card {
+    width: 100%;
+    background: #f2f3f7;
+    box-shadow: 0 10px 28px rgba(60, 60, 60, 0.1);
+}
+
+/* 상단 카드 안쪽 실제 내용 */
+.mainpage-top-inner {
+    /* 중앙 정렬의 기준은 여기서 잡는다 */
+    width: min(1700px, 96%);
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+
+    padding: 34px 0;
+    min-height: 190px;
+}
+
+.mainpage-top-left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainpage-logo {
+    width: 250px; /* 원하는 크기로 조절 */
+    height: auto; /* 비율 유지 */
+    object-fit: contain;
+
+    border-radius: 0; /* 원형 제거 */
+    background: transparent; /* 흰 배경 제거 */
+    box-shadow: none; /* 그림자 제거 */
+    padding: 0; /* 혹시 있으면 제거 */
+    display: block;
+}
+
+.mainpage-top-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* 타이틀+아이콘: 너가 원한대로 아이콘이 문장 왼쪽 */
+.mainpage-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+
+.mainpage-chatbot-icon {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+.mainpage-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    color: #222;
+}
+
+/* 검색창 크게 + 중앙 */
+.mainpage-search-input {
+    width: min(1100px, 92%);
+    margin: 0 auto;
+
+    padding: 18px 26px;
+    border-radius: 34px;
+    border: 1.5px solid #dedede;
+    background: #fff;
+
+    font-size: 1.1rem;
+    outline: none;
+    box-shadow: 0 4px 12px rgba(60, 60, 60, 0.06);
+}
+
+.mainpage-search-input:focus {
+    border-color: #a3bffa;
+}
+
+/* ===== Middle (카테고리) ===== */
+.mainpage-inner {
+    width: min(1700px, 96%);
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 38px;
+}
+
+/* 4등분 + 간격 넓게 */
+.mainpage-category-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    /* 너무 벌어지면 어색하니까 최대 120px로 제한 */
+    gap: clamp(28px, 5vw, 120px);
+    justify-items: center;
+}
+
+.mainpage-category-btn {
+    width: 220px;
+    height: 220px;
+
+    border: none;
+    border-radius: 50%;
+    background: #f2f3f7;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    color: #333;
+
+    box-shadow: 0 12px 26px rgba(60, 60, 60, 0.1);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.mainpage-category-btn:hover {
+    background: #e6eaff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 16px 34px rgba(60, 60, 60, 0.14);
+}
+
+.mainpage-category-btn.selected {
+    background: #a3bffa;
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(60, 60, 60, 0.18);
+}
+
+.mainpage-category-icon {
+    width: 66px;
+    height: 66px;
+    margin-bottom: 12px;
+}
+
+.mainpage-category-label {
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+/* ===== Bottom (콘텐츠) ===== */
+/* “양옆 좀 남기고 훨씬 넓게” = inner 폭(96%) 기준으로 거의 꽉 */
+.mainpage-content-card {
+    width: 100%;
+    min-height: 560px;
+
+    background: #fff;
+    border-radius: 26px;
+    box-shadow: 0 14px 36px rgba(60, 60, 60, 0.12);
+    padding: 70px 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-content-empty {
+    color: #b0b0b0;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.mainpage-credit {
+    text-align: center;
+    font-size: 12px;
+    color: #9aa0a6;
+    margin-top: -10px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1000px) {
+    .mainpage-top-inner {
+        grid-template-columns: 1fr;
+        padding: 26px 0;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .mainpage-category-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+    }
+
+    .mainpage-category-btn {
+        width: 180px;
+        height: 180px;
+    }
+
+    .mainpage-content-card {
+        min-height: 380px;
+        padding: 40px 18px;
+    }
+
+    .mainpage-search-input {
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .mainpage-title {
+        font-size: 1.6rem;
+    }
+
+    .mainpage-category-btn {
+        width: 150px;
+        height: 150px;
+    }
+
+    .mainpage-category-icon {
+        width: 52px;
+        height: 52px;
+    }
+}
