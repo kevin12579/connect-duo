@@ -110,11 +110,18 @@ body {
     padding: 18px 26px;
     border-radius: 34px;
     border: 1.5px solid #dedede;
+    color: #222; /* 글자 진하게 */
+    font-weight: 500;
     background: #fff;
 
     font-size: 1.1rem;
     outline: none;
     box-shadow: 0 4px 12px rgba(60, 60, 60, 0.06);
+}
+
+.mainpage-search-input::placeholder {
+    color: #8a94a6; /* placeholder는 연하게 */
+    opacity: 1;
 }
 
 .mainpage-search-input:focus {
@@ -261,4 +268,18 @@ body {
         width: 52px;
         height: 52px;
     }
+}
+
+.profile-switch-btn {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #333;
+    font-weight: 900;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(60, 60, 60, 0.08);
+}
+.profile-switch-btn:hover {
+    filter: brightness(0.98);
 }
