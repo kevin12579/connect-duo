@@ -1,0 +1,196 @@
+.loginform {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5%;
+}
+
+.logintitle {
+    width: 260px;
+    height: 70px;
+}
+
+.loginbox {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.loginpw,
+.loginid {
+    width: 300px;
+    position: relative;
+}
+
+.loginpw input,
+.loginid input {
+    width: 100%;
+    height: 60px; /* 높이를 조금 더 여유 있게(50px -> 60px) 조정 추천 */
+    padding: 20px 15px 5px 15px; /* 상단 패딩을 늘려 글자가 아래로 내려오게 함 */
+    border: none;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    outline: none;
+    border-left: 2px solid #f08d029d;
+    background-color: #f9f9f9; /* 입력창 배경색을 살짝 주면 더 깔끔합니다 */
+    box-sizing: border-box; /* 패딩이 높이에 영향을 주지 않도록 설정 */
+}
+
+.loginid input:focus + label,
+.loginpw input:focus + label,
+.loginid input:not(:placeholder-shown) + label,
+.loginpw input:not(:placeholder-shown) + label {
+    top: 8px; /* 위로 올라가는 위치 조정 */
+    font-size: 12px;
+    color: #f08d029d; /* 강조 색상 */
+    transform: translateY(0); /* 중앙 정렬 해제 */
+}
+
+.loginpw label,
+.loginid label {
+    position: absolute;
+    top: 50%; /* 부모의 50% 위치에 배치 */
+    left: 15px;
+    transform: translateY(-50%); /* 정확히 수직 중앙으로 이동 */
+    font-size: 16px;
+    color: #999; /* 기본 색상을 조금 연하게 변경 */
+    transition: all 0.3s;
+    pointer-events: none; /* 라벨 클릭 시에도 input이 선택되도록 */
+}
+
+/* 1. 입력창(input) 비활성화 스타일 */
+.loginid input:disabled,
+.loginpw input:disabled {
+    background-color: #ededed; /* 회색 배경으로 변경 */
+    color: #888; /* 글자색을 흐리게 */
+    cursor: not-allowed; /* 금지 표시 커서 */
+    border-left: 2px solid #ccc; /* 강조 선 색상도 무채색으로 변경 */
+}
+
+/* 2. 비활성화된 입력창의 라벨 처리 */
+/* 인증 완료 후 input이 disabled 되면 라벨 색상도 차분하게 변경 */
+.loginid input:disabled + label,
+.loginpw input:disabled + label {
+    color: #aaa !important;
+}
+
+.loginpw {
+    position: relative;
+}
+
+.loginbutton {
+    width: 100%;
+    height: 40px;
+    background-color: #f08d029d;
+    color: #fff;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+.loginbutton:disabled {
+    background-color: #ccc; /* 주황색에서 회색으로 */
+    color: #ffffff;
+    cursor: not-allowed; /* 금지 표시 커서 */
+    box-shadow: none; /* 그림자 제거 */
+    transform: none; /* 클릭 효과 방지 */
+}
+
+.loginLink {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    text-align: center;
+    font-size: 12px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 입력창 사이 간격 */
+    width: 100%;
+}
+
+/* 역할 선택 버튼 스타일 */
+.role-selector {
+    display: flex;
+    width: 300px;
+    margin-bottom: 25px;
+    border: 1px solid #f08d029d;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.role-selector button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.3s;
+    color: #f08d029d;
+}
+
+.role-selector button.active {
+    background: #f08d029d;
+    color: white;
+}
+
+/* 중복확인 버튼 포함된 입력창 전용 */
+.with-btn {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.inner-btn {
+    width: 80px;
+    height: 60px;
+    background-color: #f08d029d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.inner-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 메시지 스타일 */
+.err-msg {
+    color: #ff4d4d;
+    font-size: 11px;
+    display: block;
+    text-align: left;
+    margin-top: 5px;
+    margin-left: 15px;
+}
+
+.success-msg {
+    color: #28a745;
+    font-size: 11px;
+    display: block;
+    text-align: left;
+    margin-top: 5px;
+    margin-left: 15px;
+}
