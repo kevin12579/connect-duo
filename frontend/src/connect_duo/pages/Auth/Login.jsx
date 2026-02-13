@@ -9,6 +9,8 @@ import { postLogin } from '../../api/axios';
 const Login = () => {
     const navigate = useNavigate();
     const loginAuthUser = useAuthStore((s) => s.loginAuthUser);
+    const authUser = useAuthStore((s) => s.authUser);
+    const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
 
     // 1. useForm 적용 (초기값 설정)
     const { formData, inputChangeHandler, setFormData } = useForm({
@@ -20,8 +22,21 @@ const Login = () => {
     const passwdRef = useRef(null);
 
     useEffect(() => {
+        if (isAuthLoading) return;
+
+        if (authUser) {
+            navigate('/');
+        }
+    }, [authUser, isAuthLoading, navigate]);
+
+    useEffect(() => {
         emailRef.current?.focus();
     }, []);
+
+    // 3. 확인 중일 때는 로그인 폼 대신 로딩 화면을 보여줌 (깜빡임 방지)
+    if (isAuthLoading) {
+        return <div className="loading-container">로그인 확인 중입니다...</div>;
+    }
 
     // 2. 핸들러 함수 단순화
     // 기존의 복잡한 name 매핑 로직이 필요 없어집니다.
@@ -30,7 +45,7 @@ const Login = () => {
 
         // 유효성 검사
         if (!formData.email.trim()) {
-            alert('이메일을 입력하세요');
+            alert('아이디를 입력하세요');
             emailRef.current?.focus();
             return;
         }
@@ -46,6 +61,8 @@ const Login = () => {
             const { result, message, data } = response;
 
             if (result === 'success') {
+                sessionStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
                 // 전역 상태 업데이트 (토큰 저장은 axios.js 내부에서 처리되도록 권장)
                 loginAuthUser({ ...data });
                 alert('로그인 성공!');
@@ -85,7 +102,7 @@ const Login = () => {
                             value={formData.email}
                             onChange={inputChangeHandler} // 커스텀 훅 핸들러
                         />
-                        <label htmlFor="email">이메일</label>
+                        <label htmlFor="email">아이디</label>
                     </div>
                     <div className="loginpw">
                         <input

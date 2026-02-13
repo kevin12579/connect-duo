@@ -62,6 +62,22 @@
     pointer-events: none; /* 라벨 클릭 시에도 input이 선택되도록 */
 }
 
+/* 1. 입력창(input) 비활성화 스타일 */
+.loginid input:disabled,
+.loginpw input:disabled {
+    background-color: #ededed; /* 회색 배경으로 변경 */
+    color: #888; /* 글자색을 흐리게 */
+    cursor: not-allowed; /* 금지 표시 커서 */
+    border-left: 2px solid #ccc; /* 강조 선 색상도 무채색으로 변경 */
+}
+
+/* 2. 비활성화된 입력창의 라벨 처리 */
+/* 인증 완료 후 input이 disabled 되면 라벨 색상도 차분하게 변경 */
+.loginid input:disabled + label,
+.loginpw input:disabled + label {
+    color: #aaa !important;
+}
+
 .loginpw {
     position: relative;
 }
@@ -79,6 +95,13 @@
     font-family: 'Noto Sans KR', sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+}
+.loginbutton:disabled {
+    background-color: #ccc; /* 주황색에서 회색으로 */
+    color: #ffffff;
+    cursor: not-allowed; /* 금지 표시 커서 */
+    box-shadow: none; /* 그림자 제거 */
+    transform: none; /* 클릭 효과 방지 */
 }
 
 .loginLink {
