@@ -1,90 +1,91 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
-import './styles.css';
+import React, { useState } from 'react';
+import './MainPage.css';
 
-function MainScreen(props) {
-    const navigate = useNavigate();
+// 이미지 import
+import logoImg from '../../assets/connectDuo_logo.png';
+import chatbotIcon from '../../assets/chatbot.png';
+import loginIcon from '../../assets/login.png';
+import profileIcon from '../../assets/profile.png';
+import rankingIcon from '../../assets/rank.png';
+import consultIcon from '../../assets/consult.png';
 
-    // isAuthLoading 상태를 추가로 가져옵니다.
-    const { authUser, logout, isAuthLoading } = useAuthStore();
+const categories = [
+    { key: 'login', label: '로그인', icon: loginIcon },
+    { key: 'profile', label: '프로필', icon: profileIcon },
+    { key: 'ranking', label: '랭킹', icon: rankingIcon },
+    { key: 'consult', label: '상담', icon: consultIcon },
+];
 
-    const handleLogout = () => {
-        if (window.confirm('로그아웃 하시겠습니까?')) {
-            logout();
-            alert('로그아웃 되었습니다.');
-            navigate('/');
+function MainPage() {
+    const [selected, setSelected] = useState('login');
+    const [search, setSearch] = useState('');
+
+    const renderContent = () => {
+        switch (selected) {
+            case 'login':
+                return <div className="main-content-empty">로그인 컴포넌트 영역</div>;
+            case 'profile':
+                return <div className="main-content-empty">프로필 컴포넌트 영역</div>;
+            case 'ranking':
+                return <div className="main-content-empty">랭킹 컴포넌트 영역</div>;
+            case 'consult':
+                return <div className="main-content-empty">상담 컴포넌트 영역</div>;
+            default:
+                return null;
         }
     };
 
-    // [핵심] 로그인 확인 절차가 진행 중일 때는 아무것도 보여주지 않거나 로딩바를 보여줍니다.
-    if (isAuthLoading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <p>데이터를 불러오는 중입니다...</p>
-            </div>
-        );
-    }
-
     return (
-        <div className="main-container">
-            <header
-                style={{
-                    padding: '20px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderBottom: '1px solid #ddd',
-                }}
-            >
-                <h2>Connect Duo</h2>
+        <div className="mainpage-root">
+            {/* 상단 AI 챗봇 카드 (무조건 화면 끝까지) */}
+            <div className="mainpage-top-card">
+                <div className="mainpage-top-inner">
+                    <div className="mainpage-top-left">
+                        <img src={logoImg} alt="로고" className="mainpage-logo" />
+                    </div>
 
-                <div className="auth-buttons">
-                    {authUser ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <span>
-                                <strong>{authUser.username || '사용자'}</strong>님 반갑습니다!
-                            </span>
-                            <button
-                                onClick={handleLogout}
-                                className="logout-btn"
-                                style={{
-                                    padding: '8px 16px',
-                                    backgroundColor: '#ff4d4f',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                로그아웃
-                            </button>
+                    <div className="mainpage-top-center">
+                        <div className="mainpage-title-row">
+                            <img src={chatbotIcon} alt="챗봇" className="mainpage-chatbot-icon" />
+                            <div className="mainpage-title">무엇을 도와드릴까요?</div>
                         </div>
-                    ) : (
-                        <button
-                            onClick={() => navigate('/login')}
-                            className="login-btn"
-                            style={{
-                                padding: '8px 16px',
-                                backgroundColor: '#1890ff',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            로그인
-                        </button>
-                    )}
-                </div>
-            </header>
 
-            <main style={{ padding: '40px', textAlign: 'center' }}>
-                <h1>테스트입니다.</h1>
-                <p>현재 {authUser ? '로그인' : '비로그인'} 상태입니다.</p>
-            </main>
+                        <input
+                            className="mainpage-search-input"
+                            type="text"
+                            placeholder="검색어를 입력하세요"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* 여기부터 아래(카테고리/하단/출처)만 여백 */}
+            <div className="mainpage-inner">
+                {/* 중단 카테고리 메뉴 */}
+                <div className="mainpage-category-row">
+                    {categories.map((cat) => (
+                        <button
+                            key={cat.key}
+                            type="button"
+                            className={`mainpage-category-btn${selected === cat.key ? ' selected' : ''}`}
+                            onClick={() => setSelected(cat.key)}
+                        >
+                            <img src={cat.icon} alt={cat.label} className="mainpage-category-icon" />
+                            <span className="mainpage-category-label">{cat.label}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* 하단 콘텐츠 카드 */}
+                <div className="mainpage-content-card">{renderContent()}</div>
+
+                {/* 출처 */}
+                <div className="mainpage-credit">Icons by Flaticon (Freepik, Oetjandra, improstudio)</div>
+            </div>
         </div>
     );
 }
 
-export default MainScreen;
+export default MainPage;
