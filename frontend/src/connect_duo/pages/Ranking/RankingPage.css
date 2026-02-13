@@ -1,0 +1,138 @@
+/* 트로피 및 랭킹 숫자 */
+.ranking-trophy {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    z-index: 2;
+}
+.ranking-rank-num {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #1976d2;
+    background: #fff;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #1976d2;
+    z-index: 2;
+}
+/* 프로필 하단 통계 박스 */
+.ranking-stats {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+.ranking-stat {
+    flex: 1 1 40%;
+    background: #fff;
+    border-radius: 6px;
+    padding: 3px 0;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #1976d2;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(25, 118, 210, 0.04);
+}
+.ranking-stat-label {
+    display: block;
+    font-size: 0.82rem;
+    color: #888;
+    font-weight: 400;
+    margin-top: 2px;
+}
+.ranking-consult-btn {
+    margin-top: 12px;
+    width: 100%;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 0;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.ranking-consult-btn:hover {
+    background: #1565c0;
+}
+/* 랭킹 전체 감싸는 통 */
+.ranking-outer-container {
+    width: 100%;
+    overflow: hidden; /* 중요: 삐져나온 다른 페이지 가리기 */
+}
+
+/* 슬라이드 창문 */
+.ranking-window {
+    width: 100%;
+    position: relative;
+}
+
+/* 실제로 밀리는 긴 기차 판 */
+.ranking-slider-track {
+    display: flex;
+    width: 100%;
+    /* 0.5초 동안 부드럽게 스르륵 이동 */
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 한 페이지(세무사 4명 묶음) */
+.ranking-page-group {
+    min-width: 100%;
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4열 배치 */
+    gap: 20px;
+    padding: 10px;
+}
+
+/* 개별 프로필 카드 스타일 (기존 유지) */
+.ranking-profile {
+    background: #f5f6fa;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.ranking-photo {
+    width: 90%;
+    max-width: 170px;
+    aspect-ratio: 140 / 180;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 18px;
+}
+
+/* 페이지네이션 스타일 */
+.ranking-pagination {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.ranking-arrow {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #1976d2;
+    color: white;
+    cursor: pointer;
+}
+.ranking-arrow:disabled { background: #eee; }
