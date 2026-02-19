@@ -16,6 +16,7 @@ export const useAuthStore = create(
             set({ authUser: null, isAuthLoading: false });
             sessionStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userBackup');
         },
     })),
 );

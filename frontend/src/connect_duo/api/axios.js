@@ -89,4 +89,10 @@ export const postLogin = async (data) => {
     return res.data;
 };
 
+//프로필
+export const getUserProfile = async (userId) => {
+    const res = await axiosBase.post(`/profile/usercomment`, { id: userId });
+    return res.data;
+};
+
 export default axiosAuth;

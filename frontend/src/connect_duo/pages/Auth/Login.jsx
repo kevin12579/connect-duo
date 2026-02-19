@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import useForm from '../../hooks/useForm'; // 커스텀 훅 임포트
 import '../Auth/style.css';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/connectDuo_logo.png';
 import { postLogin } from '../../api/axios';
 
 const Login = () => {
@@ -63,6 +63,14 @@ const Login = () => {
             if (result === 'success') {
                 sessionStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
+                const userInfo = {
+                    id: data.id,
+                    name: data.name, // 👈 이 줄이 빠져있었습니다.
+                    username: data.username,
+                    user_type: data.user_type,
+                    email: data.email,
+                };
+                localStorage.setItem('userBackup', JSON.stringify(userInfo));
                 // 전역 상태 업데이트 (토큰 저장은 axios.js 내부에서 처리되도록 권장)
                 loginAuthUser({ ...data });
                 alert('로그인 성공!');

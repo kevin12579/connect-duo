@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import '../Auth/style.css';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/connectDuo_logo.png';
 import {
     postUserIdCheck,
     postSignUpUser,
