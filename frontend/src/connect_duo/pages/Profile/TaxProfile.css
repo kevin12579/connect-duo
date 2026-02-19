@@ -1130,3 +1130,103 @@
 .taxpro-header.is-owner .taxpro-meta {
     transform: translateX(-25px); /* ← 왼쪽 이동 */
 }
+
+/* ===== Profile: Login 톤(Gray/White/Blue)로 4섹션 구분 ===== */
+
+/* (0) 페이지 배경 = Login 그대로 */
+.profile-page {
+    background: #e9edf3;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* 공통: 바깥 카드 기본(튀어나옴 방지) */
+.profile-card {
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* -----------------------
+   1) 1번째 섹션: 프로필(겉)
+   - 흰색 금지
+   - 아주 옅은 블루그레이 틴트
+----------------------- */
+.profile-top.profile-card {
+    background: #e6eefb !important; /* ✅ 파랑 한 스푼 들어간 회색 */
+}
+
+/* 1번째 내부 박스(프로필 헤더)는 조금 더 하얗게 */
+.profile-top .taxpro-header {
+    background: #f2f6fd !important; /* ✅ 거의 흰색에 가까운 블루그레이 */
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: none !important;
+}
+
+/* -----------------------
+   2) 2번째 섹션: 댓글(접힘/펼침)
+   - 1번째보다 살짝 더 그레이
+----------------------- */
+.comment-card.profile-card {
+    background: #edf2f9 !important; /* ✅ 4번째 느낌의 '맑은 회파' */
+}
+.comment-collapsed,
+.comment-expanded {
+    background: #f2f3f7 !important; /* ✅ Login input-box랑 같은 톤 */
+}
+
+/* -----------------------
+   3) 3번째 섹션: 통계/도넛 (두 카드 동일)
+   - 4번째처럼 맑은 하늘톤인데 조금 더 연하게
+----------------------- */
+.profile-stats,
+.profile-score {
+    background: #e1e8f4
+ !important; /* ✅ 둘 동일(중요) */
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* -----------------------
+   4) 4번째 섹션: 추천/평가/댓글쓰기
+   - 너가 예쁘다던 채도감 유지 (조금 더 선명)
+----------------------- */
+.profile-actions {
+    background: #deebff !important; /* ✅ 3번째보다 한 단계 더 진한 하늘톤 */
+}
+.profile-consults,
+.mycomments-card {
+    background: #deebff !important; /* ✅ 4번째 덩어리로 같이 묶고 싶으면 */
+}
+
+/* 버튼 = Login 파랑 */
+.taxpro-btn {
+    background: #4a90e2 !important;
+    box-shadow: none !important;
+}
+.taxpro-btn:hover {
+    background: #357ab8 !important;
+}
+.taxpro-btn.pending {
+    background: rgba(74, 144, 226, 0.55) !important;
+}
+
+/* 텍스트 톤 정리 */
+.taxpro-oneLine {
+    color: #333 !important;
+}
+.taxpro-meta {
+    color: #666 !important;
+}
+
+/* 내가 쓴 댓글 카드 */
+.comment-card .my-comments-box {
+    background: #e6eefb;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* 안쪽 말풍선 */
+.comment-item.mine .comment-body {
+    background: #cfdcf4;
+    border: 1px solid #b8c9e8;
+}
+
