@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import TaxProfile from '../Profile/TaxProfile';
+import UserProfile from '../Profile/UserProfile';
+import RankingPage from '../Ranking/RankingPage';
+import Login from '../Auth/Login';
+import HomeLogoButton from '../../components/HomeLogoButton';
+import { AUTH_STORAGE_EVENT, clearAuthSession, getAuthState } from '../../utils/authStorage';
 import './MainPage.css';
 
-// 이미지 import
-import logoImg from '../../assets/connectDuo_logo.png';
 import chatbotIcon from '../../assets/chatbot.png';
 import loginIcon from '../../assets/login.png';
 import profileIcon from '../../assets/profile.png';
@@ -17,17 +22,68 @@ const categories = [
 ];
 
 function MainPage() {
-    const [selected, setSelected] = useState('login');
+    const [selected, setSelected] = useState(() => (getAuthState().isLoggedIn ? 'profile' : 'login'));
     const [search, setSearch] = useState('');
+    const location = useLocation();
+    const [authState, setAuthState] = useState(getAuthState);
+
+    const currentUser = authState.user;
+    const isLoggedIn = authState.isLoggedIn;
+    const isTaxAccountant = currentUser?.user_type === 'TAX_ACCOUNTANT';
+    const visibleCategories = isLoggedIn ? categories.filter((cat) => cat.key !== 'login') : categories;
+
+    useEffect(() => {
+        const selectedFromState = location.state?.selected;
+        if (selectedFromState) {
+            setSelected(selectedFromState);
+        }
+    }, [location.state]);
+
+    useEffect(() => {
+        const syncAuth = () => {
+            setAuthState(getAuthState());
+        };
+
+        syncAuth();
+        window.addEventListener('storage', syncAuth);
+        window.addEventListener(AUTH_STORAGE_EVENT, syncAuth);
+
+        return () => {
+            window.removeEventListener('storage', syncAuth);
+            window.removeEventListener(AUTH_STORAGE_EVENT, syncAuth);
+        };
+    }, []);
+
+    const renderedProfile = useMemo(() => {
+        if (!isLoggedIn) return null;
+        if (isTaxAccountant) {
+            return <TaxProfile viewerRole="TAXPRO" currentUser={currentUser} />;
+        }
+        return <UserProfile currentUser={currentUser} />;
+    }, [isLoggedIn, isTaxAccountant, currentUser]);
+
+    const handleCategoryClick = (key) => {
+        if (key === 'profile' && !isLoggedIn) {
+            alert('로그인 후 프로필 기능을 사용할 수 있습니다.');
+            setSelected('login');
+            return;
+        }
+        setSelected(key);
+    };
+
+    const handleLogout = () => {
+        clearAuthSession();
+        setSelected('login');
+    };
 
     const renderContent = () => {
         switch (selected) {
             case 'login':
-                return <div className="main-content-empty">로그인 컴포넌트 영역</div>;
+                return isLoggedIn ? renderedProfile : <Login />;
             case 'profile':
-                return <div className="main-content-empty">프로필 컴포넌트 영역</div>;
+                return renderedProfile;
             case 'ranking':
-                return <div className="main-content-empty">랭킹 컴포넌트 영역</div>;
+                return <RankingPage />;
             case 'consult':
                 return <div className="main-content-empty">상담 컴포넌트 영역</div>;
             default:
@@ -37,17 +93,25 @@ function MainPage() {
 
     return (
         <div className="mainpage-root">
-            {/* 상단 AI 챗봇 카드 (무조건 화면 끝까지) */}
             <div className="mainpage-top-card">
                 <div className="mainpage-top-inner">
+                    {isLoggedIn && (
+                        <div className="mainpage-top-auth">
+                            <span className="mainpage-user-name">{currentUser?.name || currentUser?.username}님</span>
+                            <button type="button" className="mainpage-logout-btn" onClick={handleLogout}>
+                                로그아웃
+                            </button>
+                        </div>
+                    )}
+
                     <div className="mainpage-top-left">
-                        <img src={logoImg} alt="로고" className="mainpage-logo" />
+                        <HomeLogoButton fixed={false} />
                     </div>
 
                     <div className="mainpage-top-center">
                         <div className="mainpage-title-row">
                             <img src={chatbotIcon} alt="챗봇" className="mainpage-chatbot-icon" />
-                            <div className="mainpage-title">무엇을 도와드릴까요?</div>
+                            <div className="mainpage-title">무엇이 필요하신가요?</div>
                         </div>
 
                         <input
@@ -61,16 +125,14 @@ function MainPage() {
                 </div>
             </div>
 
-            {/* 여기부터 아래(카테고리/하단/출처)만 여백 */}
             <div className="mainpage-inner">
-                {/* 중단 카테고리 메뉴 */}
                 <div className="mainpage-category-row">
-                    {categories.map((cat) => (
+                    {visibleCategories.map((cat) => (
                         <button
                             key={cat.key}
                             type="button"
                             className={`mainpage-category-btn${selected === cat.key ? ' selected' : ''}`}
-                            onClick={() => setSelected(cat.key)}
+                            onClick={() => handleCategoryClick(cat.key)}
                         >
                             <img src={cat.icon} alt={cat.label} className="mainpage-category-icon" />
                             <span className="mainpage-category-label">{cat.label}</span>
@@ -78,10 +140,7 @@ function MainPage() {
                     ))}
                 </div>
 
-                {/* 하단 콘텐츠 카드 */}
                 <div className="mainpage-content-card">{renderContent()}</div>
-
-                {/* 출처 */}
                 <div className="mainpage-credit">Icons by Flaticon (Freepik, Oetjandra, improstudio)</div>
             </div>
         </div>

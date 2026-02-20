@@ -1,4 +1,4 @@
-/* ===== reset ===== */
+﻿/* ===== reset ===== */
 * {
     box-sizing: border-box;
 }
@@ -22,8 +22,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 34px;
-
-    /* 여기 padding이 있으면 전체가 안쪽으로 들어가니까 root에는 주지 않음 */
     padding: 0;
     margin: 0;
 }
@@ -54,24 +52,43 @@ body {
 
     padding: 34px 0;
     min-height: 190px;
+    position: relative;
+}
+
+.mainpage-top-auth {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mainpage-user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+}
+
+.mainpage-logout-btn {
+    border: none;
+    border-radius: 18px;
+    padding: 8px 14px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mainpage-logout-btn:hover {
+    background: #1e40af;
 }
 
 .mainpage-top-left {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.mainpage-logo {
-    width: 250px; /* 원하는 크기로 조절 */
-    height: auto; /* 비율 유지 */
-    object-fit: contain;
-
-    border-radius: 0; /* 원형 제거 */
-    background: transparent; /* 흰 배경 제거 */
-    box-shadow: none; /* 그림자 제거 */
-    padding: 0; /* 혹시 있으면 제거 */
-    display: block;
 }
 
 .mainpage-top-center {
@@ -227,6 +244,12 @@ body {
         text-align: center;
     }
 
+    .mainpage-top-auth {
+        position: static;
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+
     .mainpage-category-row {
         grid-template-columns: repeat(2, 1fr);
         gap: 22px;
@@ -245,6 +268,7 @@ body {
     .mainpage-search-input {
         width: 95%;
     }
+
 }
 
 @media (max-width: 480px) {
@@ -262,3 +286,6 @@ body {
         height: 52px;
     }
 }
+
+
+

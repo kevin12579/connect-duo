@@ -1,0 +1,34 @@
+.home-logo-link {
+    position: fixed;
+    top: 16px;
+    left: 20px;
+    z-index: 1200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.home-logo-link--inline {
+    position: static;
+    top: auto;
+    left: auto;
+    z-index: auto;
+}
+
+.home-logo-image {
+    width: clamp(170px, 16vw, 250px);
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .home-logo-link {
+        top: 12px;
+        left: 12px;
+    }
+
+    .home-logo-image {
+        width: clamp(140px, 40vw, 200px);
+    }
+}

@@ -1,0 +1,1259 @@
+/* === 전체 래퍼 === */
+.profile-root {
+    width: min(1200px, 92%);
+    margin: 0 auto;
+    padding: 18px 0 40px;
+}
+
+.profile-title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    margin: 8px 0 18px;
+    color: #222;
+}
+
+/* 카드 공통 */
+.profile-card {
+    background: #f2f3f7;
+    border-radius: 26px;
+    box-shadow: 0 14px 36px rgba(60, 60, 60, 0.12);
+    padding: 26px;
+    margin-bottom: 18px;
+}
+
+/* === 상단 카드 === */
+.profile-top {
+    padding: 28px;
+}
+
+.taxpro-header {
+    display: grid;
+    grid-template-columns: 220px 1fr 220px;
+    gap: 26px;
+    align-items: center;
+
+    background: #efe8ea;
+    border-radius: 26px;
+    padding: 22px;
+}
+
+.taxpro-info .taxpro-name {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    color: #222;
+}
+.taxpro-oneLine {
+    font-size: 14px;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.taxpro-meta {
+    font-size: 12px;
+    color: #5b5b5b;
+    line-height: 1.65;
+}
+
+.taxpro-cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.taxpro-btn {
+    width: 180px;
+    padding: 14px 14px;
+    border: none;
+    border-radius: 999px;
+    background: #f2a373; /* 살구 */
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.12);
+    transition:
+        transform 0.12s ease,
+        filter 0.12s ease;
+}
+.taxpro-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.97);
+}
+.taxpro-btn.pending {
+    background: #f6c2a2;
+    color: #fff;
+    cursor: not-allowed;
+    filter: none;
+    transform: none;
+}
+
+.profile-help-text {
+    text-align: center;
+    margin-top: 10px;
+    color: #777;
+    font-size: 12px;
+}
+
+/* DEV 버튼 */
+.profile-dev-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+.profile-dev-btn {
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #666;
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* =========================
+   댓글 카드 (CommentCard / CommentList / CommentItem)
+========================= */
+
+/* 카드 래퍼 */
+.comment-card {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 26px;
+}
+
+/* -------------------------
+   1) 접힘 영역
+------------------------- */
+.comment-collapsed {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 22px;
+    background: #d9d6d7;
+}
+
+.comment-mini {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0; /* 말줄임 필수 */
+}
+
+/* 왼쪽(아바타 + 닉네임 아래) */
+.comment-mini-meta {
+    width: 92px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-mini-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #6ea8ff;
+}
+
+.comment-mini-name {
+    font-weight: 900;
+    font-size: 12px;
+    color: #222;
+    text-align: center;
+}
+
+/* 말풍선(가로 길게) */
+.comment-bubble {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 18px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #333;
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 토글 버튼(우측) */
+.comment-toggle {
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.1);
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    font-weight: 900;
+    color: #111;
+}
+.comment-toggle:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* -------------------------
+   2) 펼침 영역
+------------------------- */
+.comment-expanded {
+    background: #d9d6d7;
+    padding: 18px 22px 20px;
+}
+
+.comment-expanded-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.comment-expanded-title {
+    font-weight: 900;
+    font-size: 16px;
+    color: #222;
+}
+
+/* 리스트 */
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 10px;
+}
+
+/* 한 댓글(왼쪽 프로필 / 오른쪽 말풍선) */
+.comment-item {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 14px;
+    align-items: start;
+}
+
+/* 왼쪽 프로필 */
+.comment-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 6px;
+}
+
+.comment-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #6ea8ff;
+}
+
+.comment-nick {
+    font-weight: 900;
+    font-size: 12px;
+    color: #222;
+    text-align: center;
+}
+
+/* 오른쪽 말풍선 */
+.comment-body {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 18px;
+    padding: 14px 18px;
+    box-shadow: 0 12px 28px rgba(60, 60, 60, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 내 댓글 색 구분 */
+.comment-item.mine .comment-body {
+    background: #d8efff;
+    border-color: rgba(63, 111, 181, 0.22);
+}
+
+/* 상단(날짜 / 삭제) */
+.comment-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.comment-date {
+    font-size: 11px;
+    color: #777;
+}
+
+.comment-delete {
+    border: none;
+    background: transparent;
+    color: #e03131;
+    font-weight: 900;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 10px;
+}
+.comment-delete:hover {
+    background: rgba(224, 49, 49, 0.1);
+}
+
+.comment-content {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.55;
+}
+
+/* -------------------------
+   3) 페이지네이션
+------------------------- */
+.comment-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* 버튼 */
+.pg-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.1);
+    cursor: pointer;
+    font-size: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111;
+}
+.pg-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* 비활성 */
+.pg-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 현재/전체 */
+.pg-info {
+    min-width: 92px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.08);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    font-weight: 900;
+    color: #222;
+}
+
+.pg-current {
+    color: #111;
+    font-size: 18px;
+}
+.pg-slash,
+.pg-total {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 14px;
+}
+
+/* =========================
+   통계 + 점수 (2열)
+========================= */
+.profile-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.profile-stats,
+.profile-score {
+    background: #efe8ea;
+}
+
+.stats-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 800;
+}
+.stats-label {
+    color: #222;
+}
+.stats-value {
+    color: #222;
+}
+.stars {
+    letter-spacing: 1px;
+    color: #f2a373;
+}
+.stats-value.chip {
+    background: #fdeaa6;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #d9480f;
+}
+
+/* 도넛 */
+.score-card .score-title {
+    text-align: center;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+.donut-wrap {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+.donut-svg {
+    display: block;
+    margin: 0 auto;
+}
+.donut-bg {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.08);
+    stroke-width: 26;
+}
+.donut-seg {
+    fill: none;
+    stroke-width: 26;
+    stroke-linecap: butt;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+/* 세그먼트 색 */
+.donut-seg.seg-0 {
+    stroke: #4fd1d9;
+}
+.donut-seg.seg-1 {
+    stroke: #37b3d2;
+}
+.donut-seg.seg-2 {
+    stroke: #2b8dbf;
+}
+.donut-seg.seg-3 {
+    stroke: #4a6fae;
+}
+.donut-seg.seg-4 {
+    stroke: #6a4c93;
+}
+
+.donut-center {
+    fill: #fff;
+}
+.donut-score-text {
+    font-size: 22px;
+    font-weight: 900;
+    fill: #e63946;
+}
+
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    color: #222;
+    font-weight: 800;
+}
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.legend-dot.seg-0 {
+    background: #4fd1d9;
+}
+.legend-dot.seg-1 {
+    background: #37b3d2;
+}
+.legend-dot.seg-2 {
+    background: #2b8dbf;
+}
+.legend-dot.seg-3 {
+    background: #4a6fae;
+}
+.legend-dot.seg-4 {
+    background: #6a4c93;
+}
+.legend-label {
+    flex: 1;
+}
+.legend-val {
+    color: #555;
+}
+
+/* =========================
+   ✅ ActionCard (여기만 유지)
+   - 평가하기 타이틀: 왼쪽 정렬
+   - 댓글 카드: 분홍 전체 카드 기준 가운데 느낌
+   - textarea: 세로 길게
+========================= */
+
+.profile-actions {
+    background: #f7dfe3;
+}
+
+/* 좌/우 분할 */
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 18px;
+    align-items: start;
+}
+
+/* 왼쪽 */
+.actions-left {
+    padding: 8px 6px 6px;
+}
+
+/* 공통 타이틀 */
+.actions-title {
+    font-weight: 900;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+/* 추천 영역: 가운데 */
+.like-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+/* 👍 추천 버튼 */
+.like-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.92);
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.1);
+    transition:
+        transform 0.12s ease,
+        filter 0.12s ease,
+        background 0.12s ease,
+        border-color 0.12s ease;
+}
+.like-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+}
+.like-btn.on {
+    background: rgba(63, 111, 181, 0.12);
+    border-color: rgba(63, 111, 181, 0.45);
+    box-shadow:
+        0 0 0 4px rgba(63, 111, 181, 0.14),
+        0 12px 26px rgba(60, 60, 60, 0.12);
+}
+.like-emoji {
+    font-size: 26px;
+    line-height: 1;
+}
+.like-help {
+    font-size: 12px;
+    color: #666;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* ✅ 평가 섹션: 타이틀은 왼쪽 */
+.rating-area .actions-title {
+    text-align: left;
+    margin-top: 10px;
+}
+
+/* 별 영역 카드 */
+.rating-box {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 12px 26px rgba(60, 60, 60, 0.08);
+}
+
+/* 별 정렬 */
+.star-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 0;
+}
+.star-btn {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.18);
+    transition:
+        transform 0.12s ease,
+        filter 0.12s ease;
+}
+.star-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+}
+.star-btn.on {
+    color: #f2a373;
+}
+.star-row.disabled .star-btn {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+/* 버튼 줄(공통) */
+.actions-btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+.actions-btn-row.right {
+    justify-content: flex-end;
+}
+
+/* ✅ 댓글 카드: 가운데 배치 느낌 */
+.actions-right {
+    background: #fff;
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 12px 28px rgba(60, 60, 60, 0.1);
+
+    justify-self: center; /* grid 셀 안에서 가운데 */
+    width: min(520px, 100%); /* 너무 커지지 않게 */
+}
+
+/* 작성자 헤드 */
+.comment-writer-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.writer-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #f08fa0;
+}
+.writer-name {
+    font-weight: 900;
+    color: #222;
+}
+
+/* ✅ textarea 길게 */
+.comment-input {
+    width: 100%;
+    height: 220px; /* ← 여기로 길게 */
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 12px 14px;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+
+    background: rgba(245, 246, 248, 0.95);
+    color: #111;
+}
+.comment-input::placeholder {
+    color: rgba(0, 0, 0, 0.35);
+    font-weight: 700;
+}
+.comment-input:focus {
+    border-color: rgba(63, 111, 181, 0.45);
+    box-shadow: 0 0 0 4px rgba(63, 111, 181, 0.12);
+}
+
+/* 버튼(공통) */
+.btn-primary {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: #3f6fb5;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+.btn-danger {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: #e03131;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+.btn-primary:disabled,
+.btn-danger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================
+   ✅ 세무사 프로필: 연필 버튼 최종 + 위치 고정
+========================= */
+
+/* 사진 영역: absolute 기준점 */
+
+/* 글 영역: absolute 기준점 */
+.taxpro-info {
+    position: relative;
+    padding-right: 60px; /* ✅ 글 연필이 글을 덮지 않게 여유 */
+}
+
+/* 공통 연필 버튼(하얀 둥근 버튼) */
+.edit-btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 900;
+    line-height: 1;
+
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 18px rgba(60, 60, 60, 0.12);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111; /* ✅ 아이콘 안보임 방지 */
+    font-size: 18px; /* ✅ 선명 */
+    opacity: 1; /* ✅ 흐려짐 방지 */
+
+    transition:
+        transform 0.12s ease,
+        background 0.12s ease;
+}
+
+.edit-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+/* ✅ 세무사 저장/취소 버튼 줄 */
+.taxpro-action-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===============================
+   ✅ 세무사 화면: 상담 신청 리스트 카드
+   =============================== */
+
+.profile-consults {
+    background: #f7dfe3;
+}
+
+.consults-wrap {
+    width: 100%;
+}
+.consults-title {
+    font-weight: 900;
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #222;
+}
+.consults-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.consult-row {
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 999px;
+    padding: 6px 14px;
+}
+.consult-date {
+    font-size: 11px;
+    color: #666;
+    padding-left: 10px;
+    margin-bottom: 2px;
+}
+.consult-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding-left: 28px;
+}
+.consult-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #6ea8ff;
+    margin-left: 10px;
+    transform: translateY(-6px);
+}
+.consult-name {
+    font-weight: 900;
+    color: #222;
+    min-width: 160px;
+    margin-left: -30px;
+}
+.consult-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+    margin-right: 16px;
+    align-self: flex-start; /* ✅ 위로 붙여서 같은 높이 */
+    margin-top: -10px; /* ✅ 필요하면 -4~-8로 조절 */
+}
+.consult-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-weight: 900;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.08);
+    transition:
+        transform 0.12s ease,
+        filter 0.12s ease;
+}
+.consult-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.97);
+}
+.consult-btn.accept {
+    background: #3f6fb5;
+}
+.consult-btn.reject {
+    background: #e03131;
+}
+.consult-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ✅ 내 댓글 카드 영역 */
+.comment-card .my-comments-box {
+    background: rgba(247, 141, 141, 0.18);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.comment-card .my-comments-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.comment-card .my-comments-title {
+    font-weight: 900;
+    font-size: 14px;
+    color: #222;
+}
+
+.comment-card .my-toggle {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 14px;
+    background: gray;
+    box-shadow: 0 10px 22px rgba(60, 60, 60, 0.1);
+    cursor: pointer;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment-card .my-toggle:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.comment-card .my-toggle.disabled,
+.comment-card .my-toggle:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.comment-card .my-comments-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* =========================
+   반응형 모음
+========================= */
+@media (max-width: 980px) {
+    .comment-item {
+        grid-template-columns: 80px 1fr;
+    }
+    .comment-mini-meta {
+        width: 80px;
+    }
+
+    .taxpro-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .taxpro-cta {
+        margin-top: 8px;
+    }
+
+    .profile-row-2 {
+        grid-template-columns: 1fr;
+    }
+    .donut-wrap {
+        grid-template-columns: 1fr;
+    }
+
+    /* 액션은 1열 */
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* 모바일에서 말풍선 줄어들게 */
+    .comment-bubble {
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
+.usercard-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end; /* ✅ 아래로 */
+    gap: 12px;
+}
+
+.usercard-actions {
+    margin-bottom: auto; /* ✅ 위쪽으로 밀어 올려서 탈퇴가 아래로 */
+}
+
+/* 사진 영역: 유저 프로필처럼 "사진 + 연필" 옆배치 */
+.taxpro-avatar {
+    position: static; /* ✅ absolute 기준 제거 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+
+/* ✅ 아바타 이미지(있을 때) */
+.taxpro-avatar img {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ✅ fallback 원(없을 때) = 네가 말한 보라색 원 */
+.taxpro-avatar-fallback {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    background: #b79cb6;
+    box-shadow: inset 0 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.taxpro-avatar-circle .taxpro-avatar-fallback {
+    width: 100%;
+    height: 100%;
+}
+
+.taxpro-avatar-circle {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    overflow: hidden; /* ✅ 원 모양 유지 + 이미지 들어가면 잘림 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.taxpro-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* fallback도 원 안에서 */
+.taxpro-avatar-circle .taxpro-avatar-fallback {
+    width: 100%;
+    height: 100%;
+}
+
+/* 글 영역: 연필이 한줄 옆에 붙게 */
+.taxpro-info {
+    position: static; /* ✅ absolute 기준 제거 */
+    padding-right: 0; /* ✅ 불필요 */
+}
+
+/* 한줄 + 연필 같은 줄 */
+.taxpro-oneLine-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* 긴 한줄 말줄임(필요하면) */
+.taxpro-oneLine {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 연필 버튼: 유저 프로필 edit-icon 느낌으로 */
+.edit-btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 900;
+    line-height: 1;
+
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 18px rgba(60, 60, 60, 0.06);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111;
+    font-size: 18px;
+    transition:
+        transform 0.12s ease,
+        background 0.12s ease;
+}
+
+.edit-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* 사진 연필은 유저처럼 조금 아래로 내려주고 싶으면 */
+.taxpro-avatar .edit-photo {
+    margin-top: 40px;
+}
+
+.taxpro-header {
+    grid-template-columns: 260px 1fr 220px;
+}
+
+.taxpro-avatar-circle {
+    width: 190px;
+    height: 190px;
+    flex: 0 0 190px;
+}
+
+.taxpro-avatar .edit-photo {
+    flex: 0 0 34px;
+}
+
+.taxpro-info {
+    align-items: center;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+.taxpro-oneLine-row {
+    justify-content: center;
+}
+
+/* 세무사 → 세무사 화면에서만 살짝 왼쪽으로 */
+.taxpro-header.is-owner .taxpro-info {
+    text-align: left;
+    padding-left: 20px;
+}
+
+/* 세무사 → 세무사 화면일 때만 */
+.taxpro-header.is-owner .taxpro-name {
+    transform: translateX(-25px); /* ← 왼쪽 이동 */
+}
+
+.taxpro-header.is-owner .taxpro-meta {
+    transform: translateX(-25px); /* ← 왼쪽 이동 */
+}
+
+/* ===== Profile: Login 톤(Gray/White/Blue)로 4섹션 구분 ===== */
+
+/* (0) 페이지 배경 = Login 그대로 */
+.profile-page {
+    background: #e9edf3;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* 공통: 바깥 카드 기본(튀어나옴 방지) */
+.profile-card {
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* -----------------------
+   1) 1번째 섹션: 프로필(겉)
+   - 흰색 금지
+   - 아주 옅은 블루그레이 틴트
+----------------------- */
+.profile-top.profile-card {
+    background: #e6eefb !important; /* ✅ 파랑 한 스푼 들어간 회색 */
+}
+
+/* 1번째 내부 박스(프로필 헤더)는 조금 더 하얗게 */
+.profile-top .taxpro-header {
+    background: #f2f6fd !important; /* ✅ 거의 흰색에 가까운 블루그레이 */
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: none !important;
+}
+
+/* -----------------------
+   2) 2번째 섹션: 댓글(접힘/펼침)
+   - 1번째보다 살짝 더 그레이
+----------------------- */
+.comment-card.profile-card {
+    background: #edf2f9 !important; /* ✅ 4번째 느낌의 '맑은 회파' */
+}
+.comment-collapsed,
+.comment-expanded {
+    background: #f2f3f7 !important; /* ✅ Login input-box랑 같은 톤 */
+}
+
+/* -----------------------
+   3) 3번째 섹션: 통계/도넛 (두 카드 동일)
+   - 4번째처럼 맑은 하늘톤인데 조금 더 연하게
+----------------------- */
+.profile-stats,
+.profile-score {
+    background: #e1e8f4
+ !important; /* ✅ 둘 동일(중요) */
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* -----------------------
+   4) 4번째 섹션: 추천/평가/댓글쓰기
+   - 너가 예쁘다던 채도감 유지 (조금 더 선명)
+----------------------- */
+.profile-actions {
+    background: #deebff !important; /* ✅ 3번째보다 한 단계 더 진한 하늘톤 */
+}
+.profile-consults,
+.mycomments-card {
+    background: #deebff !important; /* ✅ 4번째 덩어리로 같이 묶고 싶으면 */
+}
+
+/* 버튼 = Login 파랑 */
+.taxpro-btn {
+    background: #4a90e2 !important;
+    box-shadow: none !important;
+}
+.taxpro-btn:hover {
+    background: #357ab8 !important;
+}
+.taxpro-btn.pending {
+    background: rgba(74, 144, 226, 0.55) !important;
+}
+
+/* 텍스트 톤 정리 */
+.taxpro-oneLine {
+    color: #333 !important;
+}
+.taxpro-meta {
+    color: #666 !important;
+}
+
+/* 내가 쓴 댓글 카드 */
+.comment-card .my-comments-box {
+    background: #e6eefb;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* 안쪽 말풍선 */
+.comment-item.mine .comment-body {
+    background: #cfdcf4;
+    border: 1px solid #b8c9e8;
+}
+
+.tax-settings-title {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #222;
+}
+
+.tax-settings-actions {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.tax-withdraw-btn {
+    border: none;
+    background: transparent;
+    color: #e03131;
+    font-weight: 900;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 10px;
+}
+
+.tax-withdraw-btn:hover {
+    background: rgba(224, 49, 49, 0.08);
+}
