@@ -7,7 +7,6 @@ export default function TaxCommentList({ comments = [], pageSize = 3 }) {
     const [page, setPage] = useState(1);
 
     const sorted = useMemo(() => sortDesc(comments), [comments]);
-
     const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
     const sliced = useMemo(() => {
         const start = (page - 1) * pageSize;
@@ -37,7 +36,6 @@ export default function TaxCommentList({ comments = [], pageSize = 3 }) {
                     ))
                 )}
             </div>
-
             <div className="comment-pagination">
                 <button className="pg-btn" onClick={goFirst} disabled={isFirst}>
                     ⏮
@@ -45,11 +43,9 @@ export default function TaxCommentList({ comments = [], pageSize = 3 }) {
                 <button className="pg-btn" onClick={goPrev} disabled={isFirst}>
                     ◀
                 </button>
-
                 <div className="pg-info">
                     <span>{page}</span> / <span>{totalPages}</span>
                 </div>
-
                 <button className="pg-btn" onClick={goNext} disabled={isLast}>
                     ▶
                 </button>

@@ -1,52 +1,53 @@
 import React from 'react';
 
 export default function ScoreDonutCard({ totalScore, segments }) {
-    // segments: [{label, value(0~100), weight(0~1)}...]
-    // 도넛은 "가중치 비율"로 섹션을 나눠서 그려줌
     const size = 220;
     const r = 78;
     const cx = size / 2;
     const cy = size / 2;
-    const c = 2 * Math.PI * r;
+    const circumference = 2 * Math.PI * r;
 
-    let acc = 0;
+    let accumulatedWeight = 0;
 
     return (
         <div className="score-card">
-            <div className="score-title">종합 점수</div>
-
+            <div className="score-title">종합 평가 지수</div>
             <div className="donut-wrap">
                 <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="donut-svg">
-                    {/* 바탕 링 */}
-                    <circle cx={cx} cy={cy} r={r} className="donut-bg" />
-
-                    {/* 섹션들 */}
+                    <circle cx={cx} cy={cy} r={r} className="donut-bg" fill="none" stroke="#f0f0f0" strokeWidth="14" />
                     {segments.map((seg, idx) => {
-                        const dash = (seg.weight || 0) * c;
-                        const dasharray = `${dash} ${c - dash}`;
-                        const dashoffset = -acc * c;
-                        acc += seg.weight || 0;
+                        const dashLength = (seg.weight || 0) * circumference;
+                        const dashArray = `${dashLength} ${circumference - dashLength}`;
+                        const dashOffset = -accumulatedWeight * circumference;
+                        accumulatedWeight += seg.weight || 0;
 
                         return (
                             <circle
-                                key={seg.label + idx}
+                                key={seg.label}
                                 cx={cx}
                                 cy={cy}
                                 r={r}
+                                fill="none"
+                                strokeWidth="14"
                                 className={`donut-seg seg-${idx}`}
-                                strokeDasharray={dasharray}
-                                strokeDashoffset={dashoffset}
+                                strokeDasharray={dashArray}
+                                strokeDashoffset={dashOffset}
+                                strokeLinecap="round"
                             />
                         );
                     })}
-
-                    {/* 가운데 */}
-                    <circle cx={cx} cy={cy} r={52} className="donut-center" />
-                    <text x={cx} y={cy + 6} textAnchor="middle" className="donut-score-text">
-                        {Math.round(totalScore)} 점
+                    <circle cx={cx} cy={cy} r={52} className="donut-center" fill="#fff" />
+                    <text
+                        x={cx}
+                        y={cy + 8}
+                        textAnchor="middle"
+                        className="donut-score-text"
+                        fill="#333"
+                        style={{ fontSize: '24px', fontWeight: 'bold' }}
+                    >
+                        {Math.round(totalScore)}점
                     </text>
                 </svg>
-
                 <div className="donut-legend">
                     {segments.map((s, idx) => (
                         <div key={s.label} className="legend-row">

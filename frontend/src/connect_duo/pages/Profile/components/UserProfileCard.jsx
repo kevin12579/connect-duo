@@ -2,181 +2,131 @@ import React, { useEffect, useRef, useState } from 'react';
 
 export default function UserProfileCard({ user, onSave, onDeleteAccount }) {
     const wrapRef = useRef(null);
+    const [photoEdit, setPhotoEdit] = useState(false);
+    const [infoEdit, setInfoEdit] = useState(false);
 
-    const [photoEdit, setPhotoEdit] = useState(false); // ✅ 사진만
-    const [infoEdit, setInfoEdit] = useState(false); // ✅ 이름/이메일
+    const [draft, setDraft] = useState({ name: '', bio: '', avatarUrl: '' });
 
-    const [draft, setDraft] = useState({ nickname: '', email: '', avatarUrl: '' });
+    // 일반 유저라면 한줄소개/수정 숨기기: 타입 체크 (예시로 'user'로 가정. 필요시 콘솔로 확인)
+    const isNormalUser = user.userType === 'USER'; // 실제 값 확인 필요!
 
     useEffect(() => {
         if (!user) return;
         setDraft({
-            nickname: user.nickname || '',
-            email: user.email || '',
+            name: user.name || '',
+            bio: user.bio || '',
             avatarUrl: user.avatarUrl || '',
         });
     }, [user]);
 
-    // 바깥 클릭 저장(둘 중 하나라도 편집중이면)
-    useEffect(() => {
-        const isEditing = photoEdit || infoEdit;
-        if (!isEditing) return;
-
-        const onDocMouseDown = (e) => {
-            if (!wrapRef.current) return;
-            if (!wrapRef.current.contains(e.target)) {
-                commitSave();
-            }
-        };
-
-        document.addEventListener('mousedown', onDocMouseDown);
-        return () => document.removeEventListener('mousedown', onDocMouseDown);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [photoEdit, infoEdit, draft]);
-
     const commitSave = () => {
-        if (!photoEdit && !infoEdit) return;
         setPhotoEdit(false);
         setInfoEdit(false);
-        onSave?.({
-            nickname: draft.nickname,
-            email: draft.email,
-            avatarUrl: draft.avatarUrl,
-        });
+        onSave?.({ ...draft });
     };
 
     const cancelAll = () => {
         setPhotoEdit(false);
         setInfoEdit(false);
-        if (!user) return;
         setDraft({
-            nickname: user.nickname || '',
-            email: user.email || '',
+            name: user.name || '',
+            bio: user.bio || '',
             avatarUrl: user.avatarUrl || '',
         });
     };
 
-    const onKeyDownSave = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            commitSave();
-        }
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            cancelAll();
-        }
-    };
-
-    if (!user) {
-        return (
-            <div className="usercard" ref={wrapRef}>
-                <div className="usercard-mid">
-                    <div className="user-name">사용자 정보 불러오는 중...</div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="usercard" ref={wrapRef}>
-            {/* 왼쪽: 아바타 + (아바타 오른쪽) 사진 연필 */}
+            {/* 왼쪽: 아바타 섹션 */}
             <div className="usercard-left">
                 <div className="user-avatar">
                     {draft.avatarUrl ? (
-                        <img src={draft.avatarUrl} alt="me" />
+                        <img src={draft.avatarUrl} alt="profile" />
                     ) : (
-                        <div className="user-avatar-fallback" />
+                        <div className="user-avatar-fallback">{user.name?.charAt(0)}</div>
                     )}
                 </div>
-
-                <button
-                    className="edit-icon edit-photo"
-                    type="button"
-                    title="사진 수정"
-                    onClick={() => {
-                        // 사진 수정만 켜기
-                        setInfoEdit(false);
-                        setPhotoEdit((v) => !v);
-                    }}
-                >
+                <button className="edit-icon edit-photo" onClick={() => setPhotoEdit(!photoEdit)} title="사진 변경">
                     ✎
                 </button>
             </div>
 
-            {/* 가운데: 이름/이메일 + 이메일 오른쪽에 정보 연필 */}
-            <div className="usercard-mid" onKeyDown={onKeyDownSave}>
+            {/* 가운데: 정보 섹션 */}
+            <div className="usercard-mid">
                 {!infoEdit ? (
                     <>
-                        <div className="user-name">{user.nickname}</div>
-
-                        <div className="user-email-row">
-                            <div className="user-sub">{user.email || ''}</div>
-
-                            <button
-                                className="edit-icon edit-info"
-                                type="button"
-                                title="이름/이메일 수정"
-                                onClick={() => {
-                                    setPhotoEdit(false);
-                                    setInfoEdit(true);
-                                }}
-                            >
-                                ✎
-                            </button>
+                        <div className="user-name">
+                            {user.name} <span className="user-role-badge">{user.userType}</span>
                         </div>
+                        <div className="user-sub-id">@{user.username}</div>
+
+                        {/* 일반유저 아니면 (== 전문가만) 한줄소개/수정 */}
+                        {!isNormalUser && (
+                            <div className="user-bio-display">
+                                {user.bio || '등록된 한 줄 소개가 없습니다. 자신을 소개해 보세요!'}
+                            </div>
+                        )}
+                        {!isNormalUser && (
+                            <button className="edit-info-btn" onClick={() => setInfoEdit(true)}>
+                                프로필 수정
+                            </button>
+                        )}
                     </>
                 ) : (
-                    <div className="user-edit-form">
-                        <label className="edit-row">
-                            <span>이름</span>
-                            <input
-                                autoFocus
-                                value={draft.nickname}
-                                onChange={(e) => setDraft((d) => ({ ...d, nickname: e.target.value }))}
-                            />
-                        </label>
-
-                        <label className="edit-row">
-                            <span>이메일</span>
-                            <input
-                                value={draft.email}
-                                onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))}
-                            />
-                        </label>
-                    </div>
+                    // 수정폼은 전문가만 띄움
+                    !isNormalUser && (
+                        <div className="user-edit-form">
+                            <div className="edit-row">
+                                <span>이름</span>
+                                <input
+                                    value={draft.name}
+                                    onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                                    placeholder="이름을 입력하세요"
+                                />
+                            </div>
+                            <div className="edit-row">
+                                <span>한줄 소개</span>
+                                <textarea
+                                    rows="3"
+                                    value={draft.bio}
+                                    onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
+                                    placeholder="나를 표현하는 한마디를 적어주세요."
+                                />
+                            </div>
+                        </div>
+                    )
                 )}
 
-                {/* ✅ 사진 수정 모드일 때만 아래에 URL 입력 */}
                 {photoEdit && (
-                    <div className="photo-edit-row" onKeyDown={onKeyDownSave}>
-                        <label className="edit-row">
-                            <span>사진URL</span>
-                            <input
-                                value={draft.avatarUrl}
-                                onChange={(e) => setDraft((d) => ({ ...d, avatarUrl: e.target.value }))}
-                                placeholder="https://..."
-                            />
-                        </label>
+                    <div className="photo-edit-input">
+                        <input
+                            placeholder="이미지 URL (https://...)"
+                            value={draft.avatarUrl}
+                            onChange={(e) => setDraft({ ...draft, avatarUrl: e.target.value })}
+                        />
                     </div>
                 )}
             </div>
 
-            {/* 오른쪽: 저장/취소 + 탈퇴 */}
+            {/* 오른쪽: 버튼 섹션 */}
             <div className="usercard-right">
-                {(photoEdit || infoEdit) && (
-                    <div className="usercard-actions">
-                        <button className="btn-primary" type="button" onClick={commitSave}>
-                            저장
-                        </button>
-                        <button className="btn-danger" type="button" onClick={cancelAll}>
-                            취소
-                        </button>
-                    </div>
+                {photoEdit || infoEdit ? (
+                    // 전문가만 저장/취소
+                    !isNormalUser && (
+                        <div className="usercard-actions" style={{ width: '100%' }}>
+                            <button className="btn-primary" onClick={commitSave} style={{ marginBottom: '8px' }}>
+                                변경사항 저장
+                            </button>
+                            <button className="btn-danger" onClick={cancelAll}>
+                                취소
+                            </button>
+                        </div>
+                    )
+                ) : (
+                    <button className="withdraw-link" onClick={onDeleteAccount}>
+                        계정 탈퇴하기
+                    </button>
                 )}
-
-                <button className="withdraw-link" onClick={onDeleteAccount} type="button">
-                    계정 탈퇴
-                </button>
             </div>
         </div>
     );

@@ -81,9 +81,9 @@ export default function MainPage() {
     };
 
     // 5. 누락되었던 openTaxProFromUser 함수 추가
-    const openTaxProFromUser = ({ taxProId, focus, highlightUserId }) => {
-        setProfileNav({ taxProId, focus, highlightUserId });
-        setProfileView('USER_TO_TAXPRO'); // 사용자가 세무사를 보는 뷰로 전환
+    const openTaxProFromUser = (taxProId) => {
+        setProfileNav({ taxProId }); // taxProId만 넣어도 충분!
+        setProfileView('USER_TO_TAXPRO');
         setSelected('profile');
     };
 
@@ -99,7 +99,7 @@ export default function MainPage() {
     const renderProfile = () => {
         if (profileView === 'USER_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
         if (profileView === 'USER_TO_TAXPRO') return <TaxProfile viewerRole="USER" nav={profileNav} />;
-        return <TaxProfile viewerRole="TAXPRO" nav={profileNav} />;
+        if (profileView === 'TAX_PROFILE') return <TaxProfile viewerRole="TAX_ACCOUNTANT" nav={profileNav} />;
     };
 
     const renderContent = () => {
@@ -132,7 +132,7 @@ export default function MainPage() {
                                 onClick={() => {
                                     setSelected('profile');
                                     const role = authUser?.user_type || 'USER';
-                                    setProfileView(role === 'TAXPRO' ? 'TAX_PROFILE' : 'USER_PROFILE');
+                                    setProfileView(role === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
                                 }}
                             >
                                 <img src={profileIcon} alt="프로필" className="btn-icon" />내 프로필 가기
@@ -161,7 +161,7 @@ export default function MainPage() {
                         loginAuthUser(data);
 
                         setSelected('profile');
-                        setProfileView(data.user_type === 'TAXPRO' ? 'TAX_PROFILE' : 'USER_PROFILE');
+                        setProfileView(data.user_type === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
                     }}
                     onGoSignup={() => setAuthView('signup')}
                 />
@@ -225,7 +225,7 @@ export default function MainPage() {
                                 if (cat.key === 'login') setAuthView('login');
                                 if (cat.key === 'profile') {
                                     const role = authUser?.user_type || 'USER';
-                                    setProfileView(role === 'TAXPRO' ? 'TAX_PROFILE' : 'USER_PROFILE');
+                                    setProfileView(role === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
                                 }
                             }}
                         >
@@ -238,8 +238,6 @@ export default function MainPage() {
                 </div>
 
                 <div className="mainpage-content-card">{renderContent()}</div>
-
-                <div className="mainpage-credit">Icons by Flaticon (Freepik, Oetjandra, improstudio)</div>
             </div>
         </div>
     );

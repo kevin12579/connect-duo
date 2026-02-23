@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { checkTokenExpiration, refreshAccessToken } from '../utils/authUtils';
 
-const BASE_URL = `http://localhost:7777/api`;
+const BASE_URL = `http://localhost:7777/api/`;
 
 // [1] 일반 요청용 인스턴스 (회원가입, 로그인, 중복체크 등)
 export const axiosBase = axios.create({
@@ -95,4 +95,53 @@ export const getUserProfile = async (userId) => {
     return res.data;
 };
 
-export default axiosAuth;
+// 프로필 정보 수정 (이름, 사진, 한줄소개 등)
+export const updateUserProfile = async (userId, data) => {
+    // data 에는 { name, profile_img, bio_one_line } 등이 담깁니다.
+    const res = await axiosBase.put(`/profile/update`, { id: userId, ...data });
+    return res.data;
+};
+
+// 회원 탈퇴
+export const deleteUserAccount = async (userId) => {
+    const res = await axiosBase.delete(`/profile/delete/${userId}`);
+    return res.data;
+};
+
+//세무사프로필
+
+// 세무사 프로필 전체 조회 (기본 정보 + 통계 + 리뷰)
+export const getTaxProProfile = async (taxProId) => {
+    // 만약 잘못된 객체가 넘어오는 경우, 안전하게 숫자로 추출
+    const id = typeof taxProId === 'object' && taxProId !== null ? taxProId.taxProId : taxProId;
+
+    const res = await axiosBase.post(`/profile/taxpro`, { id });
+    return res.data;
+};
+
+// 리뷰(댓글) 등록
+export const createReview = async (data) => axiosAuth.post(`/profile/review`, data).then((res) => res.data);
+
+// 리뷰(댓글) 삭제
+export const deleteReview = async (reviewId, userId) =>
+    axiosAuth.post(`/profile/review/delete`, { reviewId, userId }).then((res) => res.data);
+
+// 리뷰 추천 토글
+export const toggleRecommend = async (reviewId, is_recommend) =>
+    axiosAuth.post(`/profile/review/recommend`, { reviewId, is_recommend }).then((res) => res.data);
+
+// 별점 등록 (리뷰에는 평점 포함)
+export const rateReview = async (reviewId, rating) =>
+    axiosAuth.post(`/profile/review/rate`, { reviewId, rating }).then((res) => res.data);
+
+// 상담 신청
+export const requestConsult = async (user_id, tax_id) =>
+    axiosAuth.post(`/profile/consult/request`, { user_id, tax_id }).then((res) => res.data);
+
+// 상담 수락
+export const acceptConsult = async (requestId) =>
+    axiosAuth.post(`/profile/consult/accept`, { requestId }).then((res) => res.data);
+
+// 상담 거절
+export const rejectConsult = async (requestId) =>
+    axiosAuth.post(`/profile/consult/reject`, { requestId }).then((res) => res.data);

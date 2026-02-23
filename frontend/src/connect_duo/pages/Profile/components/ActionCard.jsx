@@ -36,23 +36,25 @@ export default function ActionCard({
 
     return (
         <div className="actions-grid">
-            {/* 왼쪽: 추천 + 평가 */}
             <div className="actions-left">
                 <div className="actions-title">추천하기</div>
-
                 <div className="like-area">
-                    <button className={`like-btn ${liked ? 'on' : ''}`} onClick={onToggleLike} type="button">
-                        <span className="like-emoji" aria-hidden>
-                            👍
-                        </span>
+                    {/* type="button" 확인 */}
+                    <button
+                        type="button"
+                        className={`like-btn ${liked ? 'on' : ''}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onToggleLike();
+                        }}
+                    >
+                        <span className="like-emoji">👍</span>
                     </button>
-
                     <div className="like-help">{liked ? '추천했어요!' : '눌러서 추천해보세요'}</div>
                 </div>
 
                 <div className="rating-area">
                     <div className="actions-title">평가하기</div>
-
                     <div className="rating-box">
                         <StarRow
                             value={ratingLocked ? myRating : ratingDraft}
@@ -60,25 +62,26 @@ export default function ActionCard({
                             disabled={ratingLocked}
                         />
                     </div>
-
                     <div className="actions-btn-row right">
-                        <button className="btn-primary" onClick={onSubmitRating} disabled={ratingLocked}>
+                        <button
+                            type="button"
+                            className="btn-primary"
+                            onClick={onSubmitRating}
+                            disabled={ratingLocked || !me.isLoggedIn}
+                        >
                             입력
                         </button>
-                        <button className="btn-danger" onClick={onCancelRating} disabled={ratingLocked}>
+                        <button type="button" className="btn-danger" onClick={onCancelRating} disabled={ratingLocked}>
                             취소
                         </button>
                     </div>
                 </div>
             </div>
-
-            {/* 오른쪽: 댓글 */}
             <div className="actions-right">
                 <div className="comment-writer-head">
                     <div className="writer-avatar" />
                     <div className="writer-name">{me.isLoggedIn ? me.nickname : '로그인 필요'}</div>
                 </div>
-
                 <textarea
                     className="comment-input"
                     placeholder="댓글 남기기"
@@ -86,7 +89,6 @@ export default function ActionCard({
                     onChange={(e) => onChangeCommentDraft(e.target.value)}
                     disabled={!me.isLoggedIn}
                 />
-
                 <div className="actions-btn-row right">
                     <button className="btn-primary" onClick={onSubmitComment} disabled={!me.isLoggedIn}>
                         입력

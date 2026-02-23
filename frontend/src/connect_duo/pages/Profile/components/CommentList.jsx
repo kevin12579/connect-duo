@@ -5,7 +5,7 @@ const sortDesc = (arr) => [...arr].sort((a, b) => String(b.createdAt).localeComp
 
 export default function CommentList({ me, comments, onDelete, pageSize = 3, canDelete = true }) {
     const [page, setPage] = useState(1);
-    const [myOpen, setMyOpen] = useState(false); // ✅ 내 댓글 목록 토글
+    const [myOpen, setMyOpen] = useState(false);
 
     const myComments = useMemo(() => {
         if (!me?.id) return [];
@@ -18,9 +18,8 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
     }, [comments, me?.id]);
 
     const myLatest = myComments[0] || null;
-    const myHasList = myComments.length >= 2; // ✅ 2개 이상일 때만 토글 활성
+    const myHasList = myComments.length >= 2;
 
-    // ✅ 다른 사람 댓글만 페이지네이션
     const totalPages = Math.max(1, Math.ceil(otherComments.length / pageSize));
     const slicedOthers = useMemo(() => {
         const start = (page - 1) * pageSize;
@@ -41,11 +40,9 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
 
     return (
         <div className="comment-list-wrap">
-            {/* ✅ (A) 내 댓글 카드 영역 */}
             <div className="my-comments-box">
                 <div className="my-comments-head">
                     <div className="my-comments-title">내가 쓴 댓글 (최신)</div>
-
                     <button
                         type="button"
                         className={`my-toggle ${myHasList ? '' : 'disabled'}`}
@@ -57,21 +54,12 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
                         {myOpen ? '▲' : '▼'}
                     </button>
                 </div>
-
                 <div className="my-comments-body">
                     {myLatest ? (
-                        <CommentItem
-                            me={me}
-                            comment={myLatest}
-                            canDelete={canDelete}
-                            onDelete={onDelete}
-                            forceMine // ✅ 아래 CommentItem에 옵션 하나 추가(없으면 무시해도 됨)
-                        />
+                        <CommentItem me={me} comment={myLatest} canDelete={canDelete} onDelete={onDelete} forceMine />
                     ) : (
                         <div className="comment-empty">내 댓글이 없습니다.</div>
                     )}
-
-                    {/* ✅ 내 댓글이 2개 이상일 때만 목록 */}
                     {myHasList && myOpen && (
                         <div className="my-comments-list">
                             {myComments.slice(1).map((c) => (
@@ -88,8 +76,6 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
                     )}
                 </div>
             </div>
-
-            {/* ✅ (B) 다른 사용자 댓글 목록 */}
             <div className="comment-list">
                 {slicedOthers.length === 0 ? (
                     <div className="comment-empty">아직 댓글이 없습니다.</div>
@@ -99,8 +85,6 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
                     ))
                 )}
             </div>
-
-            {/* ✅ 다른 사용자 댓글 페이지네이션 */}
             <div className="comment-pagination">
                 <button className="pg-btn" onClick={goFirst} disabled={isFirst} aria-label="first">
                     ⏮
@@ -108,13 +92,11 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
                 <button className="pg-btn" onClick={goPrev} disabled={isFirst} aria-label="prev">
                     ◀
                 </button>
-
                 <div className="pg-info">
                     <span className="pg-current">{page}</span>
                     <span className="pg-slash">/</span>
                     <span className="pg-total">{totalPages}</span>
                 </div>
-
                 <button className="pg-btn" onClick={goNext} disabled={isLast} aria-label="next">
                     ▶
                 </button>

@@ -14,11 +14,8 @@ export default function CommentCard({ open, onToggle, latestComment, children })
                             <div className="comment-mini-avatar" />
                             <div className="comment-mini-name">{name}</div>
                         </div>
-
                         <div className="comment-bubble">{preview}</div>
                     </div>
-
-                    {/* ✅ 접힘 상태 토글 1개 */}
                     <button type="button" className="comment-toggle" onClick={onToggle} aria-label="open comments">
                         ▼
                     </button>
@@ -27,13 +24,10 @@ export default function CommentCard({ open, onToggle, latestComment, children })
                 <div className="comment-expanded">
                     <div className="comment-expanded-head">
                         <div className="comment-expanded-title">댓글 목록</div>
-
-                        {/* ✅ 펼침 상태 토글 1개 */}
                         <button type="button" className="comment-toggle" onClick={onToggle} aria-label="close comments">
                             ▲
                         </button>
                     </div>
-
                     {children}
                 </div>
             )}

@@ -7,15 +7,12 @@ export default function ProfileHeaderCard({
     onConsultRequest,
     onSaveProfile,
 }) {
-    const isTaxProViewer = viewerRole === 'TAXPRO';
+    const isTaxProViewer = viewerRole === 'TAX_ACCOUNTANT';
     const isPending = consultStatus === 'PENDING';
-
     const wrapRef = useRef(null);
 
-    // ✅ 사진/글 편집을 분리
     const [photoEdit, setPhotoEdit] = useState(false);
     const [infoEdit, setInfoEdit] = useState(false);
-
     const [draft, setDraft] = useState({
         name: '',
         oneLine: '',
@@ -23,13 +20,12 @@ export default function ProfileHeaderCard({
         avatarUrl: '',
     });
 
-    // ✅ 처음 로드/프로필 바뀌면 동기화
     useEffect(() => {
         if (!taxPro) return;
         setDraft({
             name: taxPro.name || '',
             oneLine: taxPro.oneLine || '',
-            intro: taxPro.intro || taxPro.specialty || '', // intro 없으면 specialty를 소개로 대체(원하면 수정)
+            intro: taxPro.intro || taxPro.specialty || '',
             avatarUrl: taxPro.avatarUrl || '',
         });
     }, [taxPro]);
@@ -71,28 +67,22 @@ export default function ProfileHeaderCard({
         if (!isEditing) return;
         setPhotoEdit(false);
         setInfoEdit(false);
-
-        // ✅ 서버로 보낼 값(필요한 것만)
         onSaveProfile?.({
+            id: taxPro.id, // 반드시 TaxAccountantProfile.id를 넘긴다
             name: draft.name,
             oneLine: draft.oneLine,
-            intro: draft.intro,
             avatarUrl: draft.avatarUrl,
         });
     };
 
-    // ✅ 바깥 클릭 저장(원하면 유지, 싫으면 이 useEffect 통째로 삭제)
     useEffect(() => {
         if (!isEditing) return;
-
         const onDocMouseDown = (e) => {
             if (!wrapRef.current) return;
             if (!wrapRef.current.contains(e.target)) commitSave();
         };
-
         document.addEventListener('mousedown', onDocMouseDown);
         return () => document.removeEventListener('mousedown', onDocMouseDown);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEditing, draft]);
 
     const onKeyDownSave = (e) => {
@@ -108,7 +98,6 @@ export default function ProfileHeaderCard({
 
     return (
         <div className={`taxpro-header ${isTaxProViewer ? 'is-owner' : ''}`} ref={wrapRef}>
-            {/* 1) 사진 영역 */}
             <div className="taxpro-avatar">
                 <div className="taxpro-avatar-circle">
                     {draft.avatarUrl ? (
@@ -117,25 +106,18 @@ export default function ProfileHeaderCard({
                         <div className="taxpro-avatar-fallback" />
                     )}
                 </div>
-
-                {/* 사진 연필: 유저처럼 "옆에" */}
                 {isTaxProViewer && (
                     <button className="edit-btn edit-photo" type="button" title="사진 수정" onClick={startPhotoEdit}>
                         ✎
                     </button>
                 )}
             </div>
-
-            {/* 2) 글 영역 */}
             <div className="taxpro-info" onKeyDown={onKeyDownSave}>
                 {!infoEdit ? (
                     <>
                         <div className="taxpro-name">{taxPro?.name}</div>
-
-                        {/* ✅ 유저 이메일 줄처럼: 한줄 + 연필을 같은 줄에 */}
                         <div className="taxpro-oneLine-row">
                             <div className="taxpro-oneLine">{taxPro?.oneLine}</div>
-
                             {isTaxProViewer && (
                                 <button
                                     className="edit-btn edit-text"
@@ -147,7 +129,6 @@ export default function ProfileHeaderCard({
                                 </button>
                             )}
                         </div>
-
                         <div className="taxpro-meta">{taxPro?.intro || taxPro?.specialty}</div>
                     </>
                 ) : (
@@ -160,7 +141,6 @@ export default function ProfileHeaderCard({
                                 onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
                             />
                         </label>
-
                         <label className="edit-row">
                             <span>한줄</span>
                             <input
@@ -168,7 +148,6 @@ export default function ProfileHeaderCard({
                                 onChange={(e) => setDraft((d) => ({ ...d, oneLine: e.target.value }))}
                             />
                         </label>
-
                         <label className="edit-row">
                             <span>소개</span>
                             <input
@@ -178,8 +157,6 @@ export default function ProfileHeaderCard({
                         </label>
                     </div>
                 )}
-
-                {/* ✅ 사진 수정 모드일 때만 URL 입력 */}
                 {photoEdit && (
                     <div className="photo-edit-row">
                         <label className="edit-row">
@@ -193,8 +170,6 @@ export default function ProfileHeaderCard({
                     </div>
                 )}
             </div>
-
-            {/* 3) 오른쪽 영역은 그대로 */}
             <div className="taxpro-cta">
                 {!isTaxProViewer && (
                     <button
@@ -205,7 +180,6 @@ export default function ProfileHeaderCard({
                         {isPending ? '상담 신청 대기 중...' : '상담 신청'}
                     </button>
                 )}
-
                 {isTaxProViewer && isEditing && (
                     <div className="taxpro-action-row">
                         <button className="btn-primary" type="button" onClick={commitSave}>

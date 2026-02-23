@@ -791,10 +791,6 @@
    ✅ 세무사 화면: 상담 신청 리스트 카드
    =============================== */
 
-.profile-consults {
-    background: #f7dfe3;
-}
-
 .consults-wrap {
     width: 100%;
 }
@@ -1181,8 +1177,7 @@
 ----------------------- */
 .profile-stats,
 .profile-score {
-    background: #e1e8f4
- !important; /* ✅ 둘 동일(중요) */
+    background: #e1e8f4 !important; /* ✅ 둘 동일(중요) */
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -1193,7 +1188,6 @@
 .profile-actions {
     background: #deebff !important; /* ✅ 3번째보다 한 단계 더 진한 하늘톤 */
 }
-.profile-consults,
 .mycomments-card {
     background: #deebff !important; /* ✅ 4번째 덩어리로 같이 묶고 싶으면 */
 }
@@ -1221,7 +1215,7 @@
 /* 내가 쓴 댓글 카드 */
 .comment-card .my-comments-box {
     background: #e6eefb;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* 안쪽 말풍선 */
@@ -1229,4 +1223,3 @@
     background: #cfdcf4;
     border: 1px solid #b8c9e8;
 }
-
