@@ -1,0 +1,22 @@
+/* ===== GLOBAL RESET ===== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #0f172a; /* ✅ 전체 배경 */
+    color: #e2e8f0;
+    font-family: 'Noto Sans KR', 'Segoe UI', Arial, sans-serif;
+}
+
+/* ===== 공통 중앙 컨테이너 ===== */
+.app-container {
+    width: min(1700px, 98%);
+    margin: 0 auto;
+    padding: 18px;
+}
