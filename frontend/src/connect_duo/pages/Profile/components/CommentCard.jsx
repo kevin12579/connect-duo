@@ -1,7 +1,9 @@
 import React from 'react';
+import UserAvatar from './UserAvatar'; // 추가
 
 export default function CommentCard({ open, onToggle, latestComment, children }) {
     const name = latestComment?.nickname ?? '익명';
+    const avatarUrl = latestComment?.avatarUrl ?? '';
     const content = latestComment?.content ?? '아직 댓글이 없습니다.';
     const preview = content.length > 42 ? content.slice(0, 42) + '...' : content;
 
@@ -10,8 +12,9 @@ export default function CommentCard({ open, onToggle, latestComment, children })
             {!open ? (
                 <div className="comment-collapsed">
                     <div className="comment-mini">
-                        <div className="comment-mini-left">
-                            <div className="comment-mini-avatar" />
+                        <div className="comment-mini-meta">
+                            {/* ✅ 아바타 적용 (이니셜 fallback 색은 파랑) */}
+                            <UserAvatar avatarUrl={avatarUrl} name={name} size={54} bg="#6ea8ff" />
                             <div className="comment-mini-name">{name}</div>
                         </div>
                         <div className="comment-bubble">{preview}</div>

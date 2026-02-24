@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import UserAvatar from './UserAvatar'; // 추가
 
 export default function ProfileHeaderCard({
     taxPro,
@@ -68,7 +69,7 @@ export default function ProfileHeaderCard({
         setPhotoEdit(false);
         setInfoEdit(false);
         onSaveProfile?.({
-            id: taxPro.id, // 반드시 TaxAccountantProfile.id를 넘긴다
+            id: taxPro.id,
             name: draft.name,
             oneLine: draft.oneLine,
             avatarUrl: draft.avatarUrl,
@@ -100,11 +101,8 @@ export default function ProfileHeaderCard({
         <div className={`taxpro-header ${isTaxProViewer ? 'is-owner' : ''}`} ref={wrapRef}>
             <div className="taxpro-avatar">
                 <div className="taxpro-avatar-circle">
-                    {draft.avatarUrl ? (
-                        <img src={draft.avatarUrl} alt="taxpro" />
-                    ) : (
-                        <div className="taxpro-avatar-fallback" />
-                    )}
+                    {/* ✅ UserAvatar 사용, 없으면 이니셜-보라색원 */}
+                    <UserAvatar avatarUrl={draft.avatarUrl} name={draft.name || taxPro?.name} size={190} bg="#b79cb6" />
                 </div>
                 {isTaxProViewer && (
                     <button className="edit-btn edit-photo" type="button" title="사진 수정" onClick={startPhotoEdit}>

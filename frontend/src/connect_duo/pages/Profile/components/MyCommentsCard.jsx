@@ -2,106 +2,82 @@ import React, { useMemo, useState, useEffect } from 'react';
 
 export default function MyCommentsCard({ user, items = [], onOpenTaxProProfile, pageSize = 2 }) {
     const [page, setPage] = useState(1);
-
-    // 정렬: 내가 쓴 댓글 수 많은 순 -> 이름순
     const sorted = useMemo(() => {
-        return [...items].sort((a, b) => {
-            if ((b.count ?? 0) !== (a.count ?? 0)) return (b.count ?? 0) - (a.count ?? 0);
-            return String(a.taxProName).localeCompare(String(b.taxProName));
-        });
+        return [...items].sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
     }, [items]);
 
     const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
-
-    // 아이템/페이지사이즈 바뀌면 1페이지로
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize, items.length]);
-
-    // 페이지 범위 보정
-    useEffect(() => {
-        if (page > totalPages) setPage(totalPages);
-    }, [page, totalPages]);
-
     const sliced = useMemo(() => {
         const start = (page - 1) * pageSize;
         return sorted.slice(start, start + pageSize);
     }, [sorted, page, pageSize]);
 
-    const goFirst = () => setPage(1);
-    const goPrev = () => setPage((p) => Math.max(1, p - 1));
-    const goNext = () => setPage((p) => Math.min(totalPages, p + 1));
-    const goLast = () => setPage(totalPages);
-
-    const isFirst = page === 1;
-    const isLast = page === totalPages;
-
-    // 각 row에서 ➜ 을 클릭하면 해당 세무사 프로필로 이동해야 함
-    // taxProId는 TaxAccountantProfile.id (API에서 이 id로 세무사 상세조회함)
-    // highlightUserId는 현재 유저 id
     return (
-        <div>
-            <div className="mycomments-list">
-                {sliced.map((it) => (
-                    <div className="mycomments-row" key={it.taxProId}>
-                        <div className="mycomments-avatar">
-                            {it.avatarUrl ? <img src={it.avatarUrl} alt="taxpro" /> : null}
+        <div className="comments-section">
+            <div className="list-title">
+                <span>💬</span> 내가 리뷰를 남긴 전문가
+            </div>
+
+            <div className="list-wrapper">
+                {items.length === 0 ? (
+                    <div className="no-data-msg">아직 작성한 리뷰가 없습니다.</div>
+                ) : (
+                    sliced.map((it) => (
+                        <div className="item-row" key={it.taxProUserId}>
+                            <div className="item-side-info">전문가</div>
+                            <div className="item-main-info">
+                                {it.avatarUrl ? (
+                                    <img src={it.avatarUrl} className="item-avatar" alt="pro" />
+                                ) : (
+                                    <div className="item-avatar fallback-avatar">{it.taxProName?.charAt(0) || 'T'}</div>
+                                )}
+                                <div className="item-text-wrap">
+                                    <span className="item-primary-text">{it.taxProName} 세무사</span>
+                                    <span className="item-secondary-text">내가 작성한 댓글: {it.count}개</span>
+                                </div>
+                            </div>
+                            <div className="item-actions">
+                                <button
+                                    className="action-btn btn-circle"
+                                    onClick={() =>
+                                        onOpenTaxProProfile({
+                                            taxProId: it.taxProUserId,
+                                            focus: 'comments',
+                                            highlightUserId: user?.id,
+                                        })
+                                    }
+                                >
+                                    ➜
+                                </button>
+                            </div>
                         </div>
-                        <div className="mycomments-main">
-                            <div className="mycomments-name">{it.taxProName}</div>
-                            <div className="mycomments-count">내가 쓴 댓글 : {it.count}개</div>
-                        </div>
-                        <button
-                            className="enter-btn"
-                            type="button"
-                            aria-label="enter"
-                            onClick={() => {
-                                if (!onOpenTaxProProfile) return;
-                                // taxProId는 TaxAccountantProfile.id를 넘긴다!
-                                // 세무사 상세조회: getTaxProProfile(taxProId)
-                                onOpenTaxProProfile({
-                                    taxProId: it.taxProUserId, // Users.id(세무사 user_id)!!!
-                                    focus: 'comments',
-                                    highlightUserId: user?.id,
-                                });
-                            }}
-                        >
-                            ➜
-                        </button>
+                    ))
+                )}
+            </div>
+
+            {items.length > pageSize && (
+                <div className="custom-pagination">
+                    <button className="pg-ctrl-btn" onClick={() => setPage(1)} disabled={page === 1}>
+                        ⏮
+                    </button>
+                    <button className="pg-ctrl-btn" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>
+                        ◀
+                    </button>
+                    <div className="pg-num-info">
+                        {page} / {totalPages}
                     </div>
-                ))}
-            </div>
-            <div className="mycomments-pagination">
-                <button
-                    className="mycomments-pgbtn"
-                    onClick={goFirst}
-                    disabled={isFirst}
-                    aria-label="first"
-                    type="button"
-                >
-                    ⏮
-                </button>
-                <button
-                    className="mycomments-pgbtn"
-                    onClick={goPrev}
-                    disabled={isFirst}
-                    aria-label="prev"
-                    type="button"
-                >
-                    ◀
-                </button>
-                <div className="mycomments-pginfo">
-                    <span className="mycomments-pgcurrent">{page}</span>
-                    <span className="mycomments-pgslash">/</span>
-                    <span className="mycomments-pgtotal">{totalPages}</span>
+                    <button
+                        className="pg-ctrl-btn"
+                        onClick={() => setPage((p) => p + 1)}
+                        disabled={page === totalPages}
+                    >
+                        ▶
+                    </button>
+                    <button className="pg-ctrl-btn" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
+                        ⏭
+                    </button>
                 </div>
-                <button className="mycomments-pgbtn" onClick={goNext} disabled={isLast} aria-label="next" type="button">
-                    ▶
-                </button>
-                <button className="mycomments-pgbtn" onClick={goLast} disabled={isLast} aria-label="last" type="button">
-                    ⏭
-                </button>
-            </div>
+            )}
         </div>
     );
 }

@@ -3,7 +3,7 @@ import {
     acceptConsult,
     rejectConsult,
     getUserProfile,
-    getTaxProProfile, // ★ 반드시 import!
+    getTaxProProfile,
     updateUserProfile,
     deleteUserAccount,
 } from '../../api/axios';
@@ -20,45 +20,42 @@ export default function UserProfile({ onOpenTaxProProfile }) {
     const [loading, setLoading] = useState(true);
     const [requests, setRequests] = useState([]);
 
-    // 주요 데이터 패칭
     const fetchProfileData = async () => {
         setLoading(true);
         const storedUser = JSON.parse(localStorage.getItem('userBackup') || 'null');
+
         if (!storedUser || !storedUser.id) {
             setLoading(false);
             return;
         }
+
         try {
-            // 1. 기본 사용자 프로필/코멘트
+            // 1. 기본 사용자 정보 가져오기
             const response = await getUserProfile(storedUser.id);
+
             if (response.result === 'success') {
+                const userData = response.data.user;
                 setUser({
-                    id: response.data.user.id,
-                    name: response.data.user.name,
-                    username: response.data.user.username,
-                    avatarUrl: response.data.user.profile_img || '',
-                    bio: response.data.user.bio_one_line || '',
-                    userType: response.data.user.user_type,
+                    id: userData.id,
+                    name: userData.name,
+                    username: userData.username,
+                    avatarUrl: userData.profile_img || '',
+                    bio: userData.bio_one_line || '',
+                    userType: userData.user_type,
                 });
                 setMyComments(response.data.comments);
-            }
 
-            // 2. 세무사라면 상담신청 리스트도 불러오기
-            if (response.result === 'success' && response.data.user.user_type === 'TAX_ACCOUNTANT') {
-                const taxProUserId = response.data.user.id;
-                const res = await getTaxProProfile(taxProUserId); // 반드시 Users.id(본인)
-                if (res.result === 'success') {
-                    setRequests(res.data.requests || []);
-                } else {
-                    setRequests([]);
+                // 2. 세무사일 경우 본인에게 들어온 상담 신청 리스트 패칭
+                if (userData.user_type === 'TAX_ACCOUNTANT') {
+                    // ★ 수정 포인트: 두 번째 인자로 본인의 ID(viewerId)를 함께 전달
+                    const res = await getTaxProProfile(userData.id, userData.id);
+                    if (res.result === 'success') {
+                        // 백엔드에서 넘겨주는 requests 데이터 확인
+                        setRequests(res.data.requests || []);
+                    }
                 }
-            } else {
-                setRequests([]); // 일반 유저는 상담리스트 없음
             }
         } catch (error) {
-            setUser(null);
-            setMyComments([]);
-            setRequests([]);
             console.error('프로필 로딩 실패:', error);
         } finally {
             setLoading(false);
@@ -67,34 +64,32 @@ export default function UserProfile({ onOpenTaxProProfile }) {
 
     useEffect(() => {
         fetchProfileData();
-        //eslint-disable-next-line
+        // eslint-disable-next-line
     }, []);
 
-    // 상담 수락
     const handleAccept = async (requestId) => {
+        if (!window.confirm('상담을 수락하시겠습니까?')) return;
         try {
             const res = await acceptConsult(requestId);
             if (res.result === 'success') {
+                alert('상담이 수락되었습니다. 채팅 메뉴를 확인해주세요.');
                 setRequests((prev) => prev.filter((r) => r.id !== requestId));
-            } else {
-                alert(res.message || '수락 실패');
             }
         } catch (e) {
-            alert('수락 에러');
+            alert('수락 처리 중 오류 발생');
         }
     };
 
-    // 상담 거절
     const handleReject = async (requestId) => {
+        if (!window.confirm('상담을 거절하시겠습니까?')) return;
         try {
             const res = await rejectConsult(requestId);
             if (res.result === 'success') {
+                alert('상담 요청을 거절했습니다.');
                 setRequests((prev) => prev.filter((r) => r.id !== requestId));
-            } else {
-                alert(res.message || '거절 실패');
             }
         } catch (e) {
-            alert('거절 에러');
+            alert('거절 처리 중 오류 발생');
         }
     };
 
@@ -110,67 +105,52 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                 fetchProfileData();
             }
         } catch (err) {
-            alert('수정 중 오류가 발생했습니다.');
+            alert('수정 중 오류 발생');
         }
     };
 
     const handleDeleteAccount = async () => {
-        if (window.confirm('정말 탈퇴하시겠습니까? 작성하신 리뷰와 상담 내역이 모두 삭제됩니다.')) {
+        if (window.confirm('정말 탈퇴하시겠습니까?')) {
             try {
                 const res = await deleteUserAccount(user.id);
                 if (res.result === 'success') {
-                    alert('탈퇴가 완료되었습니다. 감사합니다.');
+                    alert('탈퇴 완료되었습니다.');
                     logout();
                     window.location.href = '/';
                 }
             } catch (err) {
-                alert('탈퇴 처리 실패: ' + err.message);
+                alert('탈퇴 처리 실패');
             }
         }
     };
 
-    if (loading) return <div className="loading">사용자 정보를 불러오는 중입니다...</div>;
-    if (!user) return <div className="error">로그인 세션이 만료되었습니다. 다시 로그인해주세요.</div>;
-
-    const isTaxProUser = user.userType === 'TAX_ACCOUNTANT';
+    if (loading) return <div className="loading">정보를 불러오는 중...</div>;
+    if (!user) return <div className="error">세션 만료. 다시 로그인해주세요.</div>;
 
     return (
         <div className="uprofile-root">
             <h2 className="uprofile-title">내 계정 설정</h2>
             <div className="uprofile-card">
-                {isTaxProUser && (
+                {user.userType === 'TAX_ACCOUNTANT' && (
                     <button
                         className="mytaxpro-btn"
-                        style={{
-                            marginBottom: '16px',
-                            background: '#eaf7ff',
-                            color: '#1a67b2',
-                            fontWeight: 'bold',
-                            borderRadius: '8px',
-                            padding: '10px 18px',
-                            border: '1px solid #bde0ff',
-                            cursor: 'pointer',
-                        }}
                         onClick={() => onOpenTaxProProfile(user.id)}
+                        style={{ marginBottom: '16px', padding: '10px', cursor: 'pointer' }}
                     >
-                        내 세무사 프로필 페이지로 이동
+                        내 세무사 프로필 공개 페이지 확인
                     </button>
                 )}
                 <UserProfileCard user={user} onSave={handleSave} onDeleteAccount={handleDeleteAccount} />
             </div>
-            {isTaxProUser && (
-                <div className="uprofile-card profile-consults">
-                    <ConsultationRequestList
-                        requests={requests}
-                        onAccept={handleAccept}
-                        onReject={handleReject}
-                        pageSize={3}
-                    />
+
+            {user.userType === 'TAX_ACCOUNTANT' && (
+                <div className="uprofile-card">
+                    <ConsultationRequestList requests={requests} onAccept={handleAccept} onReject={handleReject} />
                 </div>
             )}
-            <div className="uprofile-card mycomments-card">
-                <h3 className="mycomments-title">내가 리뷰를 남긴 전문가</h3>
-                <MyCommentsCard user={user} items={myComments} onOpenTaxProProfile={onOpenTaxProProfile} pageSize={2} />
+
+            <div className="uprofile-card">
+                <MyCommentsCard user={user} items={myComments} onOpenTaxProProfile={onOpenTaxProProfile} />
             </div>
         </div>
     );

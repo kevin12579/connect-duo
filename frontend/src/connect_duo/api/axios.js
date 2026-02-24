@@ -111,11 +111,13 @@ export const deleteUserAccount = async (userId) => {
 //세무사프로필
 
 // 세무사 프로필 전체 조회 (기본 정보 + 통계 + 리뷰)
-export const getTaxProProfile = async (taxProId) => {
-    // 만약 잘못된 객체가 넘어오는 경우, 안전하게 숫자로 추출
+// 세무사 프로필 전체 조회 (viewerId 추가)
+export const getTaxProProfile = async (taxProId, viewerId = null) => {
+    // taxProId 추출 로직
     const id = typeof taxProId === 'object' && taxProId !== null ? taxProId.taxProId : taxProId;
 
-    const res = await axiosBase.post(`/profile/taxpro`, { id });
+    // POST 본문에 viewerId를 포함하여 전송
+    const res = await axiosBase.post(`/profile/taxpro`, { id, viewerId });
     return res.data;
 };
 
@@ -145,3 +147,9 @@ export const acceptConsult = async (requestId) =>
 // 상담 거절
 export const rejectConsult = async (requestId) =>
     axiosAuth.post(`/profile/consult/reject`, { requestId }).then((res) => res.data);
+
+export const getTaxProRanking = async () => {
+    // 백엔드에서 TaxAccountantProfile과 TaxStats를 Join해서 가져오는 엔드포인트
+    const res = await axiosBase.get(`/profile/ranking`);
+    return res.data;
+};

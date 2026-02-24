@@ -4,11 +4,9 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount }) {
     const wrapRef = useRef(null);
     const [photoEdit, setPhotoEdit] = useState(false);
     const [infoEdit, setInfoEdit] = useState(false);
-
     const [draft, setDraft] = useState({ name: '', bio: '', avatarUrl: '' });
 
-    // 일반 유저라면 한줄소개/수정 숨기기: 타입 체크 (예시로 'user'로 가정. 필요시 콘솔로 확인)
-    const isNormalUser = user.userType === 'USER'; // 실제 값 확인 필요!
+    const isNormalUser = user.userType === 'USER';
 
     useEffect(() => {
         if (!user) return;
@@ -46,7 +44,7 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount }) {
                         <div className="user-avatar-fallback">{user.name?.charAt(0)}</div>
                     )}
                 </div>
-                <button className="edit-icon edit-photo" onClick={() => setPhotoEdit(!photoEdit)} title="사진 변경">
+                <button className="edit-photo" onClick={() => setPhotoEdit(!photoEdit)} title="사진 변경">
                     ✎
                 </button>
             </div>
@@ -56,45 +54,45 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount }) {
                 {!infoEdit ? (
                     <>
                         <div className="user-name">
-                            {user.name} <span className="user-role-badge">{user.userType}</span>
+                            {user.name}
+                            <span className="user-role-badge">
+                                {user.userType === 'TAX_ACCOUNTANT' ? '세무사' : '일반사용자'}
+                            </span>
                         </div>
                         <div className="user-sub-id">@{user.username}</div>
 
-                        {/* 일반유저 아니면 (== 전문가만) 한줄소개/수정 */}
                         {!isNormalUser && (
                             <div className="user-bio-display">
                                 {user.bio || '등록된 한 줄 소개가 없습니다. 자신을 소개해 보세요!'}
                             </div>
                         )}
+
                         {!isNormalUser && (
                             <button className="edit-info-btn" onClick={() => setInfoEdit(true)}>
-                                프로필 수정
+                                프로필 편집
                             </button>
                         )}
                     </>
                 ) : (
-                    // 수정폼은 전문가만 띄움
-                    !isNormalUser && (
-                        <div className="user-edit-form">
-                            <div className="edit-row">
-                                <span>이름</span>
-                                <input
-                                    value={draft.name}
-                                    onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                                    placeholder="이름을 입력하세요"
-                                />
-                            </div>
-                            <div className="edit-row">
-                                <span>한줄 소개</span>
-                                <textarea
-                                    rows="3"
-                                    value={draft.bio}
-                                    onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
-                                    placeholder="나를 표현하는 한마디를 적어주세요."
-                                />
-                            </div>
+                    <div className="user-edit-form">
+                        <div className="edit-row">
+                            <span>이름</span>
+                            <input
+                                value={draft.name}
+                                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                                placeholder="이름을 입력하세요"
+                            />
                         </div>
-                    )
+                        <div className="edit-row">
+                            <span>한줄 소개</span>
+                            <textarea
+                                rows="3"
+                                value={draft.bio}
+                                onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
+                                placeholder="나를 표현하는 한마디를 적어주세요."
+                            />
+                        </div>
+                    </div>
                 )}
 
                 {photoEdit && (
@@ -111,17 +109,18 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount }) {
             {/* 오른쪽: 버튼 섹션 */}
             <div className="usercard-right">
                 {photoEdit || infoEdit ? (
-                    // 전문가만 저장/취소
-                    !isNormalUser && (
-                        <div className="usercard-actions" style={{ width: '100%' }}>
-                            <button className="btn-primary" onClick={commitSave} style={{ marginBottom: '8px' }}>
-                                변경사항 저장
-                            </button>
-                            <button className="btn-danger" onClick={cancelAll}>
-                                취소
-                            </button>
-                        </div>
-                    )
+                    <div className="usercard-actions">
+                        <button
+                            className="action-btn btn-accept"
+                            onClick={commitSave}
+                            style={{ width: '100%', marginBottom: '8px' }}
+                        >
+                            저장하기
+                        </button>
+                        <button className="action-btn btn-reject" onClick={cancelAll} style={{ width: '100%' }}>
+                            취소
+                        </button>
+                    </div>
                 ) : (
                     <button className="withdraw-link" onClick={onDeleteAccount}>
                         계정 탈퇴하기

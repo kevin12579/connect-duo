@@ -9,7 +9,7 @@ import StatsCard from './components/StatsCard';
 import ScoreDonutCard from './components/ScoreDonutCard';
 import ActionCard from './components/ActionCard';
 
-import { calcTotalScore, buildDonutSegments } from './utils/score';
+import { calcTotalScore, buildDonutSegments } from '../../utils/score';
 
 import {
     getTaxProProfile,
@@ -44,14 +44,19 @@ export default function TaxProfile({ viewerRole = 'USER', nav = null }) {
         userType: storedMe?.user_type,
     };
 
-    // 1. 데이터 가져오기 로직 공통화 (ID 타입 불일치 해결 포함)
+    // 내 리뷰 객체를 실시간으로 계산 (ActionCard 전달용)
+    const myReview = useMemo(() => {
+        return comments.find((c) => String(c.userId) === String(me.id)) || null;
+    }, [comments, me.id]);
+
     const fetchTaxProData = useCallback(
         async (isInitial = false) => {
             if (!taxProUserId) return;
-            if (isInitial) setLoading(true); // 처음 로딩때만 전체 화면 가림
+            if (isInitial) setLoading(true);
 
             try {
-                const res = await getTaxProProfile(taxProUserId);
+                // API 호출 시 내 ID(me.id)를 같이 보내서 상담 상태를 확인해야 함
+                const res = await getTaxProProfile(taxProUserId, me.id);
                 if (res.result === 'success') {
                     const data = res.data;
                     setTaxPro({
@@ -62,16 +67,19 @@ export default function TaxProfile({ viewerRole = 'USER', nav = null }) {
                     setStats({
                         likesCount: data.stats.recommend_count || 0,
                         avgRating: Number(data.stats.satisfaction_score) || 0,
-                        repeatRate: Number(data.stats.re_consult_rate || 0), // DB에서 이미 0~100 사이 값
+                        repeatRate: Number(data.stats.re_consult_rate || 0),
                         consultCount: data.stats.consult_count || 0,
-                        avgResponseMinutes: Number(data.taxPro.response_speed || 0), // 분 단위
+                        avgResponseMinutes: Number(data.taxPro.response_speed || 0),
                     });
                     setComments(data.comments || []);
 
-                    // 내 리뷰 찾기 (타입 강제 변환하여 비교)
-                    const myReview = (data.comments || []).find((c) => String(c.userId) === String(me.id));
-                    setLiked(!!myReview?.is_recommend);
-                    setMyRating(myReview?.rating ?? null);
+                    // 핵심: 서버에서 현재 유저와의 상담 신청 상태를 받아와서 설정
+                    // 백엔드에서 res.data.consultStatus (PENDING, NONE 등)를 내려준다고 가정
+                    setConsultStatus(data.consultStatus || 'NONE');
+
+                    const mine = (data.comments || []).find((c) => String(c.userId) === String(me.id));
+                    setLiked(!!mine?.is_recommend);
+                    setMyRating(mine?.rating ?? null);
                 }
             } catch (err) {
                 console.error('Data Fetch Error:', err);
@@ -81,70 +89,76 @@ export default function TaxProfile({ viewerRole = 'USER', nav = null }) {
         },
         [taxProUserId, me.id],
     );
-
     useEffect(() => {
         fetchTaxProData(true);
     }, [fetchTaxProData]);
 
-    // 2. 추천 토글 (리뷰가 없으면 생성 후 토글)
+    // 상담 신청 핸들러
+    const handleConsultRequest = async () => {
+        if (!me.isLoggedIn) return alert('로그인이 필요합니다.');
+        try {
+            const res = await requestConsult(me.id, taxPro.user_id);
+            if (res.result === 'success') {
+                alert('상담 신청이 완료되었습니다.');
+                setConsultStatus('PENDING'); // 즉시 UI 반영
+            } else {
+                alert(res.message || '이미 신청되었거나 오류가 발생했습니다.');
+            }
+        } catch (e) {
+            alert('상담 신청 중 오류가 발생했습니다.');
+        }
+    };
+
     const handleToggleLike = async () => {
         if (!me.isLoggedIn) return alert('로그인이 필요합니다.');
-        const myReview = comments.find((c) => String(c.userId) === String(me.id));
+        // 이미 추천했다면 작동 안함
+        if (myReview?.is_recommend) return;
 
         try {
             if (!myReview) {
-                // 리뷰가 아예 없으면 새로 생성 (is_recommend: true)
                 await createReview({ tax_id: taxPro.id, user_id: me.id, is_recommend: true });
             } else {
-                // 있으면 토글
-                await toggleRecommend(myReview.id, !liked, taxPro.id);
+                await toggleRecommend(myReview.id, true, taxPro.id);
             }
-            // 낙관적 업데이트 대신 즉시 새로고침 (loading 없이)
             fetchTaxProData(false);
         } catch (e) {
             alert('추천 처리 중 오류가 발생했습니다.');
         }
     };
 
-    // 3. 별점 제출 (Upsert 방식)
     const handleSubmitRating = async () => {
+        if (myRating !== null) return; // 이미 별점이 있으면 중단
         if (ratingDraft < 1) return alert('별점을 선택해주세요.');
         try {
-            const res = await createReview({
+            await createReview({
                 tax_id: taxPro.id,
                 user_id: me.id,
                 rating: ratingDraft,
             });
-            if (res.result === 'success') {
-                setMyRating(ratingDraft); // 즉시 상태 반영
-                fetchTaxProData(false); // 도넛 차트/통계 갱신
-            }
+            fetchTaxProData(false);
         } catch (e) {
             alert('별점 등록 중 오류가 발생했습니다.');
         }
     };
 
-    // 4. 댓글 제출
     const handleSubmitComment = async () => {
+        if (myReview?.comment) return; // 이미 댓글이 있으면 중단
         const text = commentDraft.trim();
         if (!text) return;
         try {
-            const res = await createReview({
+            await createReview({
                 tax_id: taxPro.id,
                 user_id: me.id,
                 comment: text,
             });
-            if (res.result === 'success') {
-                setCommentDraft('');
-                setCommentsOpen(true);
-                fetchTaxProData();
-            }
+            setCommentDraft('');
+            setCommentsOpen(true);
+            fetchTaxProData(false);
         } catch (e) {
             alert('댓글 등록 오류');
         }
     };
 
-    // 나머지 헬퍼 로직 (정렬 및 점수 계산)
     const orderedComments = useMemo(() => {
         const list = [...comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         const mine = list.filter((c) => String(c.userId) === String(me.id));
@@ -165,10 +179,8 @@ export default function TaxProfile({ viewerRole = 'USER', nav = null }) {
                 <ProfileHeaderCard
                     taxPro={taxPro}
                     viewerRole={viewerRole}
-                    consultStatus={consultStatus}
-                    onConsultRequest={() =>
-                        requestConsult(me.id, taxPro.user_id).then(() => setConsultStatus('PENDING'))
-                    }
+                    consultStatus={consultStatus} // PENDING 상태 전달
+                    onConsultRequest={handleConsultRequest}
                     onSaveProfile={(updated) => updateUserProfile(updated.id, updated)}
                 />
             </div>
@@ -214,6 +226,7 @@ export default function TaxProfile({ viewerRole = 'USER', nav = null }) {
                         onChangeCommentDraft={setCommentDraft}
                         onSubmitComment={handleSubmitComment}
                         onCancelComment={() => setCommentDraft('')}
+                        myReview={myReview}
                     />
                 </div>
             )}

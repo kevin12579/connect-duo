@@ -1,5 +1,5 @@
 import React from 'react';
-
+import UserAvatar from './UserAvatar';
 function formatKoreanDate(createdAt) {
     // createdAt 예: "2024-07-09 08:11"
     if (!createdAt) return '';
@@ -20,7 +20,7 @@ export default function CommentItem({ me, comment, onDelete, canDelete = true })
     return (
         <div className={`comment-item ${isMine ? 'mine' : 'other'}`}>
             <div className="comment-left">
-                <div className="comment-avatar" />
+                <UserAvatar avatarUrl={comment.avatarUrl} name={comment.nickname} />
                 <div className="comment-name">{comment.nickname ?? '익명'}</div>
             </div>
 

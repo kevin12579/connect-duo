@@ -37,4 +37,7 @@ router.post('/consult/accept', profileController.acceptConsult);
 // 상담 거절
 router.post('/consult/reject', profileController.rejectConsult);
 
+//랭킹 가져오기
+router.get('/ranking', profileController.getRanking);
+
 module.exports = router;

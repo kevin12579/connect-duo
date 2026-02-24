@@ -99,7 +99,7 @@ export default function MainPage() {
     const renderProfile = () => {
         if (profileView === 'USER_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
         if (profileView === 'USER_TO_TAXPRO') return <TaxProfile viewerRole="USER" nav={profileNav} />;
-        if (profileView === 'TAX_PROFILE') return <TaxProfile viewerRole="TAX_ACCOUNTANT" nav={profileNav} />;
+        if (profileView === 'TAX_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
     };
 
     const renderContent = () => {
@@ -110,15 +110,34 @@ export default function MainPage() {
                     <div className="welcome-container">
                         <div className="welcome-header">
                             <div className="welcome-avatar">
-                                {/* displayUser 뒤에 ?를 붙여서 안전하게 접근 */}
-                                {(displayUser?.name || displayUser?.username || 'U').charAt(0)}
+                                {/* 1. profile_img가 존재하고 타입이 string일 때만 img 태그 출력 */}
+                                {displayUser?.profile_img && typeof displayUser.profile_img === 'string' ? (
+                                    <img
+                                        src={displayUser.profile_img}
+                                        alt="프로필"
+                                        className="avatar-img"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                        }} // 이미지 로드 실패 시 숨김 처리
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            background: '#fff',
+                                        }}
+                                    />
+                                ) : (
+                                    /* 2. 이미지가 없을 때 첫 글자 추출 (문자열 보장) */
+                                    String(displayUser?.name || displayUser?.username || 'U').charAt(0)
+                                )}
                             </div>
                             <div className="welcome-text">
                                 <h2>
                                     반가워요,{' '}
                                     <span className="highlight">
-                                        {/* displayUser 뒤에 ?를 붙이세요 */}
-                                        {displayUser?.name || displayUser?.username || '사용자'}
+                                        {/* 문자열로 확실히 변환하여 렌더링 */}
+                                        {String(displayUser?.name || displayUser?.username || '사용자')}
                                     </span>
                                     님!
                                 </h2>
@@ -171,7 +190,9 @@ export default function MainPage() {
         }
 
         if (selected === 'profile') return renderProfile();
-        if (selected === 'ranking') return <RankingPage />;
+        if (selected === 'ranking') {
+            return <RankingPage onOpenTaxProProfile={openTaxProFromUser} />;
+        }
         if (selected === 'consult') return <div className="main-content-empty">상담 컴포넌트 영역</div>;
         return null;
     };

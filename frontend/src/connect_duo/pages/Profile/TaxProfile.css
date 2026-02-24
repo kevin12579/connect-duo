@@ -1223,3 +1223,10 @@
     background: #cfdcf4;
     border: 1px solid #b8c9e8;
 }
+
+.lock-msg {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    font-weight: 700;
+}
