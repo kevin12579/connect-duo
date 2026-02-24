@@ -1,0 +1,104 @@
+git clone https://github.com/kevin12579/connect-duo.git
+-------------------------------------------------------------------------------
+cd C:\dev_source\gitWork\connect-duo
+
+---------------------------------------------------------------------------------
+git branch
+git checkout -b feature/test
+ㅡㅡ로컬ㅡㅡ
+git add login.html (자기가만든 파일명
+git add . (현재 만든거 전부 
+-> 스테이지로 올라감
+git commit -m "커밋메세지"
+->공연이 시작
+ㅡㅡ푸시ㅡㅡ
+git push -u origin feature/test
+
+==============================================
+git branch
+git checkout -b feature/test-clonen220
+git branch
+
+git add test.html
+git commit -m "커밋메세지"
+git push -u origin feature/test-clonen220
+
+==============================================
+만든 뒤 커밋요청
+develop <- feature/test-clonen220
+요청
+
+--------------------------------------------------------------------------------------
+팀장이 합친 후 본인도 받기
+git checkout develop
+git pull
+
+자기 브랜치로 적용시키기
+git checkout feature/test-clonen220
+git merge develop
+
+-----------------------------------------------------------
+새로 만들기
+git branch
+git checkout -b feature/clonen220
+
+기존 꺼 삭제
+git branch -d feature/test-clonen220
+강제 삭제
+git branch -D feature/test-clonen220
+
+다시 
+git merge develop
+
+======================================
+깃 수정 올리기
+*  add 뒤에 파일경로 적기
+
+git add .
+git add src/connect_duo/assets/
+git add src/connect_duo/pages/Main
+git add src/connect_duo/pages/Auth
+git add src/connect_duo/pages/Profile
+git add src/app.js
+git add public/index.html
+
+* 커밋
+git commit -m "mainpage"
+git commit -m "loginpage"
+git commit -m "profile"
+git commit -m "2026-02-19 채팅 백엔드_ver1"
+
+* 내 브랜치로 푸쉬
+git push -u origin feature/clonen220
+
+* 그 후 깃허브 가서 커밋요청
+
+---------------------------------------------------------
+192.168.0.8 연결해듀오 팀장님 dev
+
+###############################################
+백엔드 서버 연결
+
+터미널에
+node server.js
+브라우저에
+http://localhost:7777/api/chat/rooms
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:7777/api/chat/rooms" -ContentType "application/json" -Body '{"taxId":2,"title":"테스트 상담"}'
+
+🔥 다음 단계
+1. 채팅방 목록 다시 조회
+Invoke-RestMethod -Method Get -Uri "http://localhost:7777/api/chat/rooms"
+
+
+👉 방이 배열 안에 들어있어야 정상
+
+2. 메시지 보내보기
+Invoke-RestMethod -Method Post `
+-Uri "http://localhost:7777/api/chat/rooms/1/messages" `
+-ContentType "application/json" `
+-Body '{"type":"TEXT","content":"안녕하세요"}'
+
+3. 메시지 조회
+Invoke-RestMethod -Method Get `
+-Uri "http://localhost:7777/api/chat/rooms/1/messages"

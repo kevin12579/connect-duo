@@ -68,6 +68,9 @@ router.post('/rooms/:roomId/read', chatController.markRead);
 // ✅ 파일 업로드 (TXT/사진)
 router.post('/rooms/:roomId/upload', upload.array('files', 5), chatController.uploadFiles);
 
+// ✅ 상담사 연결 (정석)
+router.post('/rooms/:roomId/connect', chatController.connectRoom);
+
 // ✅ 상담 종료
 router.post('/rooms/:roomId/close', chatController.closeRoom);
 

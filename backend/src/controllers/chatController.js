@@ -1,106 +1,22 @@
-// const chatService = require('../services/chatService');
-
-// exports.listRooms = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const rooms = await chatService.listRooms(userId);
-//         res.json({ result: 'success', data: rooms });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.createRoom = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const { taxId, title } = req.body; // taxId optional
-//         const room = await chatService.createRoom({ userId, taxId, title });
-//         res.json({ result: 'success', data: room });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.listMessages = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const { roomId } = req.params;
-//         const { cursor, limit } = req.query;
-//         const data = await chatService.listMessages({ userId, roomId, cursor, limit });
-//         res.json({ result: 'success', data });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.sendMessage = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const { roomId } = req.params;
-//         const { type = 'TEXT', content = '' } = req.body;
-
-//         const msg = await chatService.sendMessage({ userId, roomId, type, content });
-//         res.json({ result: 'success', data: msg });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.uploadFiles = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const { roomId } = req.params;
-
-//         const files = req.files || [];
-//         const msgs = await chatService.attachFiles({ userId, roomId, files });
-//         res.json({ result: 'success', data: msgs });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.markRead = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const { roomId } = req.params;
-//         const { lastReadMessageId } = req.body;
-//         await chatService.markRead({ userId, roomId, lastReadMessageId });
-//         res.json({ result: 'success' });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.closeRoom = async (req, res) => {
-//     try {
-//         const userId = req.authUser.id;
-//         const { roomId } = req.params;
-//         await chatService.closeRoom({ userId, roomId });
-//         res.json({ result: 'success' });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
-// exports.listTaxActiveRooms = async (req, res) => {
-//     try {
-//         const taxId = req.authUser.id;
-//         const rooms = await chatService.listTaxActiveRooms(taxId);
-//         res.json({ result: 'success', data: rooms });
-//     } catch (e) {
-//         res.status(500).json({ result: 'fail', message: e.message });
-//     }
-// };
-
+// controllers/chatController.js
 const chatService = require('../services/chatService');
 
-// ✅ 개발용: 인증 미들웨어 껐을 때도 안 터지게
 function getUser(req) {
-    // 토큰 붙어있으면 그걸 쓰고
     if (req.authUser && req.authUser.id) return req.authUser;
 
-    // 토큰 없으면 개발용 임시 유저
+    // ✅ 개발용 더미 유저
     return { id: 1, user_type: 'USER', name: 'DEV', username: 'dev@local' };
+}
+
+function toInt(v, fallback = null) {
+    const n = Number(v);
+    return Number.isNaN(n) ? fallback : n;
+}
+
+function toRoomId(raw) {
+    // DB가 INT면 숫자로 맞추는게 안전
+    const n = Number(raw);
+    return Number.isNaN(n) ? raw : n;
 }
 
 exports.listRooms = async (req, res) => {
@@ -109,18 +25,27 @@ exports.listRooms = async (req, res) => {
         const rooms = await chatService.listRooms(me.id);
         res.json({ result: 'success', data: rooms });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[listRooms] ${e.message}` });
     }
 };
 
 exports.createRoom = async (req, res) => {
     try {
         const me = getUser(req);
-        const { taxId, title } = req.body; // taxId optional
-        const room = await chatService.createRoom({ userId: me.id, taxId, title });
+        let { taxId, title } = req.body || {};
+
+        // ✅ 기본 taxId=2 (BOT/상담사)
+        const parsedTaxId = toInt(taxId, 2);
+
+        const room = await chatService.createRoom({
+            userId: me.id,
+            taxId: parsedTaxId,
+            title,
+        });
+
         res.json({ result: 'success', data: room });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[createRoom] ${e.message}` });
     }
 };
 
@@ -129,10 +54,18 @@ exports.listMessages = async (req, res) => {
         const me = getUser(req);
         const { roomId } = req.params;
         const { cursor, limit } = req.query;
-        const data = await chatService.listMessages({ userId: me.id, roomId, cursor, limit });
+
+        const data = await chatService.listMessages({
+            userId: me.id,
+            roomId: toRoomId(roomId),
+            // cursor/limit도 숫자형으로 받는게 안전(서비스는 parseInt 처리하지만)
+            cursor: cursor ? toInt(cursor, cursor) : undefined,
+            limit: limit ? toInt(limit, limit) : undefined,
+        });
+
         res.json({ result: 'success', data });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[listMessages] ${e.message}` });
     }
 };
 
@@ -140,12 +73,19 @@ exports.sendMessage = async (req, res) => {
     try {
         const me = getUser(req);
         const { roomId } = req.params;
-        const { type = 'TEXT', content = '' } = req.body;
+        const { type = 'TEXT', content = '' } = req.body || {};
 
-        const msg = await chatService.sendMessage({ userId: me.id, roomId, type, content });
-        res.json({ result: 'success', data: msg });
+        // ✅ 서비스가 { user, ai } 형태로 리턴
+        const data = await chatService.sendMessage({
+            userId: me.id,
+            roomId: toRoomId(roomId),
+            type,
+            content,
+        });
+
+        res.json({ result: 'success', data });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[sendMessage] ${e.message}` });
     }
 };
 
@@ -154,11 +94,16 @@ exports.uploadFiles = async (req, res) => {
         const me = getUser(req);
         const { roomId } = req.params;
 
-        const files = req.files || [];
-        const msgs = await chatService.attachFiles({ userId: me.id, roomId, files });
+        const files = Array.isArray(req.files) ? req.files : [];
+        const msgs = await chatService.attachFiles({
+            userId: me.id,
+            roomId: toRoomId(roomId),
+            files,
+        });
+
         res.json({ result: 'success', data: msgs });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[uploadFiles] ${e.message}` });
     }
 };
 
@@ -166,11 +111,20 @@ exports.markRead = async (req, res) => {
     try {
         const me = getUser(req);
         const { roomId } = req.params;
-        const { lastReadMessageId } = req.body;
-        await chatService.markRead({ userId: me.id, roomId, lastReadMessageId });
+
+        // ✅ 프론트가 lastReadMessageId 또는 messageId로 보내도 대응
+        const { lastReadMessageId, messageId } = req.body || {};
+        const lastIdRaw = lastReadMessageId ?? messageId ?? null;
+
+        await chatService.markRead({
+            userId: me.id,
+            roomId: toRoomId(roomId),
+            lastReadMessageId: lastIdRaw == null ? null : toInt(lastIdRaw, lastIdRaw),
+        });
+
         res.json({ result: 'success' });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[markRead] ${e.message}` });
     }
 };
 
@@ -178,21 +132,52 @@ exports.closeRoom = async (req, res) => {
     try {
         const me = getUser(req);
         const { roomId } = req.params;
-        await chatService.closeRoom({ userId: me.id, roomId });
+
+        await chatService.closeRoom({
+            userId: me.id,
+            roomId: toRoomId(roomId),
+        });
+
         res.json({ result: 'success' });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[closeRoom] ${e.message}` });
     }
 };
 
 exports.listTaxActiveRooms = async (req, res) => {
     try {
         const me = getUser(req);
-        // 세무사 목록 API는 개발용으로 taxId도 임시값 줄 수 있음
+
+        // ✅ 세무사면 본인 id, 아니면 DEV 기본 2
         const taxId = me.user_type === 'TAX_ACCOUNTANT' ? me.id : 2;
+
         const rooms = await chatService.listTaxActiveRooms(taxId);
         res.json({ result: 'success', data: rooms });
     } catch (e) {
-        res.status(500).json({ result: 'fail', message: e.message });
+        res.status(500).json({ result: 'fail', message: `[listTaxActiveRooms] ${e.message}` });
+    }
+};
+
+/**
+ * (선택) ✅ 상담사 연결 API를 "정석"으로 분리하고 싶으면 이거 쓰면 됨
+ * POST /chat/rooms/:roomId/connect  body: { taxId?: number }
+ *
+ * 프론트: connectRoom(rid, 2) 이런 식으로 호출 가능
+ */
+exports.connectRoom = async (req, res) => {
+    try {
+        const me = getUser(req);
+        const { roomId } = req.params;
+        const { taxId } = req.body || {};
+
+        const data = await chatService.connectRoom({
+            userId: me.id,
+            roomId: toRoomId(roomId),
+            taxId: toInt(taxId, 2),
+        });
+
+        res.json({ result: 'success', data });
+    } catch (e) {
+        res.status(500).json({ result: 'fail', message: `[connectRoom] ${e.message}` });
     }
 };

@@ -1,0 +1,197 @@
+/* ChatList.css */
+
+/* ✅ 페이지 폭: 더 넓게 + 반응형 */
+.cl-page {
+    min-height: 100vh;
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    padding: 18px;
+}
+
+/* ✅ 920px → 780px 추천 (필요하면 760~820 사이로 조절) */
+.cl-panel {
+    width: min(780px, 92vw);
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    padding: 18px;
+    color: white;
+}
+
+/* 헤더 */
+.cl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.cl-title {
+    font-weight: 900;
+}
+
+.cl-newBtn {
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 14px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.cl-loading {
+    opacity: 0.8;
+}
+
+.cl-empty {
+    opacity: 0.8;
+}
+
+.cl-link {
+    text-decoration: none;
+}
+
+/* 카드 */
+.cl-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* 아바타 */
+.cl-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.cl-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.cl-topRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cl-roomTitle {
+    color: white;
+    font-weight: 900;
+}
+
+.cl-day {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+/* ✅ 미리보기: 1줄 말고 2줄 정도 보이게 (line-clamp) */
+.cl-preview {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    margin-top: 4px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* ✅ 2줄 */
+    -webkit-box-orient: vertical;
+
+    white-space: normal; /* ✅ nowrap 제거 */
+    line-height: 1.35;
+    word-break: keep-all; /* ✅ 글자 쪼개짐 방지 */
+    overflow-wrap: break-word; /* ✅ 너무 긴 문자열은 안전하게 */
+}
+
+/* 휴지통 */
+.cl-trashBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* =========================
+   🔥 추가: 카드 hover 강화
+========================= */
+
+.cl-card {
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.cl-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   🔥 제목 줄 정렬 안정화
+========================= */
+
+.cl-roomTitle {
+    font-weight: 700;
+}
+
+/* ===== ChatList badges (임시저장 / 안읽음) ===== */
+.cl-badge {
+    margin-left: 8px;
+    height: 22px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    padding: 0 8px;
+    line-height: 1;
+}
+
+.cl-badgeDraft {
+    background: rgba(250, 204, 21, 0.22);
+    border: 1px solid rgba(250, 204, 21, 0.35);
+    color: #d4b106;
+}
+
+.cl-badgeUnread {
+    min-width: 22px;
+    padding: 0 6px;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ✅ 더 큰 화면에서 카드도 넓어졌으니 패딩 살짝 */
+@media (min-width: 900px) {
+    .cl-panel {
+        padding: 22px;
+    }
+}

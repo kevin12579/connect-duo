@@ -1,0 +1,759 @@
+/* =========================
+   ChatRoom.css (FULL) - FIXED
+========================= */
+
+.cr-page {
+    min-height: 100dvh;
+    background: #0b1224;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.cr-wrap {
+    width: min(820px, 92vw);
+    max-width: 100%;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 40px);
+
+    /* ✅ 오버레이를 채팅창 크기만큼만 덮기 위해 */
+    position: relative;
+}
+
+/* =========================
+   Header
+========================= */
+.cr-header {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-bottom: 12px;
+}
+
+.cr-back {
+    color: #fff;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 6px 8px;
+    border-radius: 10px;
+}
+.cr-back:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.cr-title {
+    font-weight: 900;
+    max-width: 46%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cr-status {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0.75;
+    white-space: nowrap;
+}
+
+/* 오른쪽 아이콘 영역(검색/메뉴) */
+.cr-headerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.cr-hIcon {
+    width: 40px;
+    height: 36px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+
+    transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+.cr-hIcon:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+.cr-menuIcon.isOn {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.45);
+}
+
+/* =========================
+   Search Header Mode (정렬/빈칸 제거)
+========================= */
+.cr-searchBar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.cr-searchInput {
+    flex: 1;
+    height: 38px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(15, 23, 42, 0.45);
+    color: #fff;
+    padding: 0 14px;
+    outline: none;
+    min-width: 0;
+}
+.cr-searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.cr-searchX {
+    width: 44px;
+    height: 38px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+    font-size: 18px;
+}
+.cr-searchX:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ✅ 검색 결과 영역(쿼리 있을 때만 JSX에서 렌더링하도록 권장) */
+.cr-searchMeta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.cr-hitCount {
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+    font-weight: 900;
+    opacity: 0.95;
+
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+
+    min-width: 64px;
+    text-align: center;
+}
+
+.cr-searchNav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cr-navBtn {
+    width: 44px;
+    height: 38px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+    font-size: 18px;
+}
+.cr-navBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+.cr-navBtn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+/* highlight */
+.cr-hl {
+    background: rgba(251, 191, 36, 0.35);
+    color: #fff;
+    padding: 0 2px;
+    border-radius: 6px;
+}
+
+/* =========================
+   Chat Body
+========================= */
+.cr-chat {
+    flex: 1 1 auto;
+    overflow-y: auto;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 14px;
+
+    margin-bottom: 10px;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+.cr-chat::-webkit-scrollbar {
+    width: 8px;
+}
+.cr-chat::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+}
+.cr-chat::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cr-loading {
+    opacity: 0.85;
+}
+
+/* system message */
+.cr-systemRow {
+    text-align: center;
+    margin: 10px 0;
+}
+.cr-systemPill {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    opacity: 0.95;
+    white-space: pre-wrap;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+/* message rows */
+.cr-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+.cr-rowMe {
+    justify-content: flex-end;
+}
+.cr-rowOther {
+    justify-content: flex-start;
+}
+
+/* bubble */
+.cr-bubble {
+    max-width: 78%;
+    padding: 10px 12px;
+    border-radius: 18px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.35;
+
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    overflow: hidden;
+}
+
+.cr-bubbleMe {
+    background: linear-gradient(135deg, #5b63ff, #3f35ff);
+}
+.cr-bubbleOther {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* text */
+.cr-text {
+    white-space: pre-wrap;
+}
+
+/* time */
+.cr-time {
+    margin-top: 6px;
+    font-size: 11px;
+    opacity: 0.75;
+}
+.cr-timeMe {
+    text-align: right;
+}
+.cr-timeOther {
+    text-align: left;
+}
+
+/* hidden */
+.cr-hidden {
+    display: none;
+}
+
+/* =========================
+   IMAGE message
+========================= */
+.cr-imgWrap {
+    display: grid;
+    gap: 10px;
+}
+
+.cr-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 280px;
+    object-fit: contain;
+    display: block;
+
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* =========================
+   FILE card
+========================= */
+.cr-fileCard {
+    position: relative;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+}
+
+.cr-txtCornerIcon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.95;
+    pointer-events: none;
+}
+
+.cr-fileBody {
+    display: grid;
+    gap: 8px;
+}
+
+/* 코너 아이콘과 겹침 방지(우측 안전영역) */
+.cr-fileTopRow {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-right: 72px;
+}
+
+.cr-fileBadge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    white-space: nowrap;
+}
+
+.cr-fileTitle {
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ✅ 제목 옆 용량 표시 제거용 슬롯 */
+.cr-fileRightSlot {
+    width: 1px;
+    height: 1px;
+}
+
+/* 버튼 줄도 우측 안전영역 + 아래로 내려서 아이콘 겹침 방지 */
+.cr-fileActions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+
+    margin-top: 10px;
+    padding-right: 72px;
+    margin-bottom: 10px;
+}
+
+/* =========================
+   Buttons (요청사항 반영)
+========================= */
+
+/* 공통 */
+.cr-downloadBtn,
+.cr-openBtn {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+    user-select: none;
+
+    transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease,
+        border-color 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+/* ✅ 다운로드: 확실히 눈에 띄는 “강조 색” */
+.cr-downloadBtn {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: linear-gradient(135deg, #ffd45a, #ffb020);
+    color: #0b1224;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+.cr-downloadBtn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+}
+.cr-downloadBtn:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+}
+
+/* ✅ 열기/폴더열기: “테두리 원” 확실히 + hover 시 “눈에 띄는 파랑 글씨” */
+.cr-openBtn {
+    background: rgba(15, 23, 42, 0.18);
+    border: 2px solid rgba(147, 197, 253, 0.82); /* 더 잘 보이게 */
+    color: rgba(226, 232, 240, 0.95);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+.cr-openBtn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(56, 189, 248, 1);
+    background: rgba(56, 189, 248, 0.12);
+    color: rgba(56, 189, 248, 1); /* ✅ 파랑 글씨로 확 바뀜 */
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+}
+
+.cr-openBtn:focus-visible,
+.cr-downloadBtn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35), 0 10px 22px rgba(0, 0, 0, 0.24);
+}
+
+/* 상태 pill */
+.cr-dlFail,
+.cr-dlExpired {
+    font-size: 12px;
+    opacity: 0.95;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+}
+.cr-dlFail {
+    color: #ffd1d1;
+}
+.cr-dlExpired {
+    color: #ffe7b0;
+}
+
+/* =========================
+   File meta (용량/유효기간)
+========================= */
+.cr-fileSub {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    opacity: 0.95;
+}
+.cr-fileSubRow {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+}
+.cr-fileLabel {
+    opacity: 0.75;
+    min-width: 56px;
+}
+.cr-fileValue {
+    font-weight: 900;
+}
+
+/* =========================
+   Attach panel
+========================= */
+.cr-attachPanel {
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    margin: 10px 0 10px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cr-attachItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+
+    padding: 14px 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    cursor: pointer;
+}
+.cr-attachItem:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.cr-attachIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.12);
+    font-weight: 900;
+    overflow: hidden;
+}
+.cr-attachImg {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+}
+
+.cr-attachText {
+    font-size: 13px;
+    opacity: 0.92;
+    font-weight: 900;
+}
+
+/* =========================
+   Input bar
+========================= */
+.cr-inputBar {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 8px;
+
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px;
+    border-radius: 18px;
+}
+
+/* plus */
+.cr-plus {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 900;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.cr-plus:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+.cr-plus.isOpen {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.8);
+    border-color: transparent;
+}
+
+/* connect */
+.cr-connect {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    font-weight: 900;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.cr-connectBot {
+    background: rgba(255, 255, 255, 0.06);
+}
+.cr-connectConnecting {
+    background: rgba(251, 191, 36, 0.16);
+}
+.cr-connectHuman {
+    background: rgba(34, 197, 94, 0.18);
+}
+.cr-connect:disabled {
+    opacity: 0.65;
+    cursor: default;
+}
+
+/* textarea */
+.cr-textarea {
+    flex: 1;
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 14px;
+    min-width: 0;
+}
+.cr-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* send */
+.cr-send {
+    width: 56px;
+    height: 36px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    font-weight: 900;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.cr-send:hover {
+    filter: brightness(1.05);
+}
+
+/* =========================
+   Menu Overlay (채팅창 크기만큼만 + 버튼 중앙정렬/색상 분리)
+========================= */
+.cr-menuOverlay {
+    /* ✅ 화면 전체 X, 채팅창(.cr-wrap)만 */
+    position: absolute;
+    inset: 0;
+    z-index: 9999;
+
+    /* ✅ wrap 영역만 블러 */
+    background: rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(10px);
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 18px;
+
+    border-radius: 16px;
+}
+
+.cr-menuSheet {
+    width: min(520px, 92%);
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 14px;
+
+    display: grid;
+    gap: 10px;
+
+    /* ✅ 버튼 가운데 느낌 더 강하게 */
+    text-align: center;
+}
+
+.cr-leaveBtn,
+.cr-cancelBtn {
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-weight: 900;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ✅ “채팅방 나가기”는 경고/강조 */
+.cr-leaveBtn {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #ffecec;
+}
+.cr-leaveBtn:hover {
+    background: rgba(239, 68, 68, 0.28);
+    border-color: rgba(239, 68, 68, 0.55);
+}
+
+/* ✅ “닫기”는 중립 */
+.cr-cancelBtn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+.cr-cancelBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* big screen tuning */
+@media (min-width: 900px) {
+    .cr-chat {
+        padding: 16px;
+    }
+    .cr-inputBar {
+        padding: 12px;
+    }
+}
