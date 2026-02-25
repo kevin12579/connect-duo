@@ -153,3 +153,12 @@ export const getTaxProRanking = async () => {
     const res = await axiosBase.get(`/profile/ranking`);
     return res.data;
 };
+
+// 1. AI 채팅 기록 불러오기 (최근 기록 포함 전체)
+export const getAiHistory = () => axiosAuth.get('/ai/history').then((r) => r.data);
+
+// 2. AI에게 질문하기 (RAG 기반 답변 요청)
+export const postAskAi = (question) => axiosAuth.post('/ai/ask', { question }).then((r) => r.data);
+
+// 3. (선택사항) 채팅 기록 초기화가 필요하다면
+export const deleteAiHistory = () => axiosAuth.delete('/ai/history').then((r) => r.data);

@@ -10,6 +10,7 @@ const morgan = require('morgan');
 const signupRouter = require('./src/routes/signupRouter');
 const loginRouter = require('./src/routes/loginRouter');
 const profileRouter = require('./src/routes/profileRouter');
+const aiRouter = require('./src/routes/aiRouter');
 
 const port = process.env.PORT || 7777;
 console.log('port: ', port);
@@ -26,7 +27,7 @@ app.use(cors()); //react와 통신시 필요함
 app.use('/api/accounts/signup', signupRouter);
 app.use('/api/accounts', loginRouter);
 app.use('/api/profile', profileRouter);
-
+app.use('/api/ai', aiRouter);
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });

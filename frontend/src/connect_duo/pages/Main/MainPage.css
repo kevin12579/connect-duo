@@ -1,38 +1,38 @@
-/* ===== reset ===== */
+/* ==========================================================================
+   1. 초기화 및 공통 레이아웃 (Variables & Reset)
+   ========================================================================== */
 * {
     box-sizing: border-box;
 }
 
-html,
 body {
     margin: 0;
     padding: 0;
-}
-
-body {
     font-family: 'Noto Sans KR', 'Segoe UI', Arial, sans-serif;
     background: #f7f8fa;
     color: #111;
 }
 
-/* ===== layout wrapper ===== */
 .mainpage-root {
     min-height: 100vh;
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 34px;
-    padding: 0;
-    margin: 0;
 }
 
-/* 상단/중단/하단 공통으로 쓰는 “중앙 컨테이너” */
-.mainpage-container {
+/* 중앙 정렬용 내부 컨테이너 */
+.mainpage-inner {
     width: min(1700px, 96%);
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 38px;
 }
 
-/* ===== Top (챗봇 영역) ===== */
+/* ==========================================================================
+   2. 상단 헤더 & 검색 영역 (Top Section & AI Search)
+   ========================================================================== */
 .mainpage-top-card {
     width: 100%;
     background: #f2f3f7;
@@ -43,28 +43,16 @@ body {
     width: min(1700px, 96%);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 160px 1fr;
+    grid-template-columns: 200px 1fr; /* 로고 영역 확보 */
     align-items: center;
     padding: 34px 0;
     min-height: 190px;
 }
 
-.mainpage-top-left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .mainpage-logo {
-    width: 250px;
-    height: auto;
-    object-fit: contain;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    padding: 0;
-    display: block;
+    width: 200px;
     cursor: pointer;
+    object-fit: contain;
 }
 
 .mainpage-top-center {
@@ -82,62 +70,99 @@ body {
 }
 
 .mainpage-chatbot-icon {
-    width: 56px;
-    height: 56px;
-    object-fit: contain;
+    width: 50px;
+    height: 50px;
 }
 
 .mainpage-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 900;
     letter-spacing: -0.8px;
     color: #222;
 }
 
-/* 검색창 크게 + 중앙 */
-.mainpage-search-input {
+/* --- 검색 및 AI 확장 영역 --- */
+.search-wrapper {
     width: min(1100px, 92%);
     margin: 0 auto;
-    padding: 18px 26px;
-    border-radius: 34px;
-    border: 1.5px solid #dedede;
-    color: #222;
-    font-weight: 500;
-    background: #fff;
-    font-size: 1.1rem;
-    outline: none;
-    box-shadow: 0 4px 12px rgba(60, 60, 60, 0.06);
+    transition: all 0.3s ease;
 }
 
-.mainpage-search-input::placeholder {
-    color: #8a94a6;
-    opacity: 1;
+.search-bar-container {
+    position: relative;
+    width: 100%;
+}
+
+.mainpage-search-input {
+    width: 100%;
+    padding: 18px 60px 18px 26px;
+    border-radius: 34px;
+    border: 1.5px solid #dedede;
+    background: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    outline: none;
+    box-shadow: 0 4px 12px rgba(60, 60, 60, 0.06);
+    transition: all 0.2s ease;
 }
 
 .mainpage-search-input:focus {
     border-color: #a3bffa;
 }
 
-/* ===== Middle (카테고리) ===== */
-.mainpage-inner {
-    width: min(1700px, 96%);
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 38px;
+/* 채팅창이 열렸을 때 검색창 하단 각지게 변경 (일체형) */
+.search-wrapper.is-open .mainpage-search-input {
+    border-radius: 26px 26px 0 0;
+    border-bottom: 1px solid #f2f3f7;
 }
 
+.expand-arrow {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #a3bffa;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.expand-arrow.up {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.search-expand-content {
+    width: 100%;
+    animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   3. 카테고리 네비게이션 (Middle Navigation)
+   ========================================================================== */
 .mainpage-category-row {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: clamp(28px, 5vw, 120px);
+    gap: clamp(20px, 4vw, 100px);
     justify-items: center;
 }
 
 .mainpage-category-btn {
-    width: 220px;
-    height: 220px;
+    width: 200px;
+    height: 200px;
     border: none;
     border-radius: 50%;
     background: #f2f3f7;
@@ -147,66 +172,64 @@ body {
     justify-content: center;
     cursor: pointer;
     color: #333;
-    box-shadow: 0 12px 26px rgba(60, 60, 60, 0.1);
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
+    box-shadow: 0 10px 24px rgba(60, 60, 60, 0.08);
+    transition: all 0.2s ease;
 }
 
 .mainpage-category-btn:hover {
     background: #e6eaff;
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 16px 34px rgba(60, 60, 60, 0.14);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 14px 30px rgba(60, 60, 60, 0.12);
 }
 
 .mainpage-category-btn.selected {
     background: #a3bffa;
     color: #fff;
-    box-shadow: 0 20px 40px rgba(60, 60, 60, 0.18);
+    box-shadow: 0 18px 36px rgba(163, 191, 250, 0.3);
 }
 
 .mainpage-category-icon {
-    width: 66px;
-    height: 66px;
-    margin-bottom: 12px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
 }
 
 .mainpage-category-label {
-    font-size: 1.25rem;
-    font-weight: 900;
+    font-size: 1.2rem;
+    font-weight: 800;
     letter-spacing: -0.5px;
 }
 
-/* ===== Bottom (콘텐츠 영역) ===== */
+/* ==========================================================================
+   4. 하단 콘텐츠 영역 & 컴포넌트 (Bottom Content)
+   ========================================================================== */
 .mainpage-content-card {
     width: 100%;
     min-height: 560px;
     background: #fff;
     border-radius: 26px;
-    box-shadow: 0 14px 36px rgba(60, 60, 60, 0.12);
-    padding: 70px 54px;
+    box-shadow: 0 14px 36px rgba(60, 60, 60, 0.1);
+    padding: 60px 40px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* ===== Welcome Container (로그인 후 화면) ===== */
+/* 로그인 후 환영 화면 */
 .welcome-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 40px;
+    gap: 35px;
     width: 100%;
-    max-width: 600px;
+    max-width: 550px;
     animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(15px);
     }
     to {
         opacity: 1;
@@ -218,28 +241,35 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
     text-align: center;
 }
 
 .welcome-avatar {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     background: linear-gradient(135deg, #a3bffa 0%, #7d9df5 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     color: #fff;
     font-weight: 900;
-    box-shadow: 0 10px 20px rgba(163, 191, 250, 0.4);
+    box-shadow: 0 10px 25px rgba(163, 191, 250, 0.4);
+    overflow: hidden;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .welcome-text h2 {
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 900;
-    margin-bottom: 8px;
+    margin: 0 0 10px 0;
     color: #222;
 }
 
@@ -247,25 +277,31 @@ body {
     color: #5a8cf1;
 }
 
+.welcome-text p {
+    font-size: 1.05rem;
+    color: #666;
+    margin: 0;
+}
+
 .welcome-actions {
     display: flex;
-    gap: 16px;
+    gap: 14px;
     width: 100%;
 }
 
 .welcome-btn {
     flex: 1;
-    height: 60px;
+    height: 64px;
     border: none;
-    border-radius: 16px;
+    border-radius: 18px;
     font-size: 1.1rem;
     font-weight: 800;
     cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    transition: all 0.2s ease;
 }
 
 .profile-btn {
@@ -276,12 +312,6 @@ body {
 .profile-btn:hover {
     background: #444;
     transform: translateY(-3px);
-}
-
-.profile-btn .btn-icon {
-    width: 24px;
-    height: 24px;
-    filter: invert(1);
 }
 
 .logout-btn {
@@ -296,24 +326,59 @@ body {
     transform: translateY(-3px);
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 1000px) {
+.btn-icon {
+    width: 22px;
+    height: 22px;
+    filter: invert(1); /* 검은 배경 버튼 아이콘 흰색으로 */
+}
+
+/* 로딩/비어있음 상태 */
+.mainpage-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+    font-weight: 700;
+    color: #7d9df5;
+}
+
+.main-content-empty {
+    color: #adb5bd;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   5. 반응형 디자인 (Responsive)
+   ========================================================================== */
+@media (max-width: 1100px) {
     .mainpage-top-inner {
         grid-template-columns: 1fr;
-        padding: 26px 0;
-        gap: 16px;
+        padding: 30px 20px;
         text-align: center;
+        gap: 20px;
+    }
+    .mainpage-logo {
+        margin: 0 auto;
     }
     .mainpage-category-row {
         grid-template-columns: repeat(2, 1fr);
-        gap: 22px;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .mainpage-title {
+        font-size: 1.5rem;
     }
     .mainpage-category-btn {
-        width: 180px;
-        height: 180px;
+        width: 160px;
+        height: 160px;
     }
     .mainpage-content-card {
-        min-height: 380px;
-        padding: 40px 18px;
+        padding: 40px 20px;
+        min-height: 400px;
+    }
+    .welcome-actions {
+        flex-direction: column;
     }
 }

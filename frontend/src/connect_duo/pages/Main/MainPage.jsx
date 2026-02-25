@@ -4,16 +4,13 @@ import { useAuthStore } from '../../stores/authStore';
 import { refreshAccessToken } from '../../utils/authUtils';
 import './MainPage.css';
 
-// 1. 하단 화면 컴포넌트 import 추가
 import Login from '../Auth/Login';
 import Signup from '../Auth/Signup';
 import RankingPage from '../Ranking/RankingPage';
-
-// 2. 프로필 화면 컴포넌트 import 추가
 import TaxProfile from '../Profile/TaxProfile';
 import UserProfile from '../Profile/UserProfile';
+import SearchTool from '../AI/SearchTool';
 
-// 3. 이미지 및 아이콘 import 추가
 import logoImg from '../../assets/connectDuo_logo.png';
 import chatbotIcon from '../../assets/chatbot.png';
 import loginIcon from '../../assets/login.png';
@@ -21,7 +18,6 @@ import profileIcon from '../../assets/profile.png';
 import rankingIcon from '../../assets/rank.png';
 import consultIcon from '../../assets/consult.png';
 
-// 4. categories 배열 추가
 const categories = [
     { key: 'login', label: '로그인', icon: loginIcon },
     { key: 'profile', label: '프로필', icon: profileIcon },
@@ -39,11 +35,14 @@ export default function MainPage() {
 
     const [selected, setSelected] = useState('login');
     const [authView, setAuthView] = useState('login');
-    const [search, setSearch] = useState('');
     const [profileView, setProfileView] = useState('USER_PROFILE');
     const [profileNav, setProfileNav] = useState(null);
 
-    // [자동 로그인 로직] 페이지 접속 시 토큰 확인
+    // AI 채팅 관련 상태
+    const [search, setSearch] = useState('');
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [chatQuery, setChatQuery] = useState('');
+
     useEffect(() => {
         const initAuth = async () => {
             const rToken = localStorage.getItem('refreshToken');
@@ -71,7 +70,6 @@ export default function MainPage() {
         initAuth();
     }, [loginAuthUser, logout, setAuthLoading]);
 
-    // 로그아웃 핸들러
     const handleLogout = () => {
         if (window.confirm('로그아웃 하시겠습니까?')) {
             logout();
@@ -80,14 +78,12 @@ export default function MainPage() {
         }
     };
 
-    // 5. 누락되었던 openTaxProFromUser 함수 추가
     const openTaxProFromUser = (taxProId) => {
-        setProfileNav({ taxProId }); // taxProId만 넣어도 충분!
+        setProfileNav({ taxProId });
         setProfileView('USER_TO_TAXPRO');
         setSelected('profile');
     };
 
-    // 로딩 중 화면
     if (isAuthLoading) {
         return (
             <div className="mainpage-loading">
@@ -95,6 +91,29 @@ export default function MainPage() {
             </div>
         );
     }
+
+    const handleSearchAction = (e) => {
+        if (e.key === 'Enter' || e.type === 'click') {
+            // 💡 로그인 여부 확인 로직 추가
+            if (!authUser) {
+                alert('로그인이 필요한 서비스입니다.');
+                setSearch(''); // 검색창 초기화
+                setIsChatOpen(false); // 채팅창 닫기
+                setSelected('login'); // 로그인 탭으로 이동
+                setAuthView('login'); // 로그인 화면 렌더링
+                return;
+            }
+
+            if (!search.trim()) {
+                setIsChatOpen(!isChatOpen);
+                return;
+            }
+
+            setChatQuery(search);
+            setIsChatOpen(true);
+            setSearch('');
+        }
+    };
 
     const renderProfile = () => {
         if (profileView === 'USER_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
@@ -104,13 +123,11 @@ export default function MainPage() {
 
     const renderContent = () => {
         if (selected === 'login') {
-            // renderContent 함수 내부의 authUser 조건문 수정
             if (authUser && displayUser) {
                 return (
                     <div className="welcome-container">
                         <div className="welcome-header">
                             <div className="welcome-avatar">
-                                {/* 1. profile_img가 존재하고 타입이 string일 때만 img 태그 출력 */}
                                 {displayUser?.profile_img && typeof displayUser.profile_img === 'string' ? (
                                     <img
                                         src={displayUser.profile_img}
@@ -118,7 +135,7 @@ export default function MainPage() {
                                         className="avatar-img"
                                         onError={(e) => {
                                             e.target.style.display = 'none';
-                                        }} // 이미지 로드 실패 시 숨김 처리
+                                        }}
                                         style={{
                                             width: '100%',
                                             height: '100%',
@@ -128,7 +145,6 @@ export default function MainPage() {
                                         }}
                                     />
                                 ) : (
-                                    /* 2. 이미지가 없을 때 첫 글자 추출 (문자열 보장) */
                                     String(displayUser?.name || displayUser?.username || 'U').charAt(0)
                                 )}
                             </div>
@@ -136,7 +152,6 @@ export default function MainPage() {
                                 <h2>
                                     반가워요,{' '}
                                     <span className="highlight">
-                                        {/* 문자열로 확실히 변환하여 렌더링 */}
                                         {String(displayUser?.name || displayUser?.username || '사용자')}
                                     </span>
                                     님!
@@ -167,7 +182,6 @@ export default function MainPage() {
             return authView === 'login' ? (
                 <Login
                     onSuccess={(data) => {
-                        // 💡 1. 백업 데이터 생성 및 저장 (이게 있어야 새로고침 시 안 사라짐)
                         const userInfo = {
                             name: data.name,
                             username: data.username,
@@ -176,9 +190,7 @@ export default function MainPage() {
                         };
                         localStorage.setItem('userBackup', JSON.stringify(userInfo));
 
-                        // 2. 전역 상태 업데이트
                         loginAuthUser(data);
-
                         setSelected('profile');
                         setProfileView(data.user_type === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
                     }}
@@ -190,9 +202,7 @@ export default function MainPage() {
         }
 
         if (selected === 'profile') return renderProfile();
-        if (selected === 'ranking') {
-            return <RankingPage onOpenTaxProProfile={openTaxProFromUser} />;
-        }
+        if (selected === 'ranking') return <RankingPage onOpenTaxProProfile={openTaxProFromUser} />;
         if (selected === 'consult') return <div className="main-content-empty">상담 컴포넌트 영역</div>;
         return null;
     };
@@ -214,13 +224,32 @@ export default function MainPage() {
                                     : '무엇을 도와드릴까요?'}
                             </div>
                         </div>
-                        <input
-                            className="mainpage-search-input"
-                            type="text"
-                            placeholder="검색어를 입력하세요"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                        <div className={`search-wrapper ${isChatOpen ? 'is-open' : ''}`}>
+                            <div className="search-bar-container">
+                                <input
+                                    className="mainpage-search-input"
+                                    placeholder="세무 궁금증을 입력하고 엔터를 누르세요"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={handleSearchAction}
+                                />
+                                <button
+                                    className={`expand-arrow ${isChatOpen ? 'up' : ''}`}
+                                    onClick={handleSearchAction}
+                                >
+                                    ▼
+                                </button>
+                            </div>
+                            {isChatOpen && (
+                                <div className="search-expand-content">
+                                    <SearchTool
+                                        initialQuery={chatQuery}
+                                        setChatQuery={setChatQuery}
+                                        isOpen={isChatOpen}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -233,15 +262,12 @@ export default function MainPage() {
                             type="button"
                             className={`mainpage-category-btn${selected === cat.key ? ' selected' : ''}`}
                             onClick={() => {
-                                // 💡 로그인 여부 확인 로직 추가
                                 if (!authUser && cat.key !== 'login') {
                                     alert('로그인이 필요한 서비스입니다.');
                                     setSelected('login');
                                     setAuthView('login');
                                     return;
                                 }
-
-                                // 로그인 상태이거나, 'login' 카테고리를 누른 경우 정상 동작
                                 setSelected(cat.key);
                                 if (cat.key === 'login') setAuthView('login');
                                 if (cat.key === 'profile') {

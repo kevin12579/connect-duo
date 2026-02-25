@@ -1,68 +1,72 @@
-// controllers/AiController.js
 const { ChatOpenAI } = require('@langchain/openai');
 const { DynamicTool } = require('@langchain/core/tools');
 const { AgentExecutor, createOpenAIFunctionsAgent } = require('langchain/agents');
 const { ChatPromptTemplate, MessagesPlaceholder } = require('@langchain/core/prompts');
-const axios = require('axios');
-const xml2js = require('xml2js'); // XML 변환용
-const db = require('../config/db'); // 귀하의 DB 설정 파일
 
-// 1. 국가법령정보 API 도구
-const lawSearchTool = new DynamicTool({
-    name: 'national_law_search',
-    description: '대한민국 법령, 판례, 세무 관련 법규를 검색합니다. 입력은 검색어입니다.',
+const axios = require('axios');
+const db = require('../config/dbPool');
+
+// 국세청 법령해석 API 도구
+const taxLawSearchTool = new DynamicTool({
+    name: 'nts_law_interpretation',
+    description: '국세청의 세무 법령해석 사례를 검색합니다. 검색어를 입력하세요.',
     func: async (query) => {
         try {
-            const OC = process.env.LAW_API_ID; // 발급받은 ID
-            const url = `https://www.law.go.kr/DRF/lawSearch.do?OC=${OC}&target=law&type=XML&query=${encodeURIComponent(query)}`;
-            const response = await axios.get(url);
-            const parser = new xml2js.Parser({ explicitArray: false });
-            const result = await parser.parseStringPromise(response.data);
-            // 요약된 정보 반환
-            return JSON.stringify(result.LawSearch.law || '검색 결과가 없습니다.');
-        } catch (e) {
-            return '법령 검색 중 오류가 발생했습니다.';
-        }
-    },
-});
+            const OC = process.env.LAW_API_ID;
+            const url = `http://www.law.go.kr/DRF/lawSearch.do?OC=${OC}&target=ntsCgmExpc&type=JSON&query=${encodeURIComponent(query)}&display=5`;
 
-// 2. 세금 계산기 도구 (단순 수식 계산)
-const taxCalculatorTool = new DynamicTool({
-    name: 'tax_calculator',
-    description: '세금이나 숫자를 계산합니다. 예: 1000000 * 0.1',
-    func: async (expression) => {
-        try {
-            // 주의: 실제 서비스에서는 mathjs 같은 라이브러리 사용 권장
-            return String(eval(expression.replace(/[^-()\d/*+.]/g, '')));
+            const response = await axios.get(url);
+            const data = response.data;
+
+            if (!data.LawSearch || !data.LawSearch.item) {
+                return '검색된 관련 법령해석 사례가 없습니다.';
+            }
+
+            const items = Array.isArray(data.LawSearch.item) ? data.LawSearch.item : [data.LawSearch.item];
+
+            return items
+                .map(
+                    (item) =>
+                        `[안건명: ${item['안건명']}] / [해석일자: ${item['해석일자']}] / [링크: ${item['법령해석상세링크']}]`,
+                )
+                .join('\n');
         } catch (e) {
-            return '계산기 실행 오류';
+            return '세무 법령 데이터를 가져오는 중 오류가 발생했습니다.';
         }
     },
 });
 
 const askAi = async (req, res) => {
     const { question } = req.body;
-    const userId = req.user.id; // 인증 미들웨어에서 가져온 정보
+
+    // 💡 수정 포인트: req.user -> req.authUser
+    if (!req.authUser || !req.authUser.id) {
+        return res.status(401).json({ error: '인증 정보가 없습니다. 다시 로그인해주세요.' });
+    }
+
+    const userId = req.authUser.id;
 
     try {
-        // 이전 대화 기록 가져오기 (최근 5개)
-        const [historyRows] = await db.execute(
+        // 최근 대화 맥락 유지 (5개)
+        const [rows] = await db.execute(
             'SELECT role, content FROM AI_History WHERE user_id = ? ORDER BY created_at DESC LIMIT 5',
             [userId],
         );
-        const pastMessages = historyRows.reverse().map((row) => row.content);
+        const history = rows.reverse().map((r) => (r.role === 'user' ? ['human', r.content] : ['ai', r.content]));
 
         const llm = new ChatOpenAI({
             modelName: 'gpt-4o',
-            temperature: 0,
+            temperature: 0.1,
             apiKey: process.env.OPENAI_API_KEY,
         });
 
-        const tools = [lawSearchTool, taxCalculatorTool];
-        // Tavily가 필요하면 @langchain/community의 TavilySearchResults 추가 가능
-
+        const tools = [taxLawSearchTool];
         const prompt = ChatPromptTemplate.fromMessages([
-            ['system', '당신은 전문 세무사 AI입니다. 법령을 검색하고 정확한 계산을 제공하세요.'],
+            [
+                'system',
+                '당신은 대한민국 국세청 데이터를 기반으로 하는 전문 세무사입니다. 제공된 도구를 사용하여 정확한 법령해석 사례를 근거로 답변하세요.',
+            ],
+            ...history,
             ['human', '{input}'],
             new MessagesPlaceholder('agent_scratchpad'),
         ]);
@@ -72,7 +76,7 @@ const askAi = async (req, res) => {
 
         const result = await agentExecutor.invoke({ input: question });
 
-        // DB 저장
+        // DB 기록 저장
         await db.execute("INSERT INTO AI_History (user_id, role, content) VALUES (?, 'user', ?)", [userId, question]);
         await db.execute("INSERT INTO AI_History (user_id, role, content) VALUES (?, 'assistant', ?)", [
             userId,
@@ -81,15 +85,27 @@ const askAi = async (req, res) => {
 
         res.json({ answer: result.output });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'AI 처리 중 오류 발생' });
+        console.error('AI 상담 중 에러 발생:', error);
+        res.status(500).json({ error: '상담 처리 중 오류 발생' });
     }
 };
 
 const getHistory = async (req, res) => {
-    const userId = req.user.id;
-    const [rows] = await db.execute('SELECT * FROM AI_History WHERE user_id = ? ORDER BY created_at ASC', [userId]);
-    res.json(rows);
+    // 💡 수정 포인트: req.user -> req.authUser
+    if (!req.authUser || !req.authUser.id) {
+        return res.status(401).json({ error: '인증 정보가 없습니다.' });
+    }
+
+    const userId = req.authUser.id;
+    try {
+        const [rows] = await db.execute(
+            'SELECT role, content FROM AI_History WHERE user_id = ? ORDER BY created_at ASC',
+            [userId],
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: '기록 조회 실패' });
+    }
 };
 
 module.exports = { askAi, getHistory };
