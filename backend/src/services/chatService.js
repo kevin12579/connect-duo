@@ -400,7 +400,9 @@ exports.closeRoom = async ({ userId, roomId }) => {
     const conn = await pool.getConnection();
     try {
         await assertParticipant(conn, roomId, userId);
-        await conn.query(`UPDATE ChatRooms SET status='CLOSED', closed_at=NOW(), updated_at=NOW() WHERE id=?`, [roomId]);
+        await conn.query(`UPDATE ChatRooms SET status='CLOSED', closed_at=NOW(), updated_at=NOW() WHERE id=?`, [
+            roomId,
+        ]);
     } finally {
         conn.release();
     }

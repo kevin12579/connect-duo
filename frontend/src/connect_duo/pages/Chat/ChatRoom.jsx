@@ -1,3 +1,4 @@
+// ChatRoom.js (FULL) - only change: 파일(TXT) 제목도 검색 시 하이라이트 적용
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -5,7 +6,6 @@ import {
     markRoomRead,
     sendTextMessage,
     uploadRoomFiles,
-    connectRoom,
     closeRoom,
     absolutizeFileUrl,
     extractMessagesFromAxiosResponse,
@@ -14,7 +14,7 @@ import './ChatRoom.css';
 
 import txtPanelIcon from '../../assets/txt.png';
 import pictureIcon from '../../assets/picture.png';
-import txtFileIcon from '../../assets/txt-file.png';
+import txtFileIcon from '../../assets/txt-img.png';
 
 const DRAFT_KEY = 'cd_chat_drafts_v1';
 const DRAFT_EVENT = 'cd_draft_updated';
@@ -239,13 +239,10 @@ function getTxtViewerUrl(fileUrl) {
         const raw = String(filenameMaybeEncoded || '');
         let decoded = raw;
         try {
-            // 이미 %EC... 형태면 여기서 한글로 복원됨
             decoded = decodeURIComponent(raw);
         } catch {
-            // raw가 한글/일반문자면 decodeURIComponent가 에러날 수 있음 -> 그대로 둠
             decoded = raw;
         }
-        // 최종은 항상 1회 인코딩만
         const onceEncoded = encodeURIComponent(decoded);
         return `${origin}/uploads-ui/view/${onceEncoded}`;
     };
@@ -259,7 +256,7 @@ function getTxtViewerUrl(fileUrl) {
     } catch {
         const idx = u.lastIndexOf('/');
         const filename = idx >= 0 ? u.slice(idx + 1) : u;
-        return build('', filename).replace(/^\/uploads-ui/, '/uploads-ui'); // origin 없는 경우
+        return build('', filename).replace(/^\/uploads-ui/, '/uploads-ui');
     }
 }
 
@@ -305,7 +302,6 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [mode, setMode] = useState('bot'); // bot | connecting | human
 
     // ✅ msgId: 'loading' | 'failed' | 'expired'
     const [dlState, setDlState] = useState({});
@@ -322,13 +318,6 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
         const el = listRef.current;
         if (el) el.scrollTop = el.scrollHeight;
     }, []);
-
-    const detectModeFromMessages = (mapped) => {
-        const hasConnectedSystem = mapped.some(
-            (m) => String(m.type).toUpperCase() === 'SYSTEM' && (m.text || '').includes('상담사가 연결되었습니다'),
-        );
-        return hasConnectedSystem ? 'human' : 'bot';
-    };
 
     const touchRead = useCallback(
         async (lastMessageId) => {
@@ -352,7 +341,6 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
             const mapped = arr.map((m) => mapRowToUiMessage(m, MY_ID));
 
             setMessages(mapped);
-            setMode((prev) => (prev === 'connecting' ? prev : detectModeFromMessages(mapped)));
 
             const last = mapped[mapped.length - 1];
             if (last?.id) await touchRead(last.id);
@@ -384,34 +372,9 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
         saveDraft(rid, input);
     }, [rid, input]);
 
-    const doConnectHuman = async () => {
-        if (!rid) return;
-        if (loading) return;
-        if (mode !== 'bot') return;
-
-        try {
-            setMode('connecting');
-            await connectRoom(rid);
-            await loadMessages();
-            setMode('human');
-        } catch (e) {
-            console.error('상담사 연결 실패:', e);
-            setMode('bot');
-        }
-    };
-
     const sendMessage = async (overrideText) => {
         const text = (overrideText ?? input).trim();
         if (!text || !rid) return;
-
-        const connectKeywords = ['상담사', '상담원', '사람', '직원'];
-        const wantHuman = text.includes('연결') && connectKeywords.some((k) => text.includes(k));
-
-        if (wantHuman) {
-            setInput('');
-            await doConnectHuman();
-            return;
-        }
 
         setInput('');
         setShowAttach(false);
@@ -565,13 +528,6 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
     };
 
     const headerTitle = useMemo(() => `세무쳇 (방 ${rid || '-'})`, [rid]);
-    const headerStatus = useMemo(() => {
-        if (!rid) return '방 정보 없음';
-        if (loading) return '불러오는 중…';
-        if (mode === 'connecting') return '상담사 연결중…';
-        if (mode === 'human') return '상담사 연결됨';
-        return '챗봇: ON';
-    }, [loading, mode, rid]);
 
     // ✅ rid가 없을 때 안전 UI
     if (!rid) {
@@ -620,9 +576,9 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
                                 {headerTitle}
                             </div>
 
-                            <div className="cr-status">{headerStatus}</div>
+                            {/* ✅ 상담사 연결 상태 텍스트 제거 */}
 
-                            <div className="cr-headerActions">
+                            <div className="cr-headerActions" style={{ marginLeft: 'auto' }}>
                                 <button
                                     type="button"
                                     className="cr-hIcon"
@@ -758,9 +714,7 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
                                                         >
                                                             {dl === 'loading' ? '다운로드중…' : '다운로드'}
                                                         </button>
-                                                        {dl === 'failed' && (
-                                                            <div className="cr-dlFail">다운로드 실패</div>
-                                                        )}
+                                                        {dl === 'failed' && <div className="cr-dlFail">다운로드 실패</div>}
                                                         {dl === 'expired' && (
                                                             <div className="cr-dlExpired">보관기간 만료</div>
                                                         )}
@@ -790,15 +744,11 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
                                                     <div className="cr-fileSub">
                                                         <div className="cr-fileSubRow">
                                                             <span className="cr-fileLabel">용량:</span>
-                                                            <span className="cr-fileValue">
-                                                                {formatBytes(m.fileSize)}
-                                                            </span>
+                                                            <span className="cr-fileValue">{formatBytes(m.fileSize)}</span>
                                                         </div>
                                                         <div className="cr-fileSubRow">
                                                             <span className="cr-fileLabel">유효기간:</span>
-                                                            <span className="cr-fileValue">
-                                                                {formatExpireDate(m.time)}
-                                                            </span>
+                                                            <span className="cr-fileValue">{formatExpireDate(m.time)}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -814,9 +764,17 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
 
                                                 <div className="cr-fileTopRow">
                                                     <div className="cr-fileBadge">{isTxtLike(m) ? 'TXT' : 'FILE'}</div>
-                                                    <div className="cr-fileTitle" title={displayFileTitle(m)}>
-                                                        {displayFileTitle(m) || '파일'}
-                                                    </div>
+
+                                                    {/* ✅ 여기만 변경: 제목에도 하이라이트 */}
+                                                    {(() => {
+                                                        const titleText = displayFileTitle(m) || '파일';
+                                                        return (
+                                                            <div className="cr-fileTitle" title={titleText}>
+                                                                {renderHighlightedText(titleText)}
+                                                            </div>
+                                                        );
+                                                    })()}
+
                                                     <div className="cr-fileRightSlot" />
                                                 </div>
 
@@ -830,27 +788,15 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
                                                         {dl === 'loading' ? '다운로드중…' : '다운로드'}
                                                     </button>
                                                     {dl === 'failed' && <div className="cr-dlFail">다운로드 실패</div>}
-                                                    {dl === 'expired' && (
-                                                        <div className="cr-dlExpired">보관기간 만료</div>
-                                                    )}
+                                                    {dl === 'expired' && <div className="cr-dlExpired">보관기간 만료</div>}
 
                                                     {openUrl && (
-                                                        <a
-                                                            className="cr-openBtn"
-                                                            href={openUrl}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                        >
+                                                        <a className="cr-openBtn" href={openUrl} target="_blank" rel="noreferrer">
                                                             열기
                                                         </a>
                                                     )}
                                                     {folderUrl && (
-                                                        <a
-                                                            className="cr-openBtn"
-                                                            href={folderUrl}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                        >
+                                                        <a className="cr-openBtn" href={folderUrl} target="_blank" rel="noreferrer">
                                                             폴더 열기
                                                         </a>
                                                     )}
@@ -870,13 +816,9 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
                                         ) : null}
 
                                         {/* TEXT */}
-                                        {type === 'TEXT' ? (
-                                            <div className="cr-text">{renderHighlightedText(m.text)}</div>
-                                        ) : null}
+                                        {type === 'TEXT' ? <div className="cr-text">{renderHighlightedText(m.text)}</div> : null}
 
-                                        <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>
-                                            {timeText}
-                                        </div>
+                                        <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>{timeText}</div>
                                     </div>
                                 </div>
                             );
@@ -937,21 +879,7 @@ export default function ChatRoom({ roomId: propRoomId, onBack }) {
                         +
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={doConnectHuman}
-                        disabled={loading || mode !== 'bot'}
-                        className={`cr-connect ${
-                            mode === 'human'
-                                ? 'cr-connectHuman'
-                                : mode === 'connecting'
-                                  ? 'cr-connectConnecting'
-                                  : 'cr-connectBot'
-                        }`}
-                        title="상담사 연결"
-                    >
-                        {mode === 'human' ? '상담사 연결됨' : mode === 'connecting' ? '연결중…' : '상담사 연결'}
-                    </button>
+                    {/* ✅ 상담사 연결 버튼 제거 */}
 
                     <textarea
                         value={input}

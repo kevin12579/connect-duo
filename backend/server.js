@@ -4,6 +4,7 @@ require('dotenv').config();
 const path = require('path');
 const cors = require('cors');
 const morgan = require('morgan');
+const fs = require('fs');
 
 const { UPLOAD_DIR } = require('./src/middlewares/uploadMiddleware');
 const uploadsRouter = require('./src/routes/uploadsRouter');
@@ -31,18 +32,39 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ public 정적 (필요하면 유지)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ 업로드 파일 정적 서빙
-app.use('/uploads', express.static(UPLOAD_DIR));
+/* ======================================================
+   ✅ 여기만 수정됨 — 다운로드 한글 깨짐 방지
+====================================================== */
+app.get('/uploads/:filename', (req, res) => {
+    try {
+        const raw = String(req.params.filename || '');
+        if (!raw) return res.status(400).send('Bad request');
 
-// ✅ "폴더 열기/텍스트 미리보기" UI
-// - 이제 GET http://localhost:7777/uploads-ui  ✅
-// - TXT: http://localhost:7777/uploads-ui/view/<filename> ✅
+        // path traversal 방지
+        const safeName = path.basename(raw);
+        const fullPath = path.join(UPLOAD_DIR, safeName);
+
+        if (!fs.existsSync(fullPath)) {
+            return res.status(404).send('Not found');
+        }
+
+        // UTF-8 다운로드 헤더 강제 지정
+        const encoded = encodeURIComponent(safeName);
+
+        res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encoded}`);
+
+        return res.sendFile(fullPath);
+    } catch (e) {
+        console.error('[DOWNLOAD ERROR]', e);
+        return res.status(500).send('Server error');
+    }
+});
+/* ====================================================== */
+
 app.use('/uploads-ui', uploadsRouter);
 
-// 라우터
 app.use('/', indexRouter);
 app.use('/api/accounts/signup', signupRouter);
 app.use('/api/accounts', loginRouter);

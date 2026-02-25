@@ -1,0 +1,31 @@
+리액트 설치
+
+1. frontend(파일명) 만듬
+
+2. npm create vite@latest frontend (파일명)
+
+3. ✔ React
+   ✔ JavaScript (또는 TypeScript)
+
+4. Use Vite 8 beta (Experimental)?: No
+
+====> : 설치 완료
+  VITE v7.3.1  ready in 1187 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+****************************************************************************
+홈페이지 편한 구조
+src
+ ├ assets        (이미지/아이콘)
+ ├ components    (재사용 UI)
+ ├ pages         (페이지들 ⭐)
+ ├ styles        (공통 CSS ⭐)
+ ├ App.jsx       (라우터/페이지 연결용)
+ ├ main.jsx      (절대 수정 X)
+------------------------------------------------------------------------------------
+실행
+npm install
+npm start
