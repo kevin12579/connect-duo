@@ -1,0 +1,144 @@
+.cl-page {
+    min-height: 100vh;
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    padding: 18px;
+}
+.cl-panel {
+    width: min(780px, 92vw);
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    padding: 18px;
+    color: white;
+}
+.cl-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.cl-title {
+    font-weight: 900;
+}
+.cl-loading,
+.cl-empty {
+    opacity: 0.8;
+}
+.cl-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    transition:
+        transform 0.15s,
+        box-shadow 0.15s;
+}
+.cl-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.cl-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.cl-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+.cl-avatar-fallback {
+    font-size: 1.2rem;
+}
+.cl-body {
+    flex: 1;
+    min-width: 0;
+}
+.cl-topRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.cl-roomTitle {
+    color: white;
+    font-weight: 700;
+}
+.cl-status-tag {
+    margin-left: 5px;
+    color: #ffe066;
+    font-size: 13px;
+    font-weight: 700;
+}
+.cl-badge-draft {
+    background: rgba(250, 204, 21, 0.22);
+    border: 1px solid rgba(250, 204, 21, 0.35);
+    color: #d4b106;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 6px;
+    margin-left: 6px;
+}
+.cl-badge-unread {
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 7px;
+    margin-left: 7px;
+}
+.cl-day {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+.cl-preview {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.35;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+.cl-trashBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+@media (min-width: 900px) {
+    .cl-panel {
+        padding: 22px;
+    }
+}

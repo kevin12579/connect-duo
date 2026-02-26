@@ -17,6 +17,10 @@ import loginIcon from '../../assets/login.png';
 import profileIcon from '../../assets/profile.png';
 import rankingIcon from '../../assets/rank.png';
 import consultIcon from '../../assets/consult.png';
+import ChatList from '../Chat/ChatList';
+import ChatRoom from '../Chat/ChatRoom';
+
+import { getUserProfile } from '../../api/axios';
 
 const categories = [
     { key: 'login', label: '로그인', icon: loginIcon },
@@ -26,12 +30,9 @@ const categories = [
 ];
 
 export default function MainPage() {
-    const navigate = useNavigate();
     const { authUser, loginAuthUser, logout, isAuthLoading, setAuthLoading } = useAuthStore();
-    const displayUser =
-        authUser && typeof authUser === 'object' && authUser.name
-            ? authUser
-            : JSON.parse(localStorage.getItem('userBackup') || 'null');
+    const [dbUser, setDbUser] = useState(null);
+    const displayUser = dbUser || authUser;
 
     const [selected, setSelected] = useState('login');
     const [authView, setAuthView] = useState('login');
@@ -43,10 +44,17 @@ export default function MainPage() {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [chatQuery, setChatQuery] = useState('');
 
+    // ★ 상담방 열림 상태 및 현재 열린 roomId
+    const [activeChatRoom, setActiveChatRoom] = useState(null);
+
     useEffect(() => {
         const initAuth = async () => {
+            // 새로고침 시 로딩 시작
+            setAuthLoading(true);
+
             const rToken = localStorage.getItem('refreshToken');
             const userBackup = localStorage.getItem('userBackup');
+
             if (!rToken) {
                 setAuthLoading(false);
                 return;
@@ -56,11 +64,32 @@ export default function MainPage() {
                 const newAt = await refreshAccessToken();
                 if (newAt) {
                     sessionStorage.setItem('accessToken', newAt);
-                    const parsedUser = userBackup ? JSON.parse(userBackup) : {};
-                    loginAuthUser({ ...parsedUser, accessToken: newAt });
+                    const parsedBackup = userBackup ? JSON.parse(userBackup) : {};
+
+                    // ✅ 중요: parsedBackup의 ID와 실제 DB 정보가 일치하는지 확인 과정 포함
+                    if (parsedBackup.id) {
+                        const res = await getUserProfile(parsedBackup.id);
+                        if (res.result === 'success') {
+                            const userData = res.data.user;
+
+                            // 1. Zustand 스토어 업데이트
+                            loginAuthUser({ ...userData, accessToken: newAt });
+
+                            // 2. 로컬 상태 업데이트 (메인 페이지 전용)
+                            setDbUser({
+                                ...userData,
+                                avatarUrl: userData.profile_img,
+                            });
+
+                            // 3. 백업 데이터 최신화 (다음 새로고침을 위해)
+                            localStorage.setItem('userBackup', JSON.stringify(userData));
+                        }
+                    }
                 }
             } catch (error) {
-                console.error('자동 로그인 실패:', error);
+                console.error('인증 초기화 실패:', error);
+                // 토큰이 만료되었거나 에러가 나면 아예 비워버림
+                localStorage.removeItem('userBackup');
                 logout();
             } finally {
                 setAuthLoading(false);
@@ -70,9 +99,19 @@ export default function MainPage() {
         initAuth();
     }, [loginAuthUser, logout, setAuthLoading]);
 
+    if (isAuthLoading) {
+        return (
+            <div className="mainpage-loading">
+                <p>최신 정보를 불러오고 있습니다...</p>
+            </div>
+        );
+    }
+
     const handleLogout = () => {
         if (window.confirm('로그아웃 하시겠습니까?')) {
             logout();
+            setDbUser(null); // ✅ 로컬 상태 초기화
+            localStorage.removeItem('userBackup'); // ✅ 백업 삭제
             alert('로그아웃 되었습니다.');
             setSelected('login');
         }
@@ -94,13 +133,12 @@ export default function MainPage() {
 
     const handleSearchAction = (e) => {
         if (e.key === 'Enter' || e.type === 'click') {
-            // 💡 로그인 여부 확인 로직 추가
             if (!authUser) {
                 alert('로그인이 필요한 서비스입니다.');
-                setSearch(''); // 검색창 초기화
-                setIsChatOpen(false); // 채팅창 닫기
-                setSelected('login'); // 로그인 탭으로 이동
-                setAuthView('login'); // 로그인 화면 렌더링
+                setSearch('');
+                setIsChatOpen(false);
+                setSelected('login');
+                setAuthView('login');
                 return;
             }
 
@@ -121,31 +159,40 @@ export default function MainPage() {
         if (profileView === 'TAX_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
     };
 
+    // ★ 상담 영역: 채팅 room 선택 시 ChatRoom 오픈, 아니라면 ChatList
+    const renderConsultContent = () => {
+        if (activeChatRoom) {
+            return <ChatRoom roomId={activeChatRoom} onBack={() => setActiveChatRoom(null)} />;
+        }
+        return <ChatList onOpenRoom={setActiveChatRoom} />;
+    };
+
     const renderContent = () => {
         if (selected === 'login') {
             if (authUser && displayUser) {
+                const userPhoto = displayUser.profile_img || displayUser.avatarUrl;
                 return (
                     <div className="welcome-container">
                         <div className="welcome-header">
                             <div className="welcome-avatar">
-                                {displayUser?.profile_img && typeof displayUser.profile_img === 'string' ? (
+                                {userPhoto ? (
                                     <img
-                                        src={displayUser.profile_img}
+                                        src={userPhoto}
                                         alt="프로필"
                                         className="avatar-img"
                                         onError={(e) => {
                                             e.target.style.display = 'none';
+                                            e.target.parentNode.innerText = String(displayUser?.name || 'U').charAt(0);
                                         }}
                                         style={{
                                             width: '100%',
                                             height: '100%',
                                             borderRadius: '50%',
                                             objectFit: 'cover',
-                                            background: '#fff',
                                         }}
                                     />
                                 ) : (
-                                    String(displayUser?.name || displayUser?.username || 'U').charAt(0)
+                                    <span>{String(displayUser?.name || 'U').charAt(0)}</span>
                                 )}
                             </div>
                             <div className="welcome-text">
@@ -181,18 +228,34 @@ export default function MainPage() {
 
             return authView === 'login' ? (
                 <Login
-                    onSuccess={(data) => {
+                    onSuccess={async (data) => {
+                        // 로컬 백업 + 상태 업데이트 (기존대로)
                         const userInfo = {
+                            id: data.id,
                             name: data.name,
                             username: data.username,
                             user_type: data.user_type,
                             email: data.email,
                         };
                         localStorage.setItem('userBackup', JSON.stringify(userInfo));
-
-                        loginAuthUser(data);
+                        loginAuthUser({ ...data });
                         setSelected('profile');
                         setProfileView(data.user_type === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
+
+                        // 👉 프로필 동기화 (DB 최신 정보로 상태/사진 재확인)
+                        try {
+                            const res = await getUserProfile(data.id);
+                            if (res.result === 'success') {
+                                setDbUser({
+                                    ...res.data.user,
+                                    avatarUrl: res.data.user.profile_img,
+                                });
+                                // 혹시 모를 new profile 백업
+                                localStorage.setItem('userBackup', JSON.stringify(res.data.user));
+                            }
+                        } catch (e) {
+                            // fail safe
+                        }
                     }}
                     onGoSignup={() => setAuthView('signup')}
                 />
@@ -203,7 +266,7 @@ export default function MainPage() {
 
         if (selected === 'profile') return renderProfile();
         if (selected === 'ranking') return <RankingPage onOpenTaxProProfile={openTaxProFromUser} />;
-        if (selected === 'consult') return <div className="main-content-empty">상담 컴포넌트 영역</div>;
+        if (selected === 'consult') return renderConsultContent();
         return null;
     };
 
@@ -274,6 +337,8 @@ export default function MainPage() {
                                     const role = authUser?.user_type || 'USER';
                                     setProfileView(role === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
                                 }
+                                // 상담 탭 클릭 시 상담방 닫기 (항상 목록부터)
+                                if (cat.key === 'consult') setActiveChatRoom(null);
                             }}
                         >
                             <img src={cat.icon} alt={cat.label} className="mainpage-category-icon" />
@@ -283,7 +348,6 @@ export default function MainPage() {
                         </button>
                     ))}
                 </div>
-
                 <div className="mainpage-content-card">{renderContent()}</div>
             </div>
         </div>

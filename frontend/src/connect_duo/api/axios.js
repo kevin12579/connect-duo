@@ -10,7 +10,9 @@ export const axiosBase = axios.create({
 });
 
 // [2] 인증 필수 요청용 인스턴스 (프로필, 상담, 채팅 등)
-const axiosAuth = axios.create({
+// 기존: const axiosAuth = axios.create({ ...
+// 변경: export를 붙여주세요!
+export const axiosAuth = axios.create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
 });

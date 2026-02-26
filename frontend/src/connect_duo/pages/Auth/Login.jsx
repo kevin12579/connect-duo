@@ -6,7 +6,9 @@ import '../Auth/style.css';
 import Logo from '../../assets/connectDuo_logo.png';
 import { postLogin } from '../../api/axios';
 
-const Login = () => {
+import { getUserProfile } from '../../api/axios';
+
+const Login = ({ onSuccess, setDbUser }) => {
     const navigate = useNavigate();
     const loginAuthUser = useAuthStore((s) => s.loginAuthUser);
     const authUser = useAuthStore((s) => s.authUser);
@@ -71,6 +73,22 @@ const Login = () => {
                     email: data.email,
                 };
                 localStorage.setItem('userBackup', JSON.stringify(userInfo));
+
+                // 여기서 onSuccess를 await로 쓸 수 있게 바꾸거나, setDbUser가 있으면 즉시 fetch
+                if (setDbUser) {
+                    // 최신 DB 프로필 즉시 반영
+                    try {
+                        const res = await getUserProfile(data.id);
+                        if (res.result === 'success') {
+                            setDbUser({
+                                ...res.data.user,
+                                avatarUrl: res.data.user.profile_img,
+                            });
+                            localStorage.setItem('userBackup', JSON.stringify(res.data.user));
+                        }
+                    } catch {}
+                }
+
                 // 전역 상태 업데이트 (토큰 저장은 axios.js 내부에서 처리되도록 권장)
                 loginAuthUser({ ...data });
                 alert('로그인 성공!');
