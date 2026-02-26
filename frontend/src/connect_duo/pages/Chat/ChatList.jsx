@@ -88,9 +88,78 @@ function dayLabelFromTs(ts) {
     return `${yyyy}.${mm}.${dd}`;
 }
 
+// ✅ time label: 안읽음(뱃지) 있을 때만 "분 전/1시간 전" 표시 (최대 1시간)
+// - 1시간(60분) 이내: '59분 전' ... '1시간 전'
+// - 1시간 초과 & 같은 날: '오후 12:23'
+// - 다른 날: 'YYYY.MM.DD'
+function toMs(t) {
+    if (!t) return 0;
+    if (typeof t === 'number') return t;
+    const ms = new Date(t).getTime();
+    return Number.isFinite(ms) ? ms : 0;
+}
+
+function formatTimeKo(ts) {
+    if (!ts) return '';
+    try {
+        return new Date(ts).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    } catch {
+        return '';
+    }
+}
+
+function isSameDayTs(tsA, tsB) {
+    const a = new Date(tsA);
+    const b = new Date(tsB);
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+// ✅ unreadCount + 마지막 안읽은 메시지 timestamp 같이 계산
+function computeUnreadInfo(rid) {
+    const lastReadIso = localStorage.getItem(`chat_lastRead_${rid}`);
+    const lastReadTs = toMs(lastReadIso);
+
+    const history = safeParse(localStorage.getItem(`chat_history_${rid}`), []);
+    const list = Array.isArray(history) ? history : [];
+
+    let count = 0;
+    let lastTs = 0;
+
+    for (const m of list) {
+        const ts = toMs(m?.time);
+        if (m?.from !== 'me' && ts > lastReadTs) {
+            count += 1;
+            if (ts > lastTs) lastTs = ts;
+        }
+    }
+
+    return { count, lastTs };
+}
+
+// ✅ 안읽음 있을 때 보여줄 라벨(1시간까지만 상대시간)
+function labelFromUnreadTs(ts) {
+    const ms = toMs(ts);
+    if (!ms) return '';
+
+    const now = Date.now();
+    const diffMin = Math.floor((now - ms) / (60 * 1000));
+
+    if (diffMin <= 0) return '방금 전';
+    if (diffMin < 60) return `${diffMin}분 전`;
+    if (diffMin === 60) return '1시간 전';
+
+    // 1시간 초과
+    if (isSameDayTs(ms, now)) return formatTimeKo(ms);
+    return dayLabelFromTs(ms);
+}
 export default function ChatList() {
     const navigate = useNavigate();
     const [rooms, setRooms] = useState(() => ensureDefaultRoom());
+
+    // 🔥 리스트 화면에서는 active_room 제거 (배지 정상 동작용)
+    useEffect(() => {
+        localStorage.removeItem('chat_active_room');
+    }, []);
 
     // 🔔 알림 ON/OFF (localStorage 유지)
     const [soundEnabled, setSoundEnabled] = useState(() => {
@@ -191,19 +260,35 @@ export default function ChatList() {
             const card = getRoomCard(r);
             const draft = getDraft(card.id);
 
+            // ✅ unread 계산 (history + lastRead 기준)
+            const unreadInfo = computeUnreadInfo(card.id);
+            const unread = unreadInfo.count;
+
             if (draft) {
                 const nextUpdatedAt = Math.max(card.updatedAt || 0, draft.updatedAt || 0);
 
+                // unread가 있으면 "마지막 안읽은 메시지 시간" 기준으로 라벨 표시
+                const labelTs = unread > 0 && unreadInfo.lastTs ? unreadInfo.lastTs : nextUpdatedAt;
+
                 return {
                     ...card,
+                    unread,
                     preview: `임시저장: ${draft.preview}`,
                     updatedAt: nextUpdatedAt,
-                    dayLabel: dayLabelFromTs(nextUpdatedAt),
+                    dayLabel: unread > 0 ? labelFromUnreadTs(labelTs) : dayLabelFromTs(labelTs),
                     __hasDraft: true,
                 };
             }
 
-            return { ...card, __hasDraft: false };
+            const baseTs = card.updatedAt || 0;
+            const labelTs = unread > 0 && unreadInfo.lastTs ? unreadInfo.lastTs : baseTs;
+
+            return {
+                ...card,
+                unread,
+                dayLabel: unread > 0 ? labelFromUnreadTs(labelTs) : dayLabelFromTs(labelTs),
+                __hasDraft: false,
+            };
         });
 
         return list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));

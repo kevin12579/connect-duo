@@ -17,7 +17,7 @@ import {
 } from '../../utils/chat/messageNormalize';
 
 import { upsertRoomMeta } from '../../utils/chat/roomMeta';
-import { demoAgentReply } from '../../utils/chat/demoAgent';
+import { demoAgentReplyText as demoAgentReply } from '../../utils/chat/demoAgent';
 
 // ==============================
 // ✅ bytes -> "68.38KB" formatter
@@ -51,6 +51,25 @@ function formatExpireDate(baseTime) {
     return `~${yyyy}.${mm}.${dd}`;
 }
 export default function ChatRoom() {
+    // === Helpers: User Action & Mark Last Message Read ===
+    const onUserAction = () => {
+        lastUserActionAtRef.current = Date.now();
+        if (consultModeRef.current === 'human') scheduleInactivityTimers();
+    };
+
+    const markLastMyMessageRead = (list) => {
+        const arr = Array.isArray(list) ? list : [];
+        let lastIdx = -1;
+        for (let i = arr.length - 1; i >= 0; i--) {
+            if (arr[i]?.from === 'me') {
+                lastIdx = i;
+                break;
+            }
+        }
+        if (lastIdx < 0) return arr;
+        if (arr[lastIdx]?.read) return arr;
+        return arr.map((m, idx) => (idx === lastIdx ? { ...m, read: true } : m));
+    };
     const { roomId } = useParams();
     const rid = roomId || 'demo-room';
     const draftKey = `draft_${rid}`;
@@ -69,7 +88,105 @@ export default function ChatRoom() {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [consultMode, setConsultMode] = useState('bot');
+    // agentName은 사용되지 않으므로 제거
+    // ✅ 메시지 전송 상태
     const [sending, setSending] = useState(false);
+    const connectTimerRef = useRef(null);
+
+    const waitIntervalRef = useRef(null);
+    const waitCountRef = useRef(0);
+
+    // ✅ 연결 대기 중 입력 버퍼(상담사 연결 전에도 메시지 입력 가능)
+    const pendingDuringConnectRef = useRef([]); // 대기 중 보낸 메시지들
+    const connectAckShownRef = useRef(false); // "접수되었습니다" 안내 1회만
+
+    // ✅ 상담 종료 연출(상담사가 종료하거나, 종료 안내 후 사용자가 !종료)
+    const endHintShownRef = useRef(false);
+    const autoEndScheduledRef = useRef(false);
+    const humanTurnCountRef = useRef(0);
+
+    // ✅ 상담 무응답 타이머 refs
+    const inactivityWarnTimerRef = useRef(null);
+    const inactivityEndTimerRef = useRef(null);
+    const lastUserActionAtRef = useRef(Date.now());
+
+    // ✅ consultMode 최신값 참조(타이머 콜백 stale 방지)
+    const consultModeRef = useRef(consultMode);
+    useEffect(() => {
+        consultModeRef.current = consultMode;
+    }, [consultMode]);
+
+    const clearWaitInterval = () => {
+        if (waitIntervalRef.current) {
+            clearInterval(waitIntervalRef.current);
+            waitIntervalRef.current = null;
+        }
+    };
+    const clearInactivityTimers = () => {
+        if (inactivityWarnTimerRef.current) {
+            clearTimeout(inactivityWarnTimerRef.current);
+            inactivityWarnTimerRef.current = null;
+        }
+        if (inactivityEndTimerRef.current) {
+            clearTimeout(inactivityEndTimerRef.current);
+            inactivityEndTimerRef.current = null;
+        }
+    };
+
+    // Placeholder for missing function
+    const scheduleInactivityTimers = () => {
+        // Implement timer scheduling logic here if needed
+    };
+
+    // Removed misplaced pushSystemMessage and picked usage from here (handled in onClickAiCounselor)
+
+    // Removed stray '네;' line
+
+    // === Inactivity/Bot Switch Logic ===
+    // switchToBotDueToInactivity 함수는 사용되지 않아 삭제함 (no-unused-vars 경고 제거)
+
+    // 시스템 메시지를 추가하는 함수(useCallback으로 감싸기)
+    const pushSystemMessage = React.useCallback((text) => {
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: `system-${Date.now()}`,
+                from: 'system',
+                type: 'SYSTEM',
+                text,
+                time: new Date().toISOString(),
+                read: true,
+            },
+        ]);
+        requestAnimationFrame(scrollToBottom);
+    }, []);
+
+    // 상담 종료 함수 (setAgentName 제거)
+
+    const endConsultation = (endedBy = 'user') => {
+        // ✅ 연결/대기 타이머 정리
+        if (connectTimerRef.current) {
+            clearTimeout(connectTimerRef.current);
+            connectTimerRef.current = null;
+        }
+        clearWaitInterval();
+        clearInactivityTimers();
+
+        // ✅ 세션 상태 초기화
+        setConsultMode('bot');
+        pendingDuringConnectRef.current = [];
+        connectAckShownRef.current = false;
+        endHintShownRef.current = false;
+        autoEndScheduledRef.current = false;
+        humanTurnCountRef.current = 0;
+
+        // ✅ 종료 멘트(요청한 문구 2줄이 "마지막"으로 남도록)
+        pushSystemMessage(
+            '고객님의 소중한 시간에 적지 않은 기다림을 드렸습니다. 배려하고 기다려 주셔서 감사합니다. 건강 잘 챙기시고 행복하세요\n\n상담원과의 채팅 상담이 종료되었습니다.',
+        );
+    };
+
     useEffect(() => {
         // ✅ 방 들어오자마자 input === '' 때문에 draft가 지워지는 걸 방지
         if (!draftHydratedRef.current) return;
@@ -83,7 +200,7 @@ export default function ChatRoom() {
         }
 
         window.dispatchEvent(new Event('chat_meta_updated'));
-    }, [input, draftKey, draftTimeKey]);
+    }, [input, draftKey, draftTimeKey, pushSystemMessage]);
 
     useEffect(() => {
         const savedDraft = localStorage.getItem(draftKey);
@@ -224,6 +341,14 @@ export default function ChatRoom() {
         return () => {
             const cur = localStorage.getItem('chat_active_room');
             if (cur === String(rid)) localStorage.removeItem('chat_active_room');
+
+            // ✅ 타이머 정리(대기/무응답/연결)
+            clearWaitInterval();
+            clearInactivityTimers();
+            if (connectTimerRef.current) {
+                clearTimeout(connectTimerRef.current);
+                connectTimerRef.current = null;
+            }
         };
         // eslint-disable-next-line
     }, [rid]);
@@ -247,32 +372,79 @@ export default function ChatRoom() {
             }
 
             setMessages((prev) => {
-                if (prev.some((m) => String(m.id) === String(message?.id))) return prev;
+                const list = Array.isArray(prev) ? prev : [];
 
-                const newMsg = {
-                    id: message.id,
-                    from: message.from,
-                    type: message.type,
-                    text: message.text,
+                // 1) id 중복 방지
+                if (list.some((m) => String(m.id) === String(message?.id))) return list;
+
+                const incoming = {
+                    id: message.id ?? `evt-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    from: message.from ?? 'agent',
+                    type: message.type ?? 'TEXT',
+                    text: message.text ?? '',
                     fileUrl: message.fileUrl ?? null,
                     fileName: message.fileName ?? null,
-                    downloadUrl: message.downloadUrl ?? null, // ✅ 추가
-                    attachments: message.attachments ?? null, // ✅ 추가 (size용)
-                    time: message.time,
+                    downloadUrl: message.downloadUrl ?? null,
+                    attachments: message.attachments ?? null,
+                    time: message.time ?? new Date().toISOString(),
                     read: message.read ?? true,
                 };
 
-                const next = [...prev, newMsg];
+                // 2) ✅ 내 TEXT optimistic(temp) 치환
+                // - 내가 보낸 텍스트와 동일
+                // - temp id로 시작 (temp-)
+                // - 3초 이내면 같은 메시지로 보고 치환
+                const isIncomingMyText = incoming.from === 'me' && String(incoming.type).toUpperCase() === 'TEXT';
+                if (isIncomingMyText) {
+                    const reversed = [...list].reverse();
+                    const tempMine = reversed.find(
+                        (m) =>
+                            String(m?.id || '').startsWith('temp-') &&
+                            m?.from === 'me' &&
+                            String(m?.type || 'TEXT').toUpperCase() === 'TEXT' &&
+                            String(m?.text || '').trim() === String(incoming.text || '').trim(),
+                    );
+
+                    if (tempMine) {
+                        const tA = new Date(tempMine.time || 0).getTime();
+                        const tB = new Date(incoming.time || Date.now()).getTime();
+                        if (Number.isFinite(tA) && Number.isFinite(tB) && Math.abs(tA - tB) <= 3000) {
+                            const next = list.map((m) => (m.id === tempMine.id ? { ...m, ...incoming } : m));
+                            localStorage.setItem(`chat_history_${rid}`, JSON.stringify(next));
+                            localStorage.setItem(
+                                `chat_meta_${rid}`,
+                                JSON.stringify({
+                                    preview: incoming.text || '',
+                                    updatedAt: Date.now(),
+                                }),
+                            );
+                            window.dispatchEvent(new Event('chat_meta_updated'));
+                            return next;
+                        }
+                    }
+
+                    // 3) ✅ 만약 temp 못 찾았어도, 그냥 추가하지 말고 읽음만 갱신(에코로 들어온 경우)
+                    markRoomRead(rid).catch(() => {});
+                    localStorage.setItem(`chat_lastRead_${rid}`, new Date().toISOString());
+                    window.dispatchEvent(new Event('chat_meta_updated'));
+                    return list;
+                }
+
+                let next = [...list, incoming];
+
+                // ✅ 상대(상담사/봇) 메시지가 들어오면 → 내 마지막 메시지는 읽음 처리
+                if (incoming?.from !== 'me') {
+                    next = markLastMyMessageRead(next);
+                }
 
                 localStorage.setItem(`chat_history_${rid}`, JSON.stringify(next));
                 localStorage.setItem(
                     `chat_meta_${rid}`,
                     JSON.stringify({
-                        preview: newMsg.text || (newMsg.fileName ? `[파일] ${newMsg.fileName}` : ''),
+                        preview: incoming.text || (incoming.fileName ? `[파일] ${incoming.fileName}` : ''),
                         updatedAt: Date.now(),
                     }),
                 );
-
                 window.dispatchEvent(new Event('chat_meta_updated'));
                 return next;
             });
@@ -315,6 +487,29 @@ export default function ChatRoom() {
                     },
                 }),
             );
+
+            // ✅ 상담 중이라면(상담사 모드) 랜덤 종료 흐름을 가끔 연출
+            if (consultMode === 'human') {
+                humanTurnCountRef.current += 1;
+
+                // (1) 상담사가 먼저 종료해버리는 케이스 (낮은 확률)
+                if (!autoEndScheduledRef.current && humanTurnCountRef.current >= 3 && Math.random() < 0.1) {
+                    autoEndScheduledRef.current = true;
+                    setTimeout(
+                        () => {
+                            if (consultMode !== 'human') return;
+                            endConsultation('agent');
+                        },
+                        12_000 + Math.floor(Math.random() * 18_000),
+                    );
+                }
+
+                // (2) 상담사가 "!종료로 종료해주세요" 라고 안내하는 케이스 (낮은 확률)
+                if (!endHintShownRef.current && humanTurnCountRef.current >= 2 && Math.random() < 0.15) {
+                    endHintShownRef.current = true;
+                    pushSystemMessage('상담이 마무리되었습니다 🙂\n종료를 원하시면 채팅창에 "!종료"를 입력해 주세요.');
+                }
+            }
         }, 700);
     };
 
@@ -332,7 +527,26 @@ export default function ChatRoom() {
     // ==============================
     const sendMessage = async (overrideText) => {
         const text = (overrideText ?? input).trim();
+
+        // ✅ "!종료" 입력 시 서버 전송 없이 상담 종료
+        if (text === '!종료' || text === '/종료') {
+            setInput('');
+            localStorage.removeItem(draftKey);
+            localStorage.removeItem(draftTimeKey);
+            window.dispatchEvent(new Event('chat_meta_updated'));
+
+            if (consultMode !== 'human') {
+                pushSystemMessage('현재 상담사 연결 상태가 아닙니다 🙂');
+                return;
+            }
+
+            endConsultation('user');
+            return;
+        }
         if (!text || !rid || sending) return;
+
+        // ✅ 상담사 연결 중(human)이라면 유저 활동으로 간주 → 무응답 타이머 리셋
+        onUserAction();
 
         setSending(true);
         setInput('');
@@ -359,6 +573,21 @@ export default function ChatRoom() {
         });
 
         requestAnimationFrame(scrollToBottom);
+
+        // ✅ 상담사 연결 대기 중에는 메시지를 접수만 하고(버퍼 저장), 상담사 연결 후 이어서 처리
+        if (consultMode === 'connecting') {
+            pendingDuringConnectRef.current.push(text);
+
+            if (!connectAckShownRef.current) {
+                connectAckShownRef.current = true;
+                pushSystemMessage(
+                    '입력해주신 내용은 접수되었습니다 ✅\n상담사 연결 후 순서대로 확인하여 안내드릴게요 🙂',
+                );
+            }
+
+            setSending(false);
+            return;
+        }
 
         try {
             // ✅ 2) 서버 전송
@@ -393,8 +622,10 @@ export default function ChatRoom() {
         } finally {
             setSending(false);
 
-            // ✅ 데모 상담사 자동답변
-            demoPushAgentMessage(text);
+            // ✅ 데모 답변: 연결 대기 중에는 답변 금지(접수만)
+            if (consultMode === 'bot' || consultMode === 'human') {
+                demoPushAgentMessage(text);
+            }
         }
     };
 
@@ -404,6 +635,9 @@ export default function ChatRoom() {
     const onPickFiles = async (e) => {
         const list = Array.from(e.target.files || []);
         if (list.length === 0 || !rid) return;
+
+        // ✅ 파일 전송도 유저 활동으로 간주
+        onUserAction();
 
         const first = list[0];
 
@@ -460,6 +694,29 @@ export default function ChatRoom() {
                         },
                     }),
                 );
+
+                // ✅ 파일 확인 자동응답(사진/txt)
+                const __fname = (uploaded?.fileName || first?.name || '파일').trim();
+                const __lower = __fname.toLowerCase();
+                let __ack = '';
+                if (/(\.jpg|\.jpeg|\.png|\.webp)$/i.test(__lower)) {
+                    __ack = `${__fname} 사진을 확인했어요 🙂 어떤 부분이 궁금하세요?`;
+                } else if (/\.txt$/i.test(__lower)) {
+                    __ack = `${__fname} txt 파일을 확인했어요. 내용 중 어떤 걸 확인해볼까요?`;
+                } else {
+                    __ack = `${__fname} 파일을 확인했어요. 어떤 점을 도와드릴까요?`;
+                }
+
+                // connecting(대기) 중엔 상담사/봇 답변 대신 "접수"만 안내
+                if (consultMode === 'connecting') {
+                    if (!connectAckShownRef.current) {
+                        connectAckShownRef.current = true;
+                        pushSystemMessage('파일이 접수되었습니다 ✅\n상담사 연결 후 순서대로 확인하여 안내드릴게요 🙂');
+                    }
+                } else {
+                    demoPushAgentMessage(__ack);
+                }
+
                 return;
             }
 
@@ -484,6 +741,28 @@ export default function ChatRoom() {
                     },
                 }),
             );
+
+            // ✅ 파일 확인 자동응답(사진/txt)
+            const __fname = (first?.name || '파일').trim();
+            const __lower = __fname.toLowerCase();
+            let __ack = '';
+            if (/(\.jpg|\.jpeg|\.png|\.webp)$/i.test(__lower)) {
+                __ack = `${__fname} 사진을 확인했어요 🙂 어떤 부분이 궁금하세요?`;
+            } else if (/\.txt$/i.test(__lower)) {
+                __ack = `${__fname} txt 파일을 확인했어요. 내용 중 어떤 걸 확인해볼까요?`;
+            } else {
+                __ack = `${__fname} 파일을 확인했어요. 어떤 점을 도와드릴까요?`;
+            }
+
+            // connecting(대기) 중엔 상담사/봇 답변 대신 "접수"만 안내
+            if (consultMode === 'connecting') {
+                if (!connectAckShownRef.current) {
+                    connectAckShownRef.current = true;
+                    pushSystemMessage('파일이 접수되었습니다 ✅\n상담사 연결 후 순서대로 확인하여 안내드릴게요 🙂');
+                }
+            } else {
+                demoPushAgentMessage(__ack);
+            }
         } catch (err) {
             console.error('파일 업로드 실패:', err);
             alert('파일 업로드 실패! (서버/라우트/CORS/응답 확인 필요)');
@@ -494,10 +773,165 @@ export default function ChatRoom() {
     };
 
     const onClickAiCounselor = async () => {
-        await sendMessage('상담사 연결');
+        // 이미 연결중이면 중복 클릭 방지
+        if (consultMode === 'connecting') return;
+
+        // 이미 human이면 안내만
+        if (consultMode === 'human') {
+            pushSystemMessage('이미 상담사와 연결되어 있습니다 🙂');
+            return;
+        }
+
+        // ✅ 1) "상담사 연결 요청"은 사용자 메시지로 남기되, 대기 중 자동응답은 금지
+        // Use sendMessage to send the request as user message
+        sendMessage('상담사 연결 요청');
+
+        // ✅ 2) connecting
+        setConsultMode('connecting');
+        connectAckShownRef.current = false;
+        pendingDuringConnectRef.current = [];
+
+        // ✅ 대기열(표시용): 1~10명 / 1인당 3분
+        const initialWaiting = Math.floor(Math.random() * 10) + 1;
+        waitCountRef.current = initialWaiting;
+
+        const perPersonMinDisplay = 3; // 표시용(분)
+        const totalWaitMinDisplay = initialWaiting * perPersonMinDisplay;
+
+        // ✅ 실제 연결 시간은 1~3분 내로(요구사항)
+        const totalWaitMs = (Math.floor(Math.random() * 3) + 1) * 60 * 1000;
+
+        pushSystemMessage(
+            `상담사 연결 중입니다… 잠시만 기다려주세요 🙏
+
+현재 ${initialWaiting}명 대기중이며, 예상 대기시간은 ${totalWaitMinDisplay}분입니다.`,
+        );
+
+        // ✅ 대기열 감소 연출: "항상 1명씩/고정 간격"이 아니라
+        // - 업데이트 횟수 자체를 줄이고(2~6회)
+        // - 간격은 들쭉날쭉(8~40초)
+        // - 한 번에 1~2명 감소할 수도 있게(더 자연스럽게)
+        const buildDecrements = (n) => {
+            const target = Math.max(0, n - 1);
+            if (target === 0) return [];
+
+            const maxUpdates = Math.min(6, target);
+            const updates = Math.max(2, Math.min(maxUpdates, 2 + Math.floor(Math.random() * (maxUpdates - 1))));
+
+            // 감소량(합=target) 만들기: 1~2씩 섞기
+            let left = target;
+            const decs = [];
+            for (let i = 0; i < updates - 1; i++) {
+                const d = left >= 2 && Math.random() < 0.35 ? 2 : 1;
+                decs.push(d);
+                left -= d;
+                if (left <= 0) break;
+            }
+            if (left > 0) decs.push(left);
+            return decs;
+        };
+
+        const randBetween = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+
+        const decrements = buildDecrements(initialWaiting);
+        const usable = Math.floor(totalWaitMs * 0.8); // 마지막 연결 전 '잠깐 멈칫' 느낌 남기기
+        const minGap = 8_000;
+        const maxGap = 40_000;
+
+        const gaps = decrements.map(() => randBetween(minGap, maxGap));
+        const sumGaps = gaps.reduce((x, y) => x + y, 0) || 1;
+        const scale = Math.min(1, usable / sumGaps);
+
+        const schedule = [];
+        let acc = 0;
+        for (let i = 0; i < gaps.length; i++) {
+            acc += Math.max(minGap, Math.floor(gaps[i] * scale));
+            schedule.push(acc);
+        }
+
+        // 기존 interval 정리
+        clearWaitInterval();
+
+        let remaining = initialWaiting;
+
+        // 감소 메시지 예약
+        schedule.forEach((atMs, idx) => {
+            const dec = decrements[idx] ?? 1;
+
+            setTimeout(() => {
+                if (consultMode !== 'connecting') return;
+
+                remaining = Math.max(1, remaining - dec);
+                waitCountRef.current = remaining;
+
+                const etaMin = remaining * perPersonMinDisplay;
+
+                // 너무 도배되지 않도록: 남은 인원이 줄었을 때만 찍기
+                pushSystemMessage(`현재 ${remaining}명 대기중이며, 예상 대기시간은 ${etaMin}분입니다.`);
+            }, atMs);
+        });
+
+        // ✅ 3) 실제 대기시간 후 human 전환
+        if (connectTimerRef.current) clearTimeout(connectTimerRef.current);
+
+        connectTimerRef.current = setTimeout(() => {
+            clearWaitInterval();
+
+            const agents = ['김세무', '박세무', '이세무', '최세무', '정세무'];
+            const picked = agents[Math.floor(Math.random() * agents.length)];
+
+            setConsultMode('human');
+            pushSystemMessage(
+                `${picked} 상담사님이 연결되었습니다 ✅\n무엇을 도와드릴까요?\n\n` +
+                    '상담원 연결 후 5분 이내에 입력이 없으실 경우 상담이 종료될 수 있으니 이 점 참고부탁드립니다.\n' +
+                    '상담이 원활히 이루어질 수 있도록 채팅알림을 확인해 주세요.\n\n' +
+                    '상담을 종료하시려면 "!종료"를 입력해주세요.',
+            );
+
+            // ✅ 연결된 순간부터 무응답 타이머 시작
+            lastUserActionAtRef.current = Date.now();
+            scheduleInactivityTimers();
+
+            // ✅ 대기 중 접수된 메시지 처리
+            const pending = pendingDuringConnectRef.current;
+            pendingDuringConnectRef.current = [];
+            connectAckShownRef.current = false;
+
+            if (pending.length > 0) {
+                pushSystemMessage(
+                    `대기 중 접수된 메시지 ${pending.length}건을 확인했어요 ✅\n지금부터 이어서 안내드릴게요 🙂`,
+                );
+
+                // 너무 스팸처럼 여러 답변을 보내지 않도록 마지막 메시지 기준으로 한 번만 답변
+                const last = pending[pending.length - 1];
+                const replyText = demoAgentReply(last);
+                window.dispatchEvent(
+                    new CustomEvent(CHAT_MESSAGE_EVENT, {
+                        detail: {
+                            roomId: rid,
+                            message: {
+                                id: `agent-${Date.now()}`,
+                                from: 'agent',
+                                type: 'TEXT',
+                                text: replyText,
+                                time: new Date().toISOString(),
+                                read: false,
+                            },
+                        },
+                    }),
+                );
+            }
+        }, totalWaitMs);
     };
 
     const headerTitle = useMemo(() => `세무쳇 (방 ${rid})`, [rid]);
+
+    // ✅ 온라인/오프라인 표시 (상담사 기준)
+    const agentStatusText = useMemo(() => {
+        if (consultMode === 'connecting') return '🟡 연결 중…';
+        if (consultMode === 'human') return '🟢 온라인';
+        return '⚫ 오프라인';
+    }, [consultMode]);
 
     return (
         <div className="chatroom-page">
@@ -507,7 +941,7 @@ export default function ChatRoom() {
                         ←
                     </Link>
                     <div className="chatroom-title">{headerTitle}</div>
-                    <div className="chatroom-status">{loading ? '불러오는 중…' : '연결됨'}</div>
+                    <div className="chatroom-status">{loading ? '불러오는 중…' : agentStatusText}</div>
                 </div>
 
                 <div ref={listRef} className="chatroom-list">
@@ -738,18 +1172,23 @@ export default function ChatRoom() {
 
                 <div className="chatroom-inputbar">
                     <button onClick={() => fileInputRef.current?.click()}>+</button>
-                    <button onClick={onClickAiCounselor}>AI 상담사</button>
+                    <button onClick={onClickAiCounselor}>상담사 연결</button>
 
                     <textarea
                         ref={textareaRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={onKeyDown}
-                        placeholder="메시지를 입력하세요"
+                        disabled={sending}
+                        placeholder={
+                            consultMode === 'connecting'
+                                ? '대기 중에도 입력 가능해요 (전송하면 접수됩니다)'
+                                : '메시지를 입력하세요'
+                        }
                     />
 
                     <button onClick={() => sendMessage()} disabled={sending}>
-                        {sending ? '전송중…' : '전송'}
+                        {sending ? '전송중…' : consultMode === 'connecting' ? '접수' : '전송'}
                     </button>
                 </div>
             </div>

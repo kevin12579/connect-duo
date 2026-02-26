@@ -1,11 +1,11 @@
 // src/api/chatApi.js
 // ✅ Connect-Duo Chat API (single source of truth)
-
 const API_BASE = process.env.REACT_APP_API_BASE || process.env.REACT_APP_CHAT_API_BASE || 'http://localhost:4000';
+console.log('✅ API_BASE =', API_BASE);
 
 // ===== localStorage keys =====
 const ROOMS_KEY = 'chat_rooms';
-const LAST_READ_KEY = (rid) => `chat_last_read_at_${rid}`;
+const LAST_READ_KEY = (rid) => `chat_lastRead_${rid}`;
 
 // ===== helpers =====
 async function request(path, { method = 'GET', headers, body } = {}) {

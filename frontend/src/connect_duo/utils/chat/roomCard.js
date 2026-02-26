@@ -11,17 +11,32 @@ export function getUnreadCount(roomId) {
         const lastReadRaw = localStorage.getItem(`chat_lastRead_${roomId}`);
         const lastRead = lastReadRaw ? new Date(lastReadRaw).getTime() : 0;
 
-        const unread = (Array.isArray(history) ? history : []).filter((m) => {
-            if (!m?.time) return false;
-            const t = new Date(m.time).getTime();
+        const list = Array.isArray(history) ? history : [];
 
-            const incoming = m.from === 'bot' || m.from === 'agent';
-            const notSystem = m.type !== 'system' && m.from !== 'system';
+        let count = 0;
+        for (const m of list) {
+            if (!m) continue;
 
-            return incoming && notSystem && t > lastRead;
-        });
+            // ✅ time 보정: time이 없으면 createdAt/created_at도 허용
+            const tRaw = m.time ?? m.createdAt ?? m.created_at;
+            if (!tRaw) continue;
+            const t = typeof tRaw === 'number' ? tRaw : new Date(tRaw).getTime();
+            if (!t || Number.isNaN(t)) continue;
 
-        return unread.length;
+            // ✅ system 제외
+            const isSystem = m.type === 'system' || m.from === 'system';
+            if (isSystem) continue;
+
+            // ✅ incoming 범위 확장 (너 프로젝트에서 실제 from 값들 대응)
+            const from = String(m.from || '');
+            const incoming = from !== 'me'; // 🔥 핵심: 내 메시지만 제외하고 나머지는 수신으로 친다
+
+            if (!incoming) continue;
+
+            if (t > lastRead) count += 1;
+        }
+
+        return count;
     } catch {
         return 0;
     }
