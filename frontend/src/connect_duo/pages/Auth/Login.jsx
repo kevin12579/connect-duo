@@ -65,6 +65,7 @@ const Login = ({ onSuccess, setDbUser }) => {
             if (result === 'success') {
                 sessionStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken);
+                console.log('로그인 성공:', data.refreshToken);
                 const userInfo = {
                     id: data.id,
                     name: data.name, // 👈 이 줄이 빠져있었습니다.

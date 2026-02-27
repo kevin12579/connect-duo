@@ -53,6 +53,11 @@ export default function ChatRoom({ roomId, onBack }) {
 
     const MY_ID = useMemo(() => getMyIdFallback1(), []);
 
+    const isAgentOnline = useMemo(() => {
+        return [...onlineUsers].some((uid) => uid !== String(MY_ID));
+    }, [onlineUsers, MY_ID]);
+    console.log('온라인 유저 목록:', onlineUsers, '내 ID:', MY_ID, '상대방 온라인 여부:', isAgentOnline);
+
     const scrollToBottom = useCallback(() => {
         const el = listRef.current;
         if (el) el.scrollTop = el.scrollHeight;
@@ -81,46 +86,31 @@ export default function ChatRoom({ roomId, onBack }) {
             return;
         }
 
-        socket.emit('join_room', rid);
-
-        /**
-         * ✅ FIX BUG3: 내 메시지 중복 표시 문제
-         *
-         * 서버는 io.to(roomId).emit()으로 방 전체에 emit합니다 (본인 포함).
-         * 따라서 내가 보낸 메시지도 소켓으로 다시 수신됩니다.
-         *
-         * 처리 흐름:
-         *   [케이스 A] HTTP 응답이 소켓보다 먼저 도달 (일반적):
-         *     sendMessage() → tempId 추가 → HTTP 응답으로 tempId→실제id 교체
-         *     → 소켓 수신 시 id 중복 체크 → skip ✓
-         *
-         *   [케이스 B] 소켓이 HTTP 응답보다 먼저 도달 (드물지만 발생 가능):
-         *     sendMessage() → tempId 추가
-         *     → 소켓 수신 시 내 메시지 + temp-* 발견 → tempId를 실제id로 교체
-         *     → HTTP 응답 도달 시 tempId 없음 → no-op ✓
-         */
         const onReceiveMessage = (rawMsg) => {
             const uiMsg = mapRowToUiMessage(rawMsg, MY_ID, absolutizeFileUrl);
             if (!uiMsg) return;
-
+            console.log('[소켓 onReceiveMessage] 도착:', uiMsg);
             setMessages((prev) => {
                 // ① 이미 같은 id가 있으면 skip (케이스 A의 소켓 중복 처리)
                 if (prev.some((m) => String(m.id) === String(uiMsg.id))) return prev;
 
-                // ② 내가 보낸 메시지인 경우: tempId를 찾아서 교체 (케이스 B)
+                // ② 내가 보낸 메시지인 경우
                 if (uiMsg.from === 'me') {
                     const tempIdx = prev.findIndex((m) => typeof m.id === 'string' && m.id.startsWith('temp-'));
                     if (tempIdx !== -1) {
-                        // tempId 자리에 실제 서버 메시지 삽입
+                        // 텍스트 채팅: tempId 자리에 실제 서버 메시지 삽입
                         const next = [...prev];
                         next[tempIdx] = uiMsg;
                         return next;
                     }
-                    // tempId가 이미 HTTP 응답으로 교체됐거나 없으면 skip
-                    return prev;
+
+                    // 🔥 [수정됨] tempId가 없는 경우 (예: 파일 업로드)
+                    // 무시(return prev)하지 말고, 상대방 메시지처럼 배열 끝에 추가해 줍니다!
+                    return [...prev, uiMsg];
                 }
 
                 // ③ 상대방 메시지: 목록 끝에 추가
+                if (uiMsg.from !== 'me') debouncedMarkRead();
                 return [...prev, uiMsg];
             });
 
@@ -155,12 +145,20 @@ export default function ChatRoom({ roomId, onBack }) {
                 return next;
             });
         };
+        // ✅ 추가: 방에 이미 있던 유저 목록을 받았을 때 처리
+        const onCurrentUsers = ({ users }) => {
+            const normalized = users.map((id) => String(id));
+            setOnlineUsers(new Set(normalized));
+        };
 
         socket.on('receive_message', onReceiveMessage);
         socket.on('ROOM_CLOSED', onRoomClosed);
         socket.on('read_updated', onReadUpdated);
         socket.on('user_online', onUserOnline);
         socket.on('user_offline', onUserOffline);
+        socket.on('room_users', onCurrentUsers);
+
+        socket.emit('join_room', rid);
 
         return () => {
             socket.emit('leave_room', rid);
@@ -169,6 +167,7 @@ export default function ChatRoom({ roomId, onBack }) {
             socket.off('read_updated', onReadUpdated);
             socket.off('user_online', onUserOnline);
             socket.off('user_offline', onUserOffline);
+            socket.off('room_users', onCurrentUsers);
             if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
         };
     }, [rid, MY_ID, scrollToBottom, debouncedMarkRead]);
@@ -372,9 +371,6 @@ export default function ChatRoom({ roomId, onBack }) {
 
     const headerTitle = useMemo(() => `세무챗 (방 ${rid || '-'})`, [rid]);
 
-    // 상대방 온라인 여부
-    const isPartnerOnline = useMemo(() => [...onlineUsers].some((uid) => uid !== String(MY_ID)), [onlineUsers, MY_ID]);
-
     // rid 없음 fallback
     if (!rid) {
         return (
@@ -427,20 +423,10 @@ export default function ChatRoom({ roomId, onBack }) {
                                     </span>
                                 )}
                                 {/* ✅ 상대방 온라인 초록 점 */}
-                                {isPartnerOnline && (
-                                    <span
-                                        style={{
-                                            display: 'inline-block',
-                                            width: 10,
-                                            height: 10,
-                                            borderRadius: '50%',
-                                            background: '#4caf50',
-                                            marginLeft: 8,
-                                            verticalAlign: 'middle',
-                                        }}
-                                        title="상대방 온라인"
-                                    />
-                                )}
+                                <div className={`cr-status-tag ${isAgentOnline ? 'is-online' : ''}`}>
+                                    <span className="cr-status-dot"></span>
+                                    <span className="cr-status-text">{isAgentOnline ? '접속 중' : '오프라인'}</span>
+                                </div>
                             </div>
                             <div className="cr-headerActions" style={{ marginLeft: 'auto' }}>
                                 <button
@@ -676,7 +662,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                     style={{
                                                         marginLeft: 6,
                                                         fontSize: '11px',
-                                                        color: '#ffffff',
+                                                        color: '#221e1e',
                                                     }}
                                                 >
                                                     {m.isRead ? '읽음' : '안읽음'}

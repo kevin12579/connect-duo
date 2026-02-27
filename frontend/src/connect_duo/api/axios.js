@@ -3,7 +3,7 @@ import axios from 'axios';
 import { checkTokenExpiration, refreshAccessToken } from '../utils/authUtils';
 import { initSocket, disconnectSocket } from './chatAxios';
 
-const BASE_URL = `http://localhost:7777/api/`;
+const BASE_URL = `http://192.168.0.8:7777/api/`;
 
 // [1] 인증 불필요 (회원가입, 로그인 등)
 export const axiosBase = axios.create({

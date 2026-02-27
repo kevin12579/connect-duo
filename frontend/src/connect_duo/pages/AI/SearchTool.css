@@ -112,6 +112,108 @@
     border-top-left-radius: 4px;
 }
 
+:is(.chat-answer, .message-bubble.assistant .text) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.75;
+    font-size: 0.98rem;
+    color: #1f2937;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) p {
+    margin: 0 0 0.85rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h1,
+:is(.chat-answer, .message-bubble.assistant .text) h2,
+:is(.chat-answer, .message-bubble.assistant .text) h3,
+:is(.chat-answer, .message-bubble.assistant .text) h4 {
+    margin: 1.1rem 0 0.6rem;
+    line-height: 1.35;
+    color: #111827;
+    font-weight: 800;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h1 {
+    font-size: 1.25rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h2 {
+    font-size: 1.14rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h3 {
+    font-size: 1.04rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h4 {
+    font-size: 0.98rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) ul,
+:is(.chat-answer, .message-bubble.assistant .text) ol {
+    margin: 0.45rem 0 0.95rem;
+    padding-left: 1.25rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) li {
+    margin: 0.3rem 0;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.9rem 0 1rem;
+    font-size: 0.93rem;
+    overflow-wrap: anywhere;
+    table-layout: fixed;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) th,
+:is(.chat-answer, .message-bubble.assistant .text) td {
+    border: 1px solid #e5e7eb;
+    padding: 0.55rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) th {
+    background: #f8fafc;
+    font-weight: 700;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) pre {
+    background: #0f172a;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 0.85rem 0 1rem;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) code {
+    background: #f3f4f6;
+    padding: 0.15rem 0.35rem;
+    border-radius: 6px;
+    font-size: 0.92em;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) pre code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) a {
+    color: #1d4ed8;
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+}
+
 /* 내부 입력창 (하단) */
 .chat-input-area {
     padding: 20px 30px;
@@ -215,3 +317,14 @@
 }
 
 /* ... 나머지 기존 스타일 ... */
+
+@media (max-width: 768px) {
+    :is(.chat-answer, .message-bubble.assistant .text) {
+        font-size: 0.94rem;
+        line-height: 1.8;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) table {
+        font-size: 0.88rem;
+    }
+}

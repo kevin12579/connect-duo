@@ -1,269 +1,226 @@
-/* ChatRoom.css (FULL) - FIXED */
-
-/* =========================
-   ChatRoom.css (FULL) - FIXED
-========================= */
-
 .cr-page {
     min-height: 100dvh;
-    background: #0b1224;
+    background: #e9edf3;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    padding: 48px 0;
 }
-
 .cr-wrap {
-    width: min(820px, 92vw);
+    width: min(1400px, 99vw);
     max-width: 100%;
-    color: #fff;
+    color: #232c3b;
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 40px);
-
-    /* ✅ 오버레이를 채팅창 크기만큼만 덮기 위해 */
+    height: calc(100dvh - 96px);
     position: relative;
+    background: #fff;
+    border-radius: 46px;
+    box-shadow: 0 14px 62px rgba(146, 166, 211, 0.12);
+    border: 1.7px solid #e6eefb;
+    padding: 45px 0 20px 0;
+    overflow: hidden;
 }
-
-/* =========================
-   Header
-========================= */
 .cr-header {
-    padding: 12px 14px;
+    padding: 0 82px 0 82px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex: 0 0 auto;
-
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    margin-bottom: 12px;
-}
-
-.cr-back {
-    color: #fff;
-    background: transparent;
+    background: none;
     border: none;
+    min-height: 75px;
+    margin-bottom: 30px;
+}
+.cr-back {
+    color: #7387ac;
+    background: #f3f5fa;
+    border: 1.5px solid #d8e0ef;
     cursor: pointer;
-    font-size: 18px;
-    padding: 6px 8px;
-    border-radius: 10px;
+    font-size: 22px;
+    padding: 12px 20px 12px 17px;
+    border-radius: 18px;
+    transition: 0.12s;
+    font-weight: 1000;
+    margin-right: 13px;
 }
 .cr-back:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: #e7f0fb;
+    color: #2979e2;
 }
-
 .cr-title {
     font-weight: 900;
-    max-width: 46%;
+    max-width: 56%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 26px;
+    color: #18478b;
+    letter-spacing: -0.38px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
 }
-
 /* 오른쪽 아이콘 영역(검색/메뉴) */
 .cr-headerActions {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-left: 8px;
+    gap: 13px;
+    margin-left: auto;
 }
-
 .cr-hIcon {
-    width: 40px;
-    height: 36px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    width: 51px;
+    height: 45px;
+    border-radius: 14px;
+    border: 1.7px solid #e6eefb;
+    background: #f3f8ff;
+    color: #2779d1;
     cursor: pointer;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
-
-    transition:
-        transform 0.12s ease,
-        background 0.12s ease,
-        border-color 0.12s ease;
+    font-size: 23px;
 }
 .cr-hIcon:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
+    background: #fef5ef;
+    border-color: #fd93a5;
+    color: #f24f96;
 }
 .cr-menuIcon.isOn {
-    background: rgba(99, 102, 241, 0.25);
-    border-color: rgba(99, 102, 241, 0.45);
+    background: #f2eafb;
+    border-color: #aba4f2;
+    color: #685bcb;
 }
-
-/* =========================
-   Search Header Mode
-========================= */
 .cr-searchBar {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
+    padding-left: 34px;
 }
-
 .cr-searchInput {
     flex: 1;
-    height: 38px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(15, 23, 42, 0.45);
-    color: #fff;
-    padding: 0 14px;
+    height: 47px;
+    border-radius: 16px;
+    border: 1.9px solid #e6eefb;
+    background: #fafdfe;
+    color: #24324a;
+    padding: 0 20px;
     outline: none;
     min-width: 0;
+    font-size: 17px;
 }
 .cr-searchInput::placeholder {
-    color: rgba(255, 255, 255, 0.55);
+    color: #b0bbcc;
 }
-
 .cr-searchX {
-    width: 44px;
-    height: 38px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    width: 57px;
+    height: 47px;
+    border-radius: 15px;
+    border: 2px solid #e6eefb;
+    background: #f3f6fa;
+    color: #5b6c8b;
     cursor: pointer;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     line-height: 1;
-    font-size: 18px;
+    font-size: 23px;
 }
 .cr-searchX:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.22);
+    background: #fde5ef;
+    border-color: #fd93a5;
+    color: #b9426b;
 }
-
 .cr-searchMeta {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 16px;
     flex: 0 0 auto;
 }
-
 .cr-hitCount {
-    height: 38px;
+    height: 47px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 900;
-    opacity: 0.95;
-
-    padding: 0 12px;
+    opacity: 0.93;
+    padding: 0 17px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-
-    min-width: 64px;
+    background: #fafdfe;
+    border: 2px solid #e6eefb;
+    min-width: 74px;
     text-align: center;
 }
-
 .cr-searchNav {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
-
 .cr-navBtn {
-    width: 44px;
-    height: 38px;
+    width: 57px;
+    height: 47px;
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    border: 2px solid #e6eefb;
+    background: #fafdfe;
+    color: #7281a2;
     cursor: pointer;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    line-height: 1;
-    font-size: 18px;
-}
-.cr-navBtn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.22);
+    font-size: 20px;
 }
 .cr-navBtn:disabled {
-    opacity: 0.35;
-    cursor: default;
+    opacity: 0.36;
+    cursor: not-allowed;
 }
-
 /* highlight */
 .cr-hl {
-    background: rgba(251, 191, 36, 0.35);
-    color: #fff;
-    padding: 0 2px;
-    border-radius: 6px;
+    background: #fcedc2;
+    color: #222d38;
+    padding: 0 3px;
+    border-radius: 7px;
 }
-
-/* =========================
-   Chat Body
-========================= */
+/* Chat Body */
 .cr-chat {
     flex: 1 1 auto;
     overflow-y: auto;
-
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 14px;
-
-    margin-bottom: 10px;
+    background: #f8fafc;
+    border-radius: 30px;
+    margin: 0 82px 33px 82px;
+    padding: 35px;
+    border: 2px solid #eef2f9;
     scroll-behavior: smooth;
     overflow-x: hidden;
+    min-height: 330px;
 }
-
 .cr-chat::-webkit-scrollbar {
-    width: 8px;
+    width: 11px;
 }
 .cr-chat::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: #bfd7ec6a;
     border-radius: 999px;
 }
 .cr-chat::-webkit-scrollbar-track {
     background: transparent;
 }
-
-.cr-loading {
-    opacity: 0.85;
-}
-
-/* system message */
 .cr-systemRow {
     text-align: center;
-    margin: 10px 0;
+    margin: 26px 0;
 }
 .cr-systemPill {
     display: inline-block;
-    padding: 6px 12px;
-    font-size: 13px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 11px 18px;
+    font-size: 15px;
+    background: #f5f7fb;
+    border: 1.7px solid #e8eef7;
     border-radius: 999px;
-    opacity: 0.95;
+    opacity: 0.93;
     white-space: pre-wrap;
     word-break: keep-all;
-    overflow-wrap: break-word;
+    color: #6c7590;
 }
-
-/* message rows */
 .cr-row {
     display: flex;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
 }
 .cr-rowMe {
     justify-content: flex-end;
@@ -271,38 +228,43 @@
 .cr-rowOther {
     justify-content: flex-start;
 }
-
-/* bubble */
 .cr-bubble {
-    max-width: 78%;
-    padding: 10px 12px;
-    border-radius: 18px;
+    max-width: 70vw;
+    padding: 19px 27px;
+    border-radius: 26px;
     white-space: pre-wrap;
-    font-size: 14px;
-    line-height: 1.35;
-
+    font-size: 16.5px;
+    font-weight: 500;
+    background: #fff;
+    border: 1.6px solid #e7edfa;
+    box-shadow: 0 9px 30px rgba(135, 168, 211, 0.07);
     word-break: keep-all;
     overflow-wrap: break-word;
     overflow: hidden;
+    transition: 0.08s;
+    color: #22344e;
 }
-
 .cr-bubbleMe {
-    background: linear-gradient(135deg, #5b63ff, #3f35ff);
+    background: linear-gradient(135deg, #eaf4ff 60%, #d7ebfa 100%);
+    border: 1.6px solid #bad5f3;
+    color: #134e85;
+    font-weight: 800;
 }
 .cr-bubbleOther {
-    background: rgba(255, 255, 255, 0.08);
+    background: #f3f8fe;
+    border: 1.6px solid #dde8f7;
+    color: #224169;
+    font-weight: 700;
 }
-
-/* text */
 .cr-text {
     white-space: pre-wrap;
 }
-
-/* time */
 .cr-time {
-    margin-top: 6px;
-    font-size: 11px;
-    opacity: 0.75;
+    margin-top: 12px;
+    font-size: 13px;
+    opacity: 0.8;
+    color: #6e789b;
+    font-weight: 700;
 }
 .cr-timeMe {
     text-align: right;
@@ -310,424 +272,413 @@
 .cr-timeOther {
     text-align: left;
 }
-
-/* hidden */
 .cr-hidden {
     display: none;
 }
-
-/* =========================
-   IMAGE message
-========================= */
 .cr-imgWrap {
     display: grid;
-    gap: 10px;
+    gap: 13px;
 }
-
 .cr-img {
     width: 100%;
-    max-width: 100%;
+    max-width: 650px;
     height: auto;
-    max-height: 280px;
+    max-height: 320px;
     object-fit: contain;
     display: block;
-
-    border-radius: 14px;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: #e7eaf3;
+    border: 1.6px solid #e6eefb;
+    box-shadow: 0 3px 11px #c4ebff33;
 }
-
-/* =========================
-   FILE card
-========================= */
 .cr-fileCard {
     position: relative;
-    padding: 12px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 15px;
+    border-radius: 19px;
+    background: #f5f6f9;
+    border: 1.8px solid #d1e7f6;
     overflow: hidden;
+    margin-top: 6px;
 }
-
-/* ✅ TXT 코너 아이콘: 조금 키우고(40->46), 왼쪽/아래로 살짝 이동 */
 .cr-txtCornerIcon {
     position: absolute;
-    top: 10px; /* 기존 8px → 살짝 아래 */
-    right: 10px; /* 기존 8px → 살짝 왼쪽(=오른쪽 여백 증가) */
-    width: 46px; /* 기존 40px → 조금 키움 */
-    height: 46px; /* 기존 40px → 조금 키움 */
+    top: 12px;
+    right: 12px;
+    width: 45px;
+    height: 45px;
     opacity: 0.95;
     pointer-events: none;
 }
-
 .cr-fileBody {
     display: grid;
-    gap: 8px;
+    gap: 12px;
 }
-
-/* 코너 아이콘과 겹침 방지(우측 안전영역) */
 .cr-fileTopRow {
     display: grid;
     grid-template-columns: auto 1fr auto;
-    gap: 10px;
+    gap: 14px;
     align-items: center;
-    margin-bottom: 8px;
-    padding-right: 72px;
+    margin-bottom: 13px;
+    padding-right: 80px;
 }
-
 .cr-fileBadge {
-    padding: 4px 10px;
+    padding: 4px 14px;
     border-radius: 999px;
-    font-size: 12px;
-    font-weight: 900;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 14px;
+    font-weight: 800;
+    background: #eaf8f9;
+    border: 1.7px solid #dde8f7;
+    color: #22a9a0;
     white-space: nowrap;
 }
-
 .cr-fileTitle {
     font-weight: 900;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #22344e;
+    font-size: 16px;
 }
-
 .cr-fileRightSlot {
     width: 1px;
     height: 1px;
 }
-
 .cr-fileActions {
     display: flex;
-    gap: 10px;
+    gap: 14px;
     flex-wrap: wrap;
     align-items: center;
-
-    margin-top: 10px;
-    padding-right: 72px;
+    margin-top: 12px;
+    padding-right: 95px;
     margin-bottom: 10px;
 }
-
-/* =========================
-   Buttons
-========================= */
 .cr-downloadBtn,
 .cr-openBtn {
-    height: 38px;
-    padding: 0 16px;
+    height: 43px;
+    padding: 0 23px;
     border-radius: 999px;
     font-weight: 900;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
-    white-space: nowrap;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    text-decoration: none;
-    user-select: none;
-
-    transition:
-        transform 0.12s ease,
-        background 0.12s ease,
-        color 0.12s ease,
-        border-color 0.12s ease,
-        box-shadow 0.12s ease,
-        filter 0.12s ease;
+    background: #fafcff;
+    border: 1.9px solid #bad5f3;
+    color: #2779d1;
+    box-shadow: 0 2px 9px #50aaff16;
 }
-
-.cr-downloadBtn {
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: linear-gradient(135deg, #ffd45a, #ffb020);
-    color: #0b1224;
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
-}
-.cr-downloadBtn:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
-}
-.cr-downloadBtn:disabled {
-    opacity: 0.6;
-    cursor: default;
-    transform: none;
-    filter: none;
-    box-shadow: none;
-}
-
-.cr-openBtn {
-    background: rgba(15, 23, 42, 0.18);
-    border: 2px solid rgba(147, 197, 253, 0.82);
-    color: rgba(226, 232, 240, 0.95);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
-}
+.cr-downloadBtn:hover,
 .cr-openBtn:hover {
-    transform: translateY(-1px);
-    border-color: rgba(56, 189, 248, 1);
-    background: rgba(56, 189, 248, 0.12);
-    color: rgba(56, 189, 248, 1);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
-}
-
-.cr-openBtn:focus-visible,
-.cr-downloadBtn:focus-visible {
-    outline: none;
-    box-shadow:
-        0 0 0 3px rgba(56, 189, 248, 0.35),
-        0 10px 22px rgba(0, 0, 0, 0.24);
-}
-
-.cr-dlFail,
-.cr-dlExpired {
-    font-size: 12px;
-    opacity: 0.95;
-    padding: 2px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.07);
-}
-.cr-dlFail {
-    color: #ffd1d1;
-}
-.cr-dlExpired {
-    color: #ffe7b0;
-}
-
-/* =========================
-   File meta
-========================= */
-.cr-fileSub {
-    display: grid;
-    gap: 6px;
-    font-size: 12px;
-    opacity: 0.95;
-}
-.cr-fileSubRow {
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
-}
-.cr-fileLabel {
-    opacity: 0.75;
-    min-width: 56px;
-}
-.cr-fileValue {
-    font-weight: 900;
-}
-
-/* =========================
-   Attach panel
-========================= */
-.cr-attachPanel {
-    display: flex;
-    gap: 14px;
-    padding: 14px;
-    margin: 10px 0 10px;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.cr-attachItem {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-
-    padding: 14px 10px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.08);
+    background: #278bdf;
     color: #fff;
-    cursor: pointer;
+    border-color: #4a90e2;
 }
-.cr-attachItem:hover {
-    background: rgba(255, 255, 255, 0.12);
+.cr-downloadBtn:disabled,
+.cr-openBtn:disabled {
+    opacity: 0.53;
+    cursor: default;
 }
-
-.cr-attachIcon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(255, 255, 255, 0.12);
-    font-weight: 900;
-    overflow: hidden;
-}
-.cr-attachImg {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-    display: block;
-}
-
-.cr-attachText {
-    font-size: 13px;
-    opacity: 0.92;
-    font-weight: 900;
-}
-
-/* =========================
-   Input bar
-========================= */
 .cr-inputBar {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
-    gap: 8px;
-
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 10px;
-    border-radius: 18px;
+    gap: 15px;
+    background: #f2f7fd;
+    border-radius: 25px;
+    margin: 0 82px;
+    border: 1.7px solid #e6eefb;
+    padding: 22px 37px 19px 37px;
+    box-shadow: 0 2px 16px #b3cdf80c;
 }
-
 .cr-plus {
-    width: 36px;
-    height: 36px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.14);
-    color: rgba(255, 255, 255, 0.95);
+    border: 1.5px solid #f0d9fc;
+    background: #f9f3fe;
+    color: #a266c7;
     font-weight: 900;
     cursor: pointer;
     flex-shrink: 0;
-
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
+    font-size: 26px;
 }
-.cr-plus:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.22);
+.cr-plus:disabled {
+    opacity: 0.6;
+    cursor: default;
 }
 .cr-plus.isOpen {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.8);
-    border-color: transparent;
+    background: #fff0f7;
+    color: #c43f7b;
+    border-color: #fdba9f;
+    box-shadow: 0 0 0 3px #fbcfed55;
 }
-
 .cr-textarea {
     flex: 1;
     resize: none;
     border: none;
     outline: none;
     background: transparent;
-    color: white;
-    font-size: 14px;
+    color: #25344f;
+    font-size: 18px;
     min-width: 0;
+    font-weight: 700;
 }
 .cr-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.55);
+    color: #b0bbcc;
+    opacity: 0.8;
 }
-
 .cr-send {
-    width: 56px;
-    height: 36px;
+    width: 66px;
+    height: 46px;
     border-radius: 14px;
     border: none;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    background: linear-gradient(135deg, #4a90e2 70%, #a1a5fc 120%);
     color: white;
     font-weight: 900;
+    font-size: 16px;
     cursor: pointer;
     flex-shrink: 0;
-
-    white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: center;
+    letter-spacing: 1px;
     line-height: 1;
+    box-shadow: 0 12px 30px #4a90e228;
+    transition: 0.14s;
 }
-.cr-send:hover {
-    filter: brightness(1.05);
+.cr-send:disabled {
+    filter: grayscale(0.7);
+    opacity: 0.61;
+    cursor: default;
 }
-
-/* =========================
-   Menu Overlay
-========================= */
+.cr-attachPanel {
+    display: flex;
+    gap: 22px;
+    padding: 18px;
+    margin: 16px 0 20px;
+    border-radius: 20px;
+    background: #fafcff;
+    border: 1.3px solid #e6eefb;
+}
+.cr-attachItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 17px 13px;
+    border-radius: 20px;
+    border: 1.3px solid #e9e3fc;
+    background: #f7f5fd;
+    color: #7c3aed;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+}
+.cr-attachItem:hover {
+    background: #ffecef;
+}
+.cr-attachIcon {
+    width: 58px;
+    height: 58px;
+    border-radius: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f1fa;
+    font-weight: 900;
+    overflow: hidden;
+}
+.cr-attachImg {
+    width: 37px;
+    height: 37px;
+    object-fit: contain;
+    display: block;
+}
+.cr-attachText {
+    font-size: 15px;
+    opacity: 0.95;
+    font-weight: 900;
+    color: #294060;
+}
 .cr-menuOverlay {
     position: absolute;
     inset: 0;
     z-index: 9999;
-
-    background: rgba(0, 0, 0, 0.38);
-    backdrop-filter: blur(10px);
-
+    background: rgba(33, 36, 45, 0.16);
+    backdrop-filter: blur(16px);
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    padding: 18px;
-
-    border-radius: 16px;
+    padding: 33px;
+    border-radius: 36px;
 }
-
 .cr-menuSheet {
-    width: min(520px, 92%);
-    border-radius: 18px;
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    padding: 14px;
-
+    width: min(600px, 97vw);
+    border-radius: 24px;
+    background: #fafdfe;
+    border: 1.7px solid #e6eefb;
+    padding: 33px 12px;
     display: grid;
-    gap: 10px;
-
+    gap: 22px;
     text-align: center;
 }
-
 .cr-leaveBtn,
 .cr-cancelBtn {
-    height: 46px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    font-weight: 900;
+    height: 56px;
+    border-radius: 20px;
+    border: 1.7px solid #e6eefb;
+    background: #fbe6e1;
+    color: #c94268;
+    font-weight: 1000;
     cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 18px;
 }
-
-.cr-leaveBtn {
-    background: rgba(239, 68, 68, 0.18);
-    border-color: rgba(239, 68, 68, 0.35);
-    color: #ffecec;
+.cr-cancelBtn {
+    background: #f3f8ff;
+    color: #526981;
 }
 .cr-leaveBtn:hover {
-    background: rgba(239, 68, 68, 0.28);
-    border-color: rgba(239, 68, 68, 0.55);
-}
-
-.cr-cancelBtn {
-    background: rgba(255, 255, 255, 0.08);
+    background: #ffe5e6;
     color: #fff;
+    border-color: #e57187;
 }
 .cr-cancelBtn:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: #d0e2fc;
+    color: #3a5f9f;
 }
-
-/* big screen tuning */
-@media (min-width: 900px) {
-    .cr-chat {
-        padding: 16px;
+.cr-readStatus {
+    margin-left: 11px;
+    font-weight: 1000;
+    font-size: 15.5px;
+    color: #33b47c;
+    opacity: 0.85;
+    vertical-align: middle;
+}
+.cr-dlFail,
+.cr-dlExpired {
+    font-size: 14px;
+    opacity: 0.95;
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 1.4px solid #fdba9c7d;
+    background: #fbe6e1;
+    color: #fd5d5d;
+}
+.cr-dlExpired {
+    background: #fdf7da;
+    color: #b39506;
+}
+/* 반응형 */
+@media (max-width: 1440px) {
+    .cr-wrap {
+        width: 98vw;
+    }
+    .cr-chat,
+    .cr-header,
+    .cr-inputBar {
+        margin-right: 24px;
+        margin-left: 24px;
+    }
+}
+@media (max-width: 1080px) {
+    .cr-wrap {
+        width: 99vw;
+        border-radius: 24px;
+    }
+    .cr-chat,
+    .cr-inputBar,
+    .cr-header {
+        margin-left: 9px;
+        margin-right: 9px;
+    }
+    .cr-menuOverlay {
+        padding: 6vw;
+    }
+}
+@media (max-width: 700px) {
+    .cr-wrap {
+        border-radius: 12px;
+    }
+    .cr-header {
+        min-height: 38px;
+        padding: 0 5px;
     }
     .cr-inputBar {
-        padding: 12px;
+        @media (max-width: 600px) {
+            padding: 6px 6px;
+        }
+    }
+    .cr-chat {
+        padding: 7px;
+        margin: 0;
+    }
+    .cr-menuOverlay {
+        padding: 2vw;
     }
 }
 
-.cr-readStatus {
-    margin-left: 8px;
-    font-weight: bold;
+/* src/components/chat/ChatRoom.css 에 추가 */
+
+.cr-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cr-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #232c3b;
+}
+
+.cr-status-tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 상태 점 디자인 */
+.cr-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1; /* 기본 오프라인 색상 (회색) */
+    transition: background 0.3s ease;
+}
+
+/* 온라인일 때 초록색 및 애니메이션 */
+.is-online .cr-status-dot {
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+    animation: pulse-green 2s infinite;
+}
+
+.cr-status-text {
     font-size: 12px;
-    color: #5b63ff;
-    opacity: 0.75;
-    vertical-align: middle;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.is-online .cr-status-text {
+    color: #22c55e;
+}
+
+/* 온라인 표시등 깜빡임 효과 */
+@keyframes pulse-green {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

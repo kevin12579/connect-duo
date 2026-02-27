@@ -2,7 +2,7 @@
 import { io } from 'socket.io-client';
 import { axiosAuth } from './axios';
 
-const SOCKET_URL = 'http://localhost:7777';
+const SOCKET_URL = 'http://192.168.0.8:7777';
 
 let socket = null;
 
@@ -63,7 +63,7 @@ export const disconnectSocket = () => {
 export const absolutizeFileUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `http://localhost:7777${url.startsWith('/') ? url : `/${url}`}`;
+    return `http://192.168.0.8:7777${url.startsWith('/') ? url : `/${url}`}`;
 };
 
 // ─── REST API 함수들 ────────────────────────────────────────────────
