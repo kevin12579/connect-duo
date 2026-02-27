@@ -1,0 +1,112 @@
+mysql 
+
+root
+connect6343@
+
+localhost:3306
+
+-- 1. 유저 테이블 (일반사용자/세무사 통합 관리)
+CREATE TABLE IF NOT EXISTS Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,          -- 아이디
+    password VARCHAR(255) NOT NULL,                -- 비밀번호(해싱)
+    name VARCHAR(50) NOT NULL,                     -- 실명
+    phone_number VARCHAR(20),                      -- 연락처
+    user_type ENUM('USER', 'TAX_ACCOUNTANT') NOT NULL, -- 역할 구분
+    social_type ENUM('NONE', 'NAVER', 'GOOGLE') DEFAULT 'NONE',
+    profile_img VARCHAR(255),                      -- 프로필 이미지 경로
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. 세무사 상세 프로필 테이블 (1:1 관계)
+CREATE TABLE IF NOT EXISTS TaxAccountantProfile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,                   -- Users 테이블 참조
+    company_name VARCHAR(100),                     -- 상호명
+    registration_number VARCHAR(20),               -- 사업자 번호
+    bio_one_line VARCHAR(200),                     -- 한줄 소개
+    bio_full TEXT,                                 -- 자기소개 상세
+    response_speed INT DEFAULT 0,                  -- 평균 응답 속도(분)
+    is_online BOOLEAN DEFAULT FALSE,               -- 온라인 상태
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+
+-- 3. 세무사 랭킹 및 통계 테이블 (수시로 업데이트되는 정보)
+CREATE TABLE IF NOT EXISTS TaxStats (
+    tax_id INT PRIMARY KEY,                        -- TaxAccountantProfile의 id 참조
+    recommend_count INT DEFAULT 0,                 -- 추천수
+    satisfaction_score DECIMAL(3, 2) DEFAULT 0.0,  -- 만족도 평점(예: 4.55)
+    re_consult_rate INT DEFAULT 0,                 -- 재상담율(%)
+    consult_count INT DEFAULT 0,                   -- 총 상담 횟수
+    ranking_score INT DEFAULT 0,                   -- 알고리즘 계산용 점수
+    FOREIGN KEY (tax_id) REFERENCES TaxAccountantProfile(id) ON DELETE CASCADE
+);
+
+-- 4. 상담 채팅방 테이블
+CREATE TABLE IF NOT EXISTS ConsultRooms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,                          -- 일반 사용자
+    tax_id INT NOT NULL,                           -- 세무사
+    status ENUM('ACTIVE', 'CLOSED') DEFAULT 'ACTIVE', -- 상담 상태
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    closed_at TIMESTAMP NULL,                      -- 상담 종료 시점
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (tax_id) REFERENCES Users(id)      -- 세무사 유저 ID 참조
+);
+
+-- 5. 채팅 메시지 테이블
+CREATE TABLE IF NOT EXISTS ChatMessages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    content TEXT,
+    file_url VARCHAR(255) DEFAULT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (room_id) REFERENCES ConsultRooms(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES Users(id)
+);
+
+-- 6. 리뷰 및 평점 테이블
+CREATE TABLE IF NOT EXISTS Reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    tax_id INT NOT NULL,                           -- 세무사 프로필 ID
+    rating INT CHECK (rating BETWEEN 1 AND 5),      -- 평점 1~5
+    comment TEXT,
+    is_recommend BOOLEAN DEFAULT FALSE,            -- 추천 여부
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (tax_id) REFERENCES TaxAccountantProfile(id) ON DELETE CASCADE
+);
+
+-- 7. AI 질문 기록 테이블 (RAG 학습용 기초 데이터)
+CREATE TABLE IF NOT EXISTS AI_History (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    role ENUM('user', 'assistant') NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE SET NULL
+);
+
+-- 다음 쿼리를 DB에서 실행하세요
+ALTER TABLE Users ADD COLUMN refreshToken VARCHAR(255) NULL;
+
+
+-- 8. 상담 신청 대기 테이블 추가
+CREATE TABLE IF NOT EXISTS ConsultRequests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,          -- 신청한 유저
+    tax_user_id INT NOT NULL,      -- 대상 세무사(Users 테이블의 id)
+    status ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- 한 유저가 한 세무사에게 중복 요청 방지
+    UNIQUE KEY unique_request (user_id, tax_user_id),
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (tax_user_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+-- 채팅 메시지 데이터 추가
+ALTER TABLE ChatMessages ADD COLUMN file_name VARCHAR(255) DEFAULT NULL;
+ALTER TABLE ChatMessages ADD COLUMN file_size INT DEFAULT NULL;
+ALTER TABLE ChatMessages ADD COLUMN file_mime VARCHAR(100) DEFAULT NULL;

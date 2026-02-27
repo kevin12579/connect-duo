@@ -1,0 +1,330 @@
+.search-tool-inner {
+    display: flex;
+    flex-direction: column;
+    height: 520px;
+    background: #fff;
+    border-radius: 0 0 26px 26px; /* 위쪽은 검색창과 붙으므로 아래만 둥글게 */
+    border: 1.5px solid #dedede;
+    border-top: none;
+    overflow: hidden;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-window {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #fcfcfd; /* 아주 연한 배경으로 가독성 확보 */
+}
+
+.empty-chat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #8a94a6;
+    text-align: center;
+}
+
+.empty-chat p {
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: #5a8cf1;
+}
+.empty-chat span {
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+/* 말풍선 디자인 */
+.message-bubble {
+    display: flex;
+    max-width: 85%;
+    gap: 12px;
+}
+.message-bubble.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: #f2f3f7;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.message-bubble.assistant .avatar {
+    background: linear-gradient(135deg, #a3bffa 0%, #7d9df5 100%);
+    color: #fff;
+}
+
+.sender {
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: #666;
+}
+.message-bubble.user .sender {
+    text-align: right;
+}
+
+.text {
+    padding: 14px 18px;
+    border-radius: 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(60, 60, 60, 0.05);
+}
+
+.message-bubble.user .text {
+    background: #a3bffa;
+    color: #fff;
+    border-top-right-radius: 4px;
+}
+
+.message-bubble.assistant .text {
+    background: #fff;
+    color: #222;
+    border: 1px solid #eee;
+    border-top-left-radius: 4px;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.75;
+    font-size: 0.98rem;
+    color: #1f2937;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) p {
+    margin: 0 0 0.85rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h1,
+:is(.chat-answer, .message-bubble.assistant .text) h2,
+:is(.chat-answer, .message-bubble.assistant .text) h3,
+:is(.chat-answer, .message-bubble.assistant .text) h4 {
+    margin: 1.1rem 0 0.6rem;
+    line-height: 1.35;
+    color: #111827;
+    font-weight: 800;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h1 {
+    font-size: 1.25rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h2 {
+    font-size: 1.14rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h3 {
+    font-size: 1.04rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) h4 {
+    font-size: 0.98rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) ul,
+:is(.chat-answer, .message-bubble.assistant .text) ol {
+    margin: 0.45rem 0 0.95rem;
+    padding-left: 1.25rem;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) li {
+    margin: 0.3rem 0;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.9rem 0 1rem;
+    font-size: 0.93rem;
+    overflow-wrap: anywhere;
+    table-layout: fixed;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) th,
+:is(.chat-answer, .message-bubble.assistant .text) td {
+    border: 1px solid #e5e7eb;
+    padding: 0.55rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) th {
+    background: #f8fafc;
+    font-weight: 700;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) pre {
+    background: #0f172a;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 0.85rem 0 1rem;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) code {
+    background: #f3f4f6;
+    padding: 0.15rem 0.35rem;
+    border-radius: 6px;
+    font-size: 0.92em;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) pre code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
+}
+
+:is(.chat-answer, .message-bubble.assistant .text) a {
+    color: #1d4ed8;
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+}
+
+/* 내부 입력창 (하단) */
+.chat-input-area {
+    padding: 20px 30px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 12px;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 1.5px solid #eee;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.chat-input-area input:focus {
+    border-color: #a3bffa;
+}
+
+.chat-input-area button {
+    padding: 0 25px;
+    background: #222;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.chat-input-area button:hover {
+    background: #444;
+}
+
+/* 스크롤바 */
+.chat-window::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-window::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
+}
+
+/* ... 기존 스타일 ... */
+
+.search-wrapper {
+    width: min(1100px, 92%);
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.search-bar-container {
+    position: relative;
+    width: 100%;
+}
+
+.mainpage-search-input {
+    width: 100%;
+    padding: 18px 60px 18px 26px;
+    border-radius: 34px;
+    border: 1.5px solid #dedede;
+    background: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    outline: none;
+    box-shadow: 0 4px 12px rgba(60, 60, 60, 0.06);
+    transition: all 0.2s ease;
+}
+
+/* 채팅창이 열렸을 때 검색창 하단 모서리 각지게 */
+.search-wrapper.is-open .mainpage-search-input {
+    border-radius: 26px 26px 0 0;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.expand-arrow {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #a3bffa;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.expand-arrow.up {
+    transform: translateY(-50%) rotate(180deg);
+    color: #7d9df5;
+}
+
+.search-expand-content {
+    width: 100%;
+    /* SearchTool 내부의 디자인과 결합됨 */
+}
+
+/* ... 나머지 기존 스타일 ... */
+
+@media (max-width: 768px) {
+    :is(.chat-answer, .message-bubble.assistant .text) {
+        font-size: 0.94rem;
+        line-height: 1.8;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) table {
+        font-size: 0.88rem;
+    }
+}
