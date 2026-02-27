@@ -1,3 +1,4 @@
+// src/components/chat/ChatRoom.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import {
     listMessages,
@@ -6,7 +7,8 @@ import {
     uploadRoomFiles,
     closeRoom,
     absolutizeFileUrl,
-    listRooms, // 종료 상태 조회용
+    listRooms,
+    ensureSocket, // ✅ FIX BUG4: getSocket 대신 ensureSocket 사용
 } from '../../api/chatAxios';
 
 import {
@@ -33,8 +35,8 @@ import txtFileIcon from '../../assets/txt-img.png';
 export default function ChatRoom({ roomId, onBack }) {
     const rid = useMemo(() => String(roomId ?? ''), [roomId]);
     const listRef = useRef(null);
+    const markReadTimerRef = useRef(null); // markRead 디바운스용
 
-    // State
     const [showAttach, setShowAttach] = useState(false);
     const txtInputRef = useRef(null);
     const imgInputRef = useRef(null);
@@ -46,28 +48,132 @@ export default function ChatRoom({ roomId, onBack }) {
     const [query, setQuery] = useState('');
     const [activeHitIdx, setActiveHitIdx] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [roomClosed, setRoomClosed] = useState(false); // 🔥 방 종료 여부
+    const [roomClosed, setRoomClosed] = useState(false);
+    const [onlineUsers, setOnlineUsers] = useState(new Set());
 
     const MY_ID = useMemo(() => getMyIdFallback1(), []);
-    // Scroll to bottom
+
     const scrollToBottom = useCallback(() => {
         const el = listRef.current;
         if (el) el.scrollTop = el.scrollHeight;
     }, []);
 
-    // 읽음 처리
-    const touchRead = useCallback(
-        async (lastMessageId) => {
-            try {
-                localStorage.setItem(LAST_READ_MS_KEY(rid), String(Date.now()));
-                window.dispatchEvent(new Event('chat_meta_updated'));
-                if (lastMessageId != null) await markRead(rid).catch(() => {});
-            } catch {}
-        },
-        [rid],
-    );
+    // markRead 디바운스: 연속 호출 방지 (500ms)
+    const debouncedMarkRead = useCallback(() => {
+        if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
+        markReadTimerRef.current = setTimeout(() => {
+            markRead(rid).catch(() => {});
+            localStorage.setItem(LAST_READ_MS_KEY(rid), String(Date.now()));
+            window.dispatchEvent(new Event('chat_meta_updated'));
+        }, 500);
+    }, [rid]);
 
-    // 마지막 내 메시지 id
+    // =========================================================
+    // Socket.io 이벤트 핸들러 등록
+    // =========================================================
+    useEffect(() => {
+        if (!rid) return;
+
+        // ✅ FIX BUG4: ensureSocket()으로 새로고침 후에도 소켓 자동 복구
+        const socket = ensureSocket();
+        if (!socket) {
+            console.warn('[ChatRoom] 소켓 초기화 실패. 로그인 상태를 확인하세요.');
+            return;
+        }
+
+        socket.emit('join_room', rid);
+
+        /**
+         * ✅ FIX BUG3: 내 메시지 중복 표시 문제
+         *
+         * 서버는 io.to(roomId).emit()으로 방 전체에 emit합니다 (본인 포함).
+         * 따라서 내가 보낸 메시지도 소켓으로 다시 수신됩니다.
+         *
+         * 처리 흐름:
+         *   [케이스 A] HTTP 응답이 소켓보다 먼저 도달 (일반적):
+         *     sendMessage() → tempId 추가 → HTTP 응답으로 tempId→실제id 교체
+         *     → 소켓 수신 시 id 중복 체크 → skip ✓
+         *
+         *   [케이스 B] 소켓이 HTTP 응답보다 먼저 도달 (드물지만 발생 가능):
+         *     sendMessage() → tempId 추가
+         *     → 소켓 수신 시 내 메시지 + temp-* 발견 → tempId를 실제id로 교체
+         *     → HTTP 응답 도달 시 tempId 없음 → no-op ✓
+         */
+        const onReceiveMessage = (rawMsg) => {
+            const uiMsg = mapRowToUiMessage(rawMsg, MY_ID, absolutizeFileUrl);
+            if (!uiMsg) return;
+
+            setMessages((prev) => {
+                // ① 이미 같은 id가 있으면 skip (케이스 A의 소켓 중복 처리)
+                if (prev.some((m) => String(m.id) === String(uiMsg.id))) return prev;
+
+                // ② 내가 보낸 메시지인 경우: tempId를 찾아서 교체 (케이스 B)
+                if (uiMsg.from === 'me') {
+                    const tempIdx = prev.findIndex((m) => typeof m.id === 'string' && m.id.startsWith('temp-'));
+                    if (tempIdx !== -1) {
+                        // tempId 자리에 실제 서버 메시지 삽입
+                        const next = [...prev];
+                        next[tempIdx] = uiMsg;
+                        return next;
+                    }
+                    // tempId가 이미 HTTP 응답으로 교체됐거나 없으면 skip
+                    return prev;
+                }
+
+                // ③ 상대방 메시지: 목록 끝에 추가
+                return [...prev, uiMsg];
+            });
+
+            setTimeout(scrollToBottom, 0);
+
+            // 상대방 메시지 수신 시에만 읽음 처리
+            if (uiMsg.from !== 'me') {
+                debouncedMarkRead();
+            }
+        };
+
+        // 상담 종료 실시간 수신
+        const onRoomClosed = () => {
+            setRoomClosed(true);
+        };
+
+        // 상대방이 읽으면 내 메시지들 읽음 표시
+        const onReadUpdated = ({ userId }) => {
+            if (String(userId) !== String(MY_ID)) {
+                setMessages((prev) => prev.map((m) => (m.from === 'me' ? { ...m, isRead: true } : m)));
+            }
+        };
+
+        // 온라인/오프라인 상태 수신
+        const onUserOnline = ({ userId }) => {
+            setOnlineUsers((prev) => new Set([...prev, String(userId)]));
+        };
+        const onUserOffline = ({ userId }) => {
+            setOnlineUsers((prev) => {
+                const next = new Set(prev);
+                next.delete(String(userId));
+                return next;
+            });
+        };
+
+        socket.on('receive_message', onReceiveMessage);
+        socket.on('ROOM_CLOSED', onRoomClosed);
+        socket.on('read_updated', onReadUpdated);
+        socket.on('user_online', onUserOnline);
+        socket.on('user_offline', onUserOffline);
+
+        return () => {
+            socket.emit('leave_room', rid);
+            socket.off('receive_message', onReceiveMessage);
+            socket.off('ROOM_CLOSED', onRoomClosed);
+            socket.off('read_updated', onReadUpdated);
+            socket.off('user_online', onUserOnline);
+            socket.off('user_offline', onUserOffline);
+            if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
+        };
+    }, [rid, MY_ID, scrollToBottom, debouncedMarkRead]);
+
+    // 마지막 내 메시지 id (읽음/안읽음 표시용)
     const lastMyMsgId = useMemo(() => {
         for (let i = messages.length - 1; i >= 0; i--) {
             if (messages[i].from === 'me') return messages[i].id;
@@ -75,7 +181,7 @@ export default function ChatRoom({ roomId, onBack }) {
         return null;
     }, [messages]);
 
-    // 🔥 방 상태(종료 여부)도 가져옴
+    // 방 상태(ACTIVE/CLOSED) 확인
     const fetchRoomStatus = useCallback(async () => {
         if (!rid) return;
         try {
@@ -84,13 +190,12 @@ export default function ChatRoom({ roomId, onBack }) {
                 const meRoom = res.data.find((r) => String(r.id) === rid);
                 setRoomClosed(meRoom?.status === 'CLOSED');
             }
-        } catch (e) {
-            // 실패하면 기본 false
+        } catch {
             setRoomClosed(false);
         }
     }, [rid]);
 
-    // 메시지 불러오기 (방 종료여부도 함께 체크)
+    // 메시지 목록 로드
     const loadMessages = useCallback(async () => {
         if (!rid) return;
         try {
@@ -100,8 +205,7 @@ export default function ChatRoom({ roomId, onBack }) {
             const arr = extractMessagesSafely(res, (r) => r?.messages || r?.data || r || []);
             const mapped = arr.map((m) => mapRowToUiMessage(m, MY_ID, absolutizeFileUrl));
             setMessages(mapped);
-            const last = mapped[mapped.length - 1];
-            if (last?.id) await touchRead(last.id);
+            if (mapped.length > 0) debouncedMarkRead();
         } catch (e) {
             console.error('메시지 불러오기 실패:', e);
             setMessages([]);
@@ -109,8 +213,9 @@ export default function ChatRoom({ roomId, onBack }) {
             setLoading(false);
             setTimeout(scrollToBottom, 0);
         }
-    }, [rid, scrollToBottom, touchRead, MY_ID, fetchRoomStatus]);
+    }, [rid, scrollToBottom, MY_ID, fetchRoomStatus, debouncedMarkRead]);
 
+    // 방 입장 시 초기화
     useEffect(() => {
         if (!rid) {
             setLoading(false);
@@ -120,21 +225,25 @@ export default function ChatRoom({ roomId, onBack }) {
         const draft = getDraft(rid);
         if (draft) setInput(draft);
         loadMessages();
-        // eslint-disable-next-line
-    }, [rid, loadMessages]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rid]);
 
+    // 임시 저장
     useEffect(() => {
         if (!rid) return;
         saveDraft(rid, input);
     }, [rid, input]);
 
+    // ─── 텍스트 메시지 전송 ─────────────────────────────────────────
     const sendMessage = async (overrideText) => {
         if (roomClosed) return;
         const text = (overrideText ?? input).trim();
         if (!text || !rid) return;
+
         setInput('');
-        setShowAttach(false);
         const tempId = `temp-${Date.now()}`;
+
+        // 낙관적 UI: 임시 메시지 먼저 표시
         setMessages((prev) => [
             ...prev,
             {
@@ -143,48 +252,44 @@ export default function ChatRoom({ roomId, onBack }) {
                 type: 'TEXT',
                 text,
                 time: new Date().toISOString(),
+                isRead: false,
             },
         ]);
         setTimeout(scrollToBottom, 0);
 
         try {
             const res = await apiSendMessage(rid, text);
-            const data = res?.data?.data || res?.data || res;
-            const savedUser = data?.user;
-            const savedAi = data?.ai;
-            if (savedUser) {
-                const userUi = mapRowToUiMessage(savedUser, MY_ID, absolutizeFileUrl);
-                setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, ...userUi } : m)));
+            // axiosAuth → r.data → { result:'success', data:{ id, sender_id, ... } }
+            const serverMsg = res?.data;
+            if (serverMsg?.id) {
+                const uiMsg = mapRowToUiMessage(serverMsg, MY_ID, absolutizeFileUrl);
+                // tempId를 실제 서버 메시지로 교체
+                // (소켓이 먼저 케이스 B 처리를 했다면 tempId가 없어 no-op)
+                setMessages((prev) => prev.map((m) => (m.id === tempId ? uiMsg : m)));
             }
-            if (savedAi) {
-                const aiUi = mapRowToUiMessage(savedAi, MY_ID, absolutizeFileUrl);
-                setMessages((prev) => {
-                    if (prev.some((x) => String(x.id) === String(aiUi.id))) return prev;
-                    return [...prev, aiUi];
-                });
-            }
-            setTimeout(scrollToBottom, 0);
-        } catch (e) {
-            console.error('전송 실패:', e);
-            setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, text: `${text}\n\n(전송 실패)` } : m)));
-        } finally {
-            setTimeout(scrollToBottom, 0);
+        } catch {
+            setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, text: `${text} (전송 실패)` } : m)));
         }
     };
 
+    // ─── 파일 업로드 ────────────────────────────────────────────────
     const addFileMessages = async (files) => {
         if (roomClosed) return;
         if (!files || files.length === 0 || !rid) return;
         try {
             await uploadRoomFiles(rid, files);
-            await loadMessages();
+            // 서버가 소켓으로 receive_message emit → onReceiveMessage에서 자동 수신
+            // (파일 업로드는 낙관적 UI 없이 소켓 수신으로만 처리)
         } catch (e) {
             console.error('파일 업로드 실패:', e);
+            // 실패 시 수동 갱신
+            await loadMessages();
         } finally {
             setShowAttach(false);
         }
     };
 
+    // ─── 파일 다운로드 ──────────────────────────────────────────────
     const handleDownload = async (m) => {
         if (!m?.fileUrl) return;
         setDlState((prev) => ({ ...prev, [m.id]: 'loading' }));
@@ -203,8 +308,9 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     };
 
+    // ─── 채팅방 나가기 (상담 종료) ──────────────────────────────────
     const leaveRoom = async () => {
-        if (!window.confirm('정말 나가시겠습니까? 채팅방이 삭제됩니다.')) return;
+        if (!window.confirm('정말 나가시겠습니까? 채팅방이 종료됩니다.')) return;
         try {
             await closeRoom(rid);
         } catch (e) {
@@ -214,6 +320,7 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     };
 
+    // ─── 키보드 입력 ────────────────────────────────────────────────
     const onKeyDown = (e) => {
         if (roomClosed) return;
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -222,15 +329,14 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     };
 
-    // 검색 관련
+    // ─── 검색 ───────────────────────────────────────────────────────
     const hits = useMemo(() => {
         const q = query.trim();
         if (!q) return [];
         const lower = q.toLowerCase();
         return messages
             .filter((m) => {
-                const type = String(m.type).toUpperCase();
-                if (type === 'SYSTEM') return false;
+                if (String(m.type).toUpperCase() === 'SYSTEM') return false;
                 const hay = `${m.text || ''} ${m.fileName || ''}`.toLowerCase();
                 return hay.includes(lower);
             })
@@ -240,8 +346,7 @@ export default function ChatRoom({ roomId, onBack }) {
     useEffect(() => {
         if (!searchOpen || !hits.length) return;
         const idx = Math.min(activeHitIdx, hits.length - 1);
-        const id = hits[idx];
-        const el = document.getElementById(`msg-${id}`);
+        const el = document.getElementById(`msg-${hits[idx]}`);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, [searchOpen, hits, activeHitIdx]);
 
@@ -267,19 +372,21 @@ export default function ChatRoom({ roomId, onBack }) {
 
     const headerTitle = useMemo(() => `세무챗 (방 ${rid || '-'})`, [rid]);
 
+    // 상대방 온라인 여부
+    const isPartnerOnline = useMemo(() => [...onlineUsers].some((uid) => uid !== String(MY_ID)), [onlineUsers, MY_ID]);
+
+    // rid 없음 fallback
     if (!rid) {
         return (
             <div className="cr-page">
                 <div className="cr-wrap" style={{ padding: 16 }}>
                     <div style={{ fontWeight: 900, marginBottom: 10 }}>채팅방을 열 수 없어요</div>
                     <div style={{ opacity: 0.8, lineHeight: 1.4 }}>roomId가 비어있거나 잘못 전달되었습니다.</div>
-                    <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                    <div style={{ marginTop: 12 }}>
                         <button
                             type="button"
                             className="cr-send"
-                            onClick={() => {
-                                if (typeof onBack === 'function') onBack();
-                            }}
+                            onClick={() => typeof onBack === 'function' && onBack()}
                         >
                             리스트로
                         </button>
@@ -292,14 +399,13 @@ export default function ChatRoom({ roomId, onBack }) {
     return (
         <div className="cr-page">
             <div className="cr-wrap">
+                {/* ─── 헤더 ─────────────────────────────────────── */}
                 <div className="cr-header">
                     {!searchOpen ? (
                         <>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    if (typeof onBack === 'function') onBack();
-                                }}
+                                onClick={() => typeof onBack === 'function' && onBack()}
                                 className="cr-back"
                                 aria-label="뒤로가기"
                                 title="리스트로 돌아가기"
@@ -309,9 +415,31 @@ export default function ChatRoom({ roomId, onBack }) {
                             <div className="cr-title" title={headerTitle}>
                                 {headerTitle}
                                 {roomClosed && (
-                                    <span style={{ color: '#ffe066', fontSize: 14, marginLeft: 8, fontWeight: 700 }}>
+                                    <span
+                                        style={{
+                                            color: '#ffe066',
+                                            fontSize: 14,
+                                            marginLeft: 8,
+                                            fontWeight: 700,
+                                        }}
+                                    >
                                         [상담 종료]
                                     </span>
+                                )}
+                                {/* ✅ 상대방 온라인 초록 점 */}
+                                {isPartnerOnline && (
+                                    <span
+                                        style={{
+                                            display: 'inline-block',
+                                            width: 10,
+                                            height: 10,
+                                            borderRadius: '50%',
+                                            background: '#4caf50',
+                                            marginLeft: 8,
+                                            verticalAlign: 'middle',
+                                        }}
+                                        title="상대방 온라인"
+                                    />
                                 )}
                             </div>
                             <div className="cr-headerActions" style={{ marginLeft: 'auto' }}>
@@ -347,7 +475,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                         setActiveHitIdx(0);
                                     }}
                                     placeholder="대화 내용 검색"
-                                    disabled={roomClosed}
+                                    autoFocus
                                 />
                                 <button
                                     type="button"
@@ -395,6 +523,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     )}
                 </div>
 
+                {/* ─── 메시지 목록 ──────────────────────────────── */}
                 <div
                     ref={listRef}
                     className="cr-chat"
@@ -409,7 +538,6 @@ export default function ChatRoom({ roomId, onBack }) {
                             const isMe = m.from === 'me';
                             const type = String(m.type).toUpperCase();
                             const isSystem = type === 'SYSTEM' || m.from === 'system';
-
                             const isLastMyMsg = isMe && m.id === lastMyMsgId;
 
                             if (isSystem)
@@ -424,7 +552,10 @@ export default function ChatRoom({ roomId, onBack }) {
                             const timeObj = new Date(m.time);
                             const timeText = Number.isNaN(timeObj.getTime())
                                 ? ''
-                                : timeObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+                                : timeObj.toLocaleTimeString('ko-KR', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                  });
 
                             return (
                                 <div
@@ -488,7 +619,6 @@ export default function ChatRoom({ roomId, onBack }) {
                                                 {isTxtLike(m) && (
                                                     <img className="cr-txtCornerIcon" src={txtFileIcon} alt="txt" />
                                                 )}
-
                                                 <div className="cr-fileTopRow">
                                                     <div className="cr-fileBadge">{isTxtLike(m) ? 'TXT' : 'FILE'}</div>
                                                     <div className="cr-fileTitle" title={m?.fileName || '파일'}>
@@ -496,7 +626,6 @@ export default function ChatRoom({ roomId, onBack }) {
                                                     </div>
                                                     <div className="cr-fileRightSlot" />
                                                 </div>
-
                                                 <div className="cr-fileActions">
                                                     <button
                                                         type="button"
@@ -521,7 +650,6 @@ export default function ChatRoom({ roomId, onBack }) {
                                                         </a>
                                                     )}
                                                 </div>
-
                                                 <div className="cr-fileSub">
                                                     <div className="cr-fileSubRow">
                                                         <span className="cr-fileLabel">용량:</span>
@@ -561,7 +689,7 @@ export default function ChatRoom({ roomId, onBack }) {
                         })}
                 </div>
 
-                {/* 파일 첨부 input - 종료방이면 disabled */}
+                {/* ─── 파일 첨부 hidden input ───────────────────── */}
                 <input
                     ref={txtInputRef}
                     type="file"
@@ -586,7 +714,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     disabled={roomClosed}
                 />
 
-                {/* 첨부 패널 */}
+                {/* ─── 첨부 패널 ───────────────────────────────── */}
                 {showAttach && !roomClosed && (
                     <div className="cr-attachPanel">
                         <button type="button" className="cr-attachItem" onClick={() => txtInputRef.current?.click()}>
@@ -604,7 +732,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     </div>
                 )}
 
-                {/* 입력 바 - 종료방이면 전체 disabled */}
+                {/* ─── 입력 바 ──────────────────────────────────── */}
                 <div className="cr-inputBar">
                     <button
                         type="button"
@@ -621,7 +749,7 @@ export default function ChatRoom({ roomId, onBack }) {
                         value={input}
                         onChange={(e) => !roomClosed && setInput(e.target.value)}
                         onKeyDown={onKeyDown}
-                        placeholder={roomClosed ? '상담이 종료되어 메시지 입력 불가' : '메시지를 입력하세요'}
+                        placeholder={roomClosed ? '상담이 종료되었습니다.' : '메시지를 입력하세요'}
                         rows={1}
                         className="cr-textarea"
                         onFocus={() => !roomClosed && setShowAttach(false)}
@@ -634,7 +762,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     </button>
                 </div>
 
-                {/* 메뉴 오버레이 */}
+                {/* ─── 메뉴 오버레이 ───────────────────────────── */}
                 {menuOpen && (
                     <div className="cr-menuOverlay" onClick={() => setMenuOpen(false)}>
                         <div className="cr-menuSheet" onClick={(e) => e.stopPropagation()}>

@@ -1,8 +1,8 @@
+// src/controllers/chatController.js
 const chatService = require('../services/chatService');
 
-// ✅ 미들웨어에서 넣어준 인증 정보를 가져오는 함수
 function getMe(req) {
-    return req.authUser; // verifyAccessToken 미들웨어가 넣어준 정보
+    return req.authUser;
 }
 
 function toInt(v, fallback = null) {
@@ -23,13 +23,11 @@ exports.listMessages = async (req, res) => {
     try {
         const { roomId } = req.params;
         const { cursor, limit } = req.query;
-
         const messages = await chatService.listMessages({
             roomId: toInt(roomId),
             cursor: cursor ? toInt(cursor) : null,
             limit: limit ? toInt(limit) : 20,
         });
-
         res.json({ result: 'success', data: messages });
     } catch (e) {
         res.status(500).json({ result: 'fail', message: `[listMessages] ${e.message}` });
@@ -48,7 +46,21 @@ exports.sendMessage = async (req, res) => {
             content,
         });
 
+        // ① 먼저 HTTP 응답 반환 (프론트의 tempId 교체용)
         res.json({ result: 'success', data: msg });
+
+        // ② 소켓으로 방 전체(본인 포함)에 emit
+        //
+        // ✅ FIX BUG1: 이전 코드는 fetchSockets()를 써서 s.user를 체크했으나
+        //    RemoteSocket 객체에는 socket.user 같은 임의 프로퍼티가 존재하지 않아
+        //    아무에게도 emit 되지 않는 치명적 버그가 있었음.
+        //
+        //    해결책: io.to(roomId).emit() 으로 방 전체에 emit 하고
+        //    프론트(ChatRoom.jsx)에서 내 메시지 중복을 직접 처리한다.
+        //    → 프론트의 onReceiveMessage: 내 메시지가 도착하면 tempId를 실제id로 교체,
+        //       이미 교체된 상태라면 id 중복 체크로 skip 처리.
+        const io = req.app.get('io');
+        io.to(String(roomId)).emit('receive_message', msg);
     } catch (e) {
         res.status(500).json({ result: 'fail', message: `[sendMessage] ${e.message}` });
     }
@@ -59,6 +71,7 @@ exports.uploadFiles = async (req, res) => {
         const me = getMe(req);
         const { roomId } = req.params;
         const files = req.files || [];
+        const io = req.app.get('io');
 
         const results = [];
         for (const file of files) {
@@ -68,10 +81,13 @@ exports.uploadFiles = async (req, res) => {
                 senderId: me.id,
                 content: '파일을 전송했습니다.',
                 fileUrl,
-                fileName: file.originalname, // 원본 파일명 (예: '보고서.pdf')
-                fileSize: file.size, // 파일 크기 (byte 단위)
-                fileMime: file.mimetype, // 파일 타입 (예: 'image/png')
+                fileName: file.originalname,
+                fileSize: file.size,
+                fileMime: file.mimetype,
             });
+
+            // 파일도 방 전체에 emit (프론트에서 id 중복 체크로 처리)
+            io.to(String(roomId)).emit('receive_message', msg);
             results.push(msg);
         }
 
@@ -84,26 +100,29 @@ exports.uploadFiles = async (req, res) => {
 exports.markRead = async (req, res) => {
     try {
         const me = getMe(req);
-        await chatService.markRead(toInt(req.params.roomId), me.id);
+        const { roomId } = req.params;
+        await chatService.markRead(toInt(roomId), me.id);
+
+        const io = req.app.get('io');
+        io.to(String(roomId)).emit('read_updated', { roomId, userId: me.id });
+
         res.json({ result: 'success' });
     } catch (e) {
         res.status(500).json({ result: 'fail', message: e.message });
     }
 };
 
-// ✅ [추가] 채팅방 생성
 exports.createRoom = async (req, res) => {
     try {
         const me = getMe(req);
         const { taxId, userId } = req.body;
 
-        // 접속한 유저의 타입에 따라 파라미터 매핑
         let finalUserId, finalTaxId;
         if (me.user_type === 'USER') {
             finalUserId = me.id;
-            finalTaxId = taxId; // 유저가 요청 시 taxId를 받아옴
+            finalTaxId = taxId;
         } else {
-            finalUserId = userId; // 세무사가 요청 시 userId를 받아옴
+            finalUserId = userId;
             finalTaxId = me.id;
         }
 
@@ -118,18 +137,20 @@ exports.createRoom = async (req, res) => {
     }
 };
 
-// ✅ [추가] 상담(채팅방) 종료
 exports.closeRoom = async (req, res) => {
     try {
         const { roomId } = req.params;
         await chatService.closeRoom(toInt(roomId));
+
+        const io = req.app.get('io');
+        io.to(String(roomId)).emit('ROOM_CLOSED', { roomId });
+
         res.json({ result: 'success', message: '상담이 성공적으로 종료되었습니다.' });
     } catch (e) {
         res.status(500).json({ result: 'fail', message: `[closeRoom] ${e.message}` });
     }
 };
 
-// ✅ 세무사용 활성 채팅방 목록
 exports.listTaxActiveRooms = async (req, res) => {
     try {
         const me = getMe(req);
@@ -140,7 +161,6 @@ exports.listTaxActiveRooms = async (req, res) => {
     }
 };
 
-// chatController.js
 exports.deleteRoom = async (req, res) => {
     try {
         const { roomId } = req.params;

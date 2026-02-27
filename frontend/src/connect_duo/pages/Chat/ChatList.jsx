@@ -1,9 +1,17 @@
+// src/components/chat/ChatList.jsx
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { listRooms, closeRoom, deleteRoom, absolutizeFileUrl } from '../../api/chatAxios';
+import {
+    listRooms,
+    closeRoom,
+    deleteRoom,
+    absolutizeFileUrl,
+    ensureSocket, // ✅ FIX BUG5: 실시간 목록 갱신을 위해 소켓 사용
+} from '../../api/chatAxios';
 import './ChatList.css';
 
 const DRAFT_KEY = 'cd_chat_drafts_v1';
 const DRAFT_EVENT = 'cd_draft_updated';
+
 const safeParse = (raw, fallback) => {
     try {
         return raw ? JSON.parse(raw) : fallback;
@@ -12,6 +20,7 @@ const safeParse = (raw, fallback) => {
     }
 };
 const toMillis = (v) => (v ? new Date(v).getTime() : 0);
+
 function formatDayLabel(ts) {
     if (!ts) return '';
     const d = new Date(ts);
@@ -39,13 +48,41 @@ export default function ChatList({ onOpenRoom }) {
         }
     }, []);
 
+    // ✅ FIX BUG5: 소켓으로 실시간 목록 갱신
+    //
+    // ChatList는 현재 어떤 방에도 join하지 않은 상태입니다.
+    // 그래서 receive_message 이벤트를 방별로 받을 수 없고,
+    // 대신 서버에서 'list_updated' 이벤트를 전송하는 방식이 이상적이지만
+    // 백엔드 수정 없이도 작동하는 방법으로:
+    //   - 소켓이 연결(connect)될 때 목록을 다시 불러온다
+    //   - window 이벤트(chat_meta_updated)를 통해 ChatRoom과 동기화한다
+    //
+    // 추가로, 소켓의 'receive_message' 이벤트는 방에 join한 경우에만 받을 수 있으므로
+    // ChatList에서는 소켓 재연결 시 자동 갱신으로 처리합니다.
     useEffect(() => {
         loadRooms();
+
+        // window 이벤트 기반 갱신 (ChatRoom ↔ ChatList 동기화)
         window.addEventListener('chat_meta_updated', loadRooms);
         window.addEventListener(DRAFT_EVENT, loadRooms);
+
+        // ✅ 소켓 연결/재연결 시 목록 갱신
+        const socket = ensureSocket();
+        let onConnect = null;
+        if (socket) {
+            onConnect = () => {
+                console.log('[ChatList] 소켓 연결됨 → 목록 갱신');
+                loadRooms();
+            };
+            // 이미 연결되어 있으면 즉시 갱신
+            if (socket.connected) loadRooms();
+            else socket.on('connect', onConnect);
+        }
+
         return () => {
             window.removeEventListener('chat_meta_updated', loadRooms);
             window.removeEventListener(DRAFT_EVENT, loadRooms);
+            if (socket && onConnect) socket.off('connect', onConnect);
         };
     }, [loadRooms]);
 
@@ -73,31 +110,28 @@ export default function ChatList({ onOpenRoom }) {
         [rooms],
     );
 
-    // 기존 열기
-    const handleOpenRoom = (id, status) => onOpenRoom && onOpenRoom(id);
+    const handleOpenRoom = (id) => onOpenRoom && onOpenRoom(id);
 
-    // 종료 (=닫기)
     const handleCloseRoom = async (e, rid) => {
         e.stopPropagation();
         if (!window.confirm('상담을 종료하시겠습니까?')) return;
         try {
             await closeRoom(rid);
             await loadRooms();
-        } catch (e) {
-            console.error('방 종료 실패:', e);
+        } catch (err) {
+            console.error('방 종료 실패:', err);
         }
     };
 
-    // ★ 종료된 방에서 삭제 (완전 삭제)
     const handleDeleteRoom = async (e, rid) => {
         e.stopPropagation();
         if (!window.confirm('채팅방을 정말 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.')) return;
         try {
             await deleteRoom(rid);
             await loadRooms();
-        } catch (e) {
+        } catch (err) {
             alert('채팅방 삭제에 실패했습니다.');
-            console.error('방 삭제 실패:', e);
+            console.error('방 삭제 실패:', err);
         }
     };
 
@@ -107,6 +141,7 @@ export default function ChatList({ onOpenRoom }) {
                 <div className="cl-header">
                     <h2 className="cl-title">상담 목록</h2>
                 </div>
+
                 {loading ? (
                     <div className="cl-loading">불러오는 중...</div>
                 ) : cards.length === 0 ? (
@@ -116,7 +151,7 @@ export default function ChatList({ onOpenRoom }) {
                         <div
                             key={c.id}
                             className={`cl-card-wrapper ${c.status === 'CLOSED' ? 'is-closed' : ''}`}
-                            onClick={() => handleOpenRoom(c.id, c.status)}
+                            onClick={() => handleOpenRoom(c.id)}
                         >
                             <div className="cl-card">
                                 <div className="cl-avatar">
@@ -142,13 +177,22 @@ export default function ChatList({ onOpenRoom }) {
                                     </div>
                                     <div className="cl-preview">{c.preview}</div>
                                 </div>
-                                {/* 상태별 버튼: ACTIVE → 종료, CLOSED → 삭제 */}
+
+                                {/* ACTIVE → 종료 버튼 / CLOSED → 삭제 버튼 */}
                                 {c.status !== 'CLOSED' ? (
-                                    <button className="cl-trashBtn" onClick={(e) => handleCloseRoom(e, c.id)}>
+                                    <button
+                                        className="cl-trashBtn"
+                                        onClick={(e) => handleCloseRoom(e, c.id)}
+                                        title="상담 종료"
+                                    >
                                         ✕
                                     </button>
                                 ) : (
-                                    <button className="cl-trashBtn" onClick={(e) => handleDeleteRoom(e, c.id)}>
+                                    <button
+                                        className="cl-trashBtn"
+                                        onClick={(e) => handleDeleteRoom(e, c.id)}
+                                        title="채팅방 삭제"
+                                    >
                                         🗑
                                     </button>
                                 )}
