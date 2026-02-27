@@ -43,22 +43,14 @@ exports.sendMessage = async (req, res) => {
         const msg = await chatService.sendMessage({
             roomId: toInt(roomId),
             senderId: me.id,
+            senderType: me.user_type, // ★ USER | TAX_ACCOUNTANT
             content,
         });
 
-        // ① 먼저 HTTP 응답 반환 (프론트의 tempId 교체용)
+        // HTTP 응답 먼저 반환
         res.json({ result: 'success', data: msg });
 
-        // ② 소켓으로 방 전체(본인 포함)에 emit
-        //
-        // ✅ FIX BUG1: 이전 코드는 fetchSockets()를 써서 s.user를 체크했으나
-        //    RemoteSocket 객체에는 socket.user 같은 임의 프로퍼티가 존재하지 않아
-        //    아무에게도 emit 되지 않는 치명적 버그가 있었음.
-        //
-        //    해결책: io.to(roomId).emit() 으로 방 전체에 emit 하고
-        //    프론트(ChatRoom.jsx)에서 내 메시지 중복을 직접 처리한다.
-        //    → 프론트의 onReceiveMessage: 내 메시지가 도착하면 tempId를 실제id로 교체,
-        //       이미 교체된 상태라면 id 중복 체크로 skip 처리.
+        // 소켓으로 방 전체에 emit
         const io = req.app.get('io');
         io.to(String(roomId)).emit('receive_message', msg);
     } catch (e) {
@@ -79,6 +71,7 @@ exports.uploadFiles = async (req, res) => {
             const msg = await chatService.sendMessage({
                 roomId: toInt(roomId),
                 senderId: me.id,
+                senderType: me.user_type, // ★ 파일 업로드도 동일하게 전달
                 content: '파일을 전송했습니다.',
                 fileUrl,
                 fileName: file.originalname,
@@ -86,7 +79,6 @@ exports.uploadFiles = async (req, res) => {
                 fileMime: file.mimetype,
             });
 
-            // 파일도 방 전체에 emit (프론트에서 id 중복 체크로 처리)
             io.to(String(roomId)).emit('receive_message', msg);
             results.push(msg);
         }

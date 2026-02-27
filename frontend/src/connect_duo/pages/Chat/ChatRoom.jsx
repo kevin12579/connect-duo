@@ -31,6 +31,7 @@ import './ChatRoom.css';
 import txtPanelIcon from '../../assets/txt.png';
 import pictureIcon from '../../assets/picture.png';
 import txtFileIcon from '../../assets/txt-img.png';
+import { formatResponseSpeed, responseSpeedClass } from '../../utils/formatResponseSpeed';
 
 export default function ChatRoom({ roomId, onBack }) {
     const rid = useMemo(() => String(roomId ?? ''), [roomId]);
@@ -50,8 +51,20 @@ export default function ChatRoom({ roomId, onBack }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [roomClosed, setRoomClosed] = useState(false);
     const [onlineUsers, setOnlineUsers] = useState(new Set());
+    const [roomInfo, setRoomInfo] = useState(null); // ★ 파트너명 + 응답속도
 
     const MY_ID = useMemo(() => getMyIdFallback1(), []);
+
+    // ★ 내가 일반 유저(USER)일 때만 파트너(세무사)의 응답속도를 표시
+    // 세무사가 채팅할 때는 상대(일반유저)의 응답속도를 표시하지 않음
+    const isMyTypeUser = useMemo(() => {
+        try {
+            const backup = JSON.parse(localStorage.getItem('userBackup') || '{}');
+            return (backup?.user_type || 'USER') === 'USER';
+        } catch {
+            return true;
+        }
+    }, []);
 
     const isAgentOnline = useMemo(() => {
         return [...onlineUsers].some((uid) => uid !== String(MY_ID));
@@ -188,6 +201,7 @@ export default function ChatRoom({ roomId, onBack }) {
             if (Array.isArray(res.data)) {
                 const meRoom = res.data.find((r) => String(r.id) === rid);
                 setRoomClosed(meRoom?.status === 'CLOSED');
+                if (meRoom) setRoomInfo(meRoom); // ★ partner_name, partner_response_speed 저장
             }
         } catch {
             setRoomClosed(false);
@@ -369,7 +383,7 @@ export default function ChatRoom({ roomId, onBack }) {
         return out;
     };
 
-    const headerTitle = useMemo(() => `세무챗 (방 ${rid || '-'})`, [rid]);
+    const headerTitle = useMemo(() => roomInfo?.partner_name || `세무챗 (방 ${rid || '-'})`, [rid, roomInfo]);
 
     // rid 없음 fallback
     if (!rid) {
@@ -408,24 +422,44 @@ export default function ChatRoom({ roomId, onBack }) {
                             >
                                 ←
                             </button>
-                            <div className="cr-title" title={headerTitle}>
-                                {headerTitle}
-                                {roomClosed && (
-                                    <span
-                                        style={{
-                                            color: '#ffe066',
-                                            fontSize: 14,
-                                            marginLeft: 8,
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        [상담 종료]
-                                    </span>
-                                )}
-                                {/* ✅ 상대방 온라인 초록 점 */}
-                                <div className={`cr-status-tag ${isAgentOnline ? 'is-online' : ''}`}>
-                                    <span className="cr-status-dot"></span>
-                                    <span className="cr-status-text">{isAgentOnline ? '접속 중' : '오프라인'}</span>
+                            <div className="cr-header-info">
+                                <div className="cr-title" title={headerTitle}>
+                                    {headerTitle}
+                                    {roomClosed && (
+                                        <span
+                                            style={{
+                                                color: '#ffe066',
+                                                fontSize: 14,
+                                                marginLeft: 8,
+                                                fontWeight: 700,
+                                            }}
+                                        >
+                                            [상담 종료]
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* 온라인 상태 + 평균 응답속도 한 줄 */}
+                                <div className="cr-header-meta">
+                                    {/* 온라인 상태 점 */}
+                                    <div className={`cr-status-tag ${isAgentOnline ? 'is-online' : ''}`}>
+                                        <span className="cr-status-dot"></span>
+                                        <span className="cr-status-text">{isAgentOnline ? '접속 중' : '오프라인'}</span>
+                                    </div>
+
+                                    {/* ★ 평균 응답속도 뱃지 - 일반 유저일 때만 표시 (파트너가 세무사인 경우) */}
+                                    {isMyTypeUser && roomInfo?.partner_response_speed !== undefined && (
+                                        <div
+                                            className={`cr-status-tag cr-response-speed ${responseSpeedClass(
+                                                roomInfo.partner_response_speed,
+                                            )}`}
+                                        >
+                                            <span className="cr-status-dot" />
+                                            <span className="cr-status-text">
+                                                평균 응답 {formatResponseSpeed(roomInfo.partner_response_speed)}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="cr-headerActions" style={{ marginLeft: 'auto' }}>

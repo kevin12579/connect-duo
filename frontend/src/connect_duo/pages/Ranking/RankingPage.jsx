@@ -32,7 +32,8 @@ const RankingPage = ({ onOpenTaxProProfile }) => {
     const [advisors, setAdvisors] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
-
+    const storedMe = JSON.parse(localStorage.getItem('userBackup') || 'null');
+    const myId = storedMe?.id;
     useEffect(() => {
         const fetchRankingData = async () => {
             try {
@@ -153,10 +154,12 @@ const RankingPage = ({ onOpenTaxProProfile }) => {
                                                     Score <span>{(advisor.totalScore || 0).toFixed(1)}</span>
                                                 </div>
                                                 <button
-                                                    className="ranking-action-btn"
+                                                    className={`ranking-action-btn ${String(advisor.user_id) === String(myId) ? 'is-me' : ''}`}
                                                     onClick={() => onOpenTaxProProfile(advisor.user_id)}
                                                 >
-                                                    프로필 상세보기
+                                                    {String(advisor.user_id) === String(myId)
+                                                        ? '내 프로필 관리'
+                                                        : '프로필 상세보기'}
                                                 </button>
                                             </div>
                                         </div>

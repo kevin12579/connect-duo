@@ -117,9 +117,16 @@ export default function MainPage() {
         }
     };
 
-    const openTaxProFromUser = (taxProId) => {
-        setProfileNav({ taxProId });
-        setProfileView('USER_TO_TAXPRO');
+    const openTaxProFromUser = (targetTaxProId) => {
+        const myId = authUser?.id || JSON.parse(localStorage.getItem('userBackup') || 'null')?.id;
+
+        // 2. 타겟 ID와 내 ID 비교하여 역할 결정
+        const isMe = String(myId) === String(targetTaxProId);
+        const role = isMe ? 'TAX_ACCOUNTANT' : 'USER';
+
+        // 3. 상태 업데이트
+        setProfileNav({ taxProId: targetTaxProId, viewerRole: role });
+        setProfileView('TAX_DETAIL_VIEW'); // 통합된 상세 뷰 상태값
         setSelected('profile');
     };
 
@@ -154,11 +161,24 @@ export default function MainPage() {
     };
 
     const renderProfile = () => {
-        if (profileView === 'USER_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
-        if (profileView === 'USER_TO_TAXPRO') return <TaxProfile viewerRole="USER" nav={profileNav} />;
-        if (profileView === 'TAX_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
-    };
+        // 1. 기본 유저 프로필 (설정 페이지)
+        if (profileView === 'USER_PROFILE') {
+            return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
+        }
 
+        // 2. 세무사 본인의 설정 페이지 (UserProfile과 동일하지만 구분 필요시)
+        if (profileView === 'TAX_PROFILE') {
+            return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
+        }
+
+        // 3. 세무사 공개 프로필 상세 페이지 (유저가 보거나, 세무사 본인이 보거나)
+        if (profileView === 'TAX_DETAIL_VIEW') {
+            return <TaxProfile viewerRole={profileNav?.viewerRole || 'USER'} nav={profileNav} />;
+        }
+
+        // 기본값
+        return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
+    };
     // ★ 상담 영역: 채팅 room 선택 시 ChatRoom 오픈, 아니라면 ChatList
     const renderConsultContent = () => {
         if (activeChatRoom) {
@@ -257,6 +277,7 @@ export default function MainPage() {
                             // fail safe
                         }
                     }}
+                    setDbUser={setDbUser}
                     onGoSignup={() => setAuthView('signup')}
                 />
             ) : (
