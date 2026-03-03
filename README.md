@@ -1,4 +1,4 @@
-# 오픈마켓 <img src="src/assets/connectDuo_logo.png" width="120" alt="ConnectDuo Logo"/>
+# 오픈마켓 <img src="frontend/src/assets/connectDuo_logo.png" width="120" alt="ConnectDuo Logo"/>
 
 ### 소상공인을 위한 공공데이터 기반 **AI 세무 상담 및 전문가 매칭 플랫폼**
 
@@ -97,9 +97,3 @@ npm start
 - **SMU 엔지니어 9기 팀 프로젝트**
 
 ---
-
-## ✨ 기타 참고/수정사항
-
-- **이미지 alt 속성(접근성), 불필요 줄바꿈, 코드 블록 통일, 강조(볼드/이탤릭) 가독성 강화**
-- **팀원 역할 명료화, 스택분류 명확화, 주요 기능은 요약형(한 줄 핵심), 일정은 시각적으로 한 줄로 구분**
-- **공지/배포/연락처/라이센스 섹션 등은 필요시 추가**
