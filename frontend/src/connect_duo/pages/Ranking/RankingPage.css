@@ -173,6 +173,19 @@
     background:#3c7ec8;
 }
 
+/* ✅ 맨처음/맨끝: 조금 더 진한 톤(기본보다 강조) */
+.ranking-root .nav-btn.first,
+.ranking-root .nav-btn.last {
+    border-color: #6f9fe6;   /* 더 진한 파랑 보더 */
+    color: #1d5cc6;          /* 화살표도 조금 더 진하게 */
+}
+
+/* (선택) first/last hover는 기존 hover 그대로 타게 두되, 색감 더 또렷하게 */
+.ranking-root .nav-btn.first:hover:not(:disabled),
+.ranking-root .nav-btn.last:hover:not(:disabled) {
+    background: #1976d2; /* 너가 말한 “어울리는 파란색” 계열 */
+    color: #fff;
+}
 
 
 .ranking-root .ranking-rank-num {
@@ -190,6 +203,7 @@
 }
 
 /* 페이지네이션 */
+/* 페이지네이션 */
 .ranking-root .ranking-pagination {
     display: flex;
     justify-content: center;
@@ -198,35 +212,81 @@
     margin-top: 30px;
 }
 
+/* ✅ 버튼 기본(모두 동일): first/last 따로 "기본 보더 진하게" 없앰 */
 .ranking-root .nav-btn {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid #e2e8f0;
-    background: white;
-    color: #1976d2;
+    border: 2px solid #b7cff6;
+    background: #ffffff;
     cursor: pointer;
-    font-weight: bold;
     transition: 0.2s;
+
+    /* ✅ 아이콘 정중앙 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
 }
 
+/* ✅ 기본 hover(이전/다음): 스카이블루 계열 */
 .ranking-root .nav-btn:hover:not(:disabled) {
-    background: #1976d2;
-    color: white;
+    background: #eef6ff;     /* 스카이블루 느낌 */
+    border-color: #8fb6f3;
 }
 
+/* ✅ first/last hover는 "조금 더 진하게" */
+.ranking-root .nav-btn.first:hover:not(:disabled),
+.ranking-root .nav-btn.last:hover:not(:disabled) {
+    background: #cfe6ff;   /* 기존보다 한 단계 더 진한 스카이 */
+    border-color: #3f82e0; /* 살짝 더 또렷한 블루 */
+}
+
+/* disabled */
 .ranking-root .nav-btn:disabled {
-    color: #cbd5e1;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
+/* ✅ 아이콘 크기 조금 더 줄임 + 남색/푸른계 톤 입히기 */
+.ranking-root .nav-icon {
+    width: 16px;            /* 18 -> 16 */
+    height: 16px;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+
+    /* ✅ 검정 PNG를 "남색/푸른계"로 보이게 */
+    filter: brightness(0) saturate(100%) invert(22%) sepia(40%) saturate(2200%) hue-rotate(195deg) brightness(93%) contrast(98%);
+}
+
+/* hover 때 아이콘도 조금 더 또렷하게 */
+.ranking-root .nav-btn:hover:not(:disabled) .nav-icon {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(55%) saturate(2800%) hue-rotate(200deg) brightness(96%) contrast(105%);
+}
+
+/* disabled 때 아이콘 흐리게 */
+.ranking-root .nav-btn:disabled .nav-icon {
+    filter: grayscale(1) opacity(0.55);
+}
+
+/* ✅ 왼쪽 방향 만들기 */
+.ranking-root .nav-icon.flip {
+    transform: scaleX(-1);
+}
+
+/* ✅ 가운데 페이지 텍스트 키우고 톤 맞추기 */
 .ranking-root .page-indicator {
-    font-size: 0.95rem;
-    color: #64748b;
+    font-size: 1.05rem;     /* 0.95 -> 1.05 */
+    color: #4f6fa6;         /* 버튼 톤과 어울리는 블루그레이 */
+    font-weight: 800;
+    letter-spacing: -0.2px;
 }
 
 .ranking-root .page-indicator strong {
-    color: #1976d2;
+    color: #1d5cc6;         /* 아이콘 톤과 맞춘 딥 블루 */
+    font-weight: 900;
 }
 
 /* --- 랭킹 1,2,3위 특별 스타일 --- */

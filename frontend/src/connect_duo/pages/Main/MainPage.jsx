@@ -42,6 +42,7 @@ export default function MainPage() {
     // AI 채팅 관련 상태
     const [search, setSearch] = useState('');
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const [lockMainSearch, setLockMainSearch] = useState(false);
     const [chatQuery, setChatQuery] = useState('');
 
     // ★ 상담방 열림 상태 및 현재 열린 roomId
@@ -99,6 +100,11 @@ export default function MainPage() {
         initAuth();
     }, [loginAuthUser, logout, setAuthLoading]);
 
+    // ✅ 추가: 토글이 닫히면(언마운트 때문에) 무조건 잠금 해제
+    useEffect(() => {
+        if (!isChatOpen) setLockMainSearch(false);
+    }, [isChatOpen]);
+
     if (isAuthLoading) {
         return (
             <div className="mainpage-loading">
@@ -149,8 +155,11 @@ export default function MainPage() {
                 return;
             }
 
+            // ✅ 수정: "빈 값이면 토글" 할 때, 닫히는 순간 잠금 해제도 같이
             if (!search.trim()) {
-                setIsChatOpen(!isChatOpen);
+                const next = !isChatOpen;
+                setIsChatOpen(next);
+                if (!next) setLockMainSearch(false);
                 return;
             }
 
@@ -179,6 +188,7 @@ export default function MainPage() {
         // 기본값
         return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
     };
+
     // ★ 상담 영역: 채팅 room 선택 시 ChatRoom 오픈, 아니라면 ChatList
     const renderConsultContent = () => {
         if (activeChatRoom) {
@@ -308,15 +318,43 @@ export default function MainPage() {
                                     : '무엇을 도와드릴까요?'}
                             </div>
                         </div>
+
                         <div className={`search-wrapper ${isChatOpen ? 'is-open' : ''}`}>
                             <div className="search-bar-container">
                                 <input
                                     className="mainpage-search-input"
                                     placeholder="세무 궁금증을 입력하고 엔터를 누르세요"
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    onKeyDown={handleSearchAction}
+                                    onChange={(e) => {
+                                        // ✅ 열렸을 때만 막힘 / 닫히면 정상 입력
+                                        if (lockMainSearch) return;
+                                        setSearch(e.target.value);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // ✅ 열렸을 때만 엔터/입력 막힘 / 닫히면 정상
+                                        if (lockMainSearch) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            return;
+                                        }
+                                        handleSearchAction(e);
+                                    }}
+                                    onMouseDown={(e) => {
+                                        // ✅ 열렸을 때만 클릭 자체 막힘 / 닫히면 정상 클릭
+                                        if (lockMainSearch) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                        }
+                                    }}
+                                    onFocus={(e) => {
+                                        // ✅ 열렸을 때만 포커스 제거 / 닫히면 정상 포커스
+                                        if (lockMainSearch) e.target.blur();
+                                    }}
+                                    readOnly={lockMainSearch}
+                                    tabIndex={lockMainSearch ? -1 : 0}
+                                    aria-disabled={lockMainSearch}
                                 />
+
                                 <button
                                     className={`expand-arrow ${isChatOpen ? 'up' : ''}`}
                                     onClick={handleSearchAction}
@@ -324,12 +362,14 @@ export default function MainPage() {
                                     ▼
                                 </button>
                             </div>
+
                             {isChatOpen && (
                                 <div className="search-expand-content">
                                     <SearchTool
                                         initialQuery={chatQuery}
                                         setChatQuery={setChatQuery}
                                         isOpen={isChatOpen}
+                                        onToggleLock={setLockMainSearch}
                                     />
                                 </div>
                             )}
@@ -369,6 +409,7 @@ export default function MainPage() {
                         </button>
                     ))}
                 </div>
+
                 <div className="mainpage-content-card">{renderContent()}</div>
             </div>
         </div>

@@ -9,6 +9,10 @@ import silverBadge from '../../assets/Silver_2st.png';
 import bronzeBadge from '../../assets/Bronze_3st.png';
 import crownImg from '../../assets/Crown.png';
 
+// ✅ pagination icons
+import rightNext from '../../assets/right-next.png';
+import rightEnd from '../../assets/right-end.png';
+
 const PAGE_SIZE = 4;
 
 const RankingPage = ({ onOpenTaxProProfile }) => {
@@ -179,16 +183,28 @@ const RankingPage = ({ onOpenTaxProProfile }) => {
 
                 {totalPages > 1 && (
                     <div className="ranking-pagination">
+                        {/* ✅ 맨 처음 (right-end를 좌우반전) */}
+                        <button className="nav-btn first" onClick={() => setPage(1)} disabled={page === 1}>
+                            <img className="nav-icon flip" src={rightEnd} alt="맨 처음" />
+                        </button>
+
+                        {/* ✅ 이전 (right-next를 좌우반전) */}
                         <button className="nav-btn prev" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>
-                            &lt;
+                            <img className="nav-icon flip" src={rightNext} alt="이전" />
                         </button>
 
                         <div className="page-indicator">
                             <strong>{page}</strong> / {totalPages}
                         </div>
 
+                        {/* ✅ 다음 */}
                         <button className="nav-btn next" onClick={() => setPage((p) => p + 1)} disabled={page === totalPages}>
-                            &gt;
+                            <img className="nav-icon" src={rightNext} alt="다음" />
+                        </button>
+
+                        {/* ✅ 맨 끝 */}
+                        <button className="nav-btn last" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
+                            <img className="nav-icon" src={rightEnd} alt="맨 끝" />
                         </button>
                     </div>
                 )}

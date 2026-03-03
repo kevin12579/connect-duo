@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import CommentItem from './CommentItem';
 
+// ✅ pagination icons
+import rightNext from '../../../assets/right-next.png';
+import rightEnd from '../../../assets/right-end.png';
+
 const sortDesc = (arr) => [...arr].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 
 export default function CommentList({ me, comments, onDelete, pageSize = 3, canDelete = true }) {
@@ -76,6 +80,7 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
                     )}
                 </div>
             </div>
+
             <div className="comment-list">
                 {slicedOthers.length === 0 ? (
                     <div className="comment-empty">아직 댓글이 없습니다.</div>
@@ -85,23 +90,29 @@ export default function CommentList({ me, comments, onDelete, pageSize = 3, canD
                     ))
                 )}
             </div>
+
+            {/* ✅ pagination: 아이콘 버전 */}
             <div className="comment-pagination">
-                <button className="pg-btn" onClick={goFirst} disabled={isFirst} aria-label="first">
-                    ⏮
+                <button className="pg-btn" onClick={goFirst} disabled={isFirst} aria-label="first" title="처음">
+                    <img className="pg-icon pg-rotate" src={rightEnd} alt="" aria-hidden="true" />
                 </button>
-                <button className="pg-btn" onClick={goPrev} disabled={isFirst} aria-label="prev">
-                    ◀
+
+                <button className="pg-btn" onClick={goPrev} disabled={isFirst} aria-label="prev" title="이전">
+                    <img className="pg-icon pg-rotate" src={rightNext} alt="" aria-hidden="true" />
                 </button>
+
                 <div className="pg-info">
                     <span className="pg-current">{page}</span>
                     <span className="pg-slash">/</span>
                     <span className="pg-total">{totalPages}</span>
                 </div>
-                <button className="pg-btn" onClick={goNext} disabled={isLast} aria-label="next">
-                    ▶
+
+                <button className="pg-btn" onClick={goNext} disabled={isLast} aria-label="next" title="다음">
+                    <img className="pg-icon" src={rightNext} alt="" aria-hidden="true" />
                 </button>
-                <button className="pg-btn" onClick={goLast} disabled={isLast} aria-label="last">
-                    ⏭
+
+                <button className="pg-btn" onClick={goLast} disabled={isLast} aria-label="last" title="마지막">
+                    <img className="pg-icon" src={rightEnd} alt="" aria-hidden="true" />
                 </button>
             </div>
         </div>

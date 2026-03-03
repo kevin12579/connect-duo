@@ -39,6 +39,27 @@ import downIcon from '../../assets/down.png';
 
 import { formatResponseSpeed, responseSpeedClass } from '../../utils/formatResponseSpeed';
 
+// ✅ 날짜 key: YYYY-MM-DD
+function dayKeyFromTime(t) {
+    const d = new Date(t);
+    if (Number.isNaN(d.getTime())) return null;
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+// ✅ "2026년 02월 05일 목요일" 형식
+function formatKoreanDayHeader(t) {
+    const d = new Date(t);
+    if (Number.isNaN(d.getTime())) return '';
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const WEEK = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    return `${yyyy}년 ${mm}월 ${dd}일 ${WEEK[d.getDay()]}`;
+}
+
 export default function ChatRoom({ roomId, onBack }) {
     const rid = useMemo(() => String(roomId ?? ''), [roomId]);
     const listRef = useRef(null);
@@ -387,7 +408,11 @@ export default function ChatRoom({ roomId, onBack }) {
                     <div style={{ fontWeight: 900, marginBottom: 10 }}>채팅방을 열 수 없어요</div>
                     <div style={{ opacity: 0.8, lineHeight: 1.4 }}>roomId가 비어있거나 잘못 전달되었습니다.</div>
                     <div style={{ marginTop: 12 }}>
-                        <button type="button" className="cr-send" onClick={() => typeof onBack === 'function' && onBack()}>
+                        <button
+                            type="button"
+                            className="cr-send"
+                            onClick={() => typeof onBack === 'function' && onBack()}
+                        >
                             리스트로
                         </button>
                     </div>
@@ -416,7 +441,9 @@ export default function ChatRoom({ roomId, onBack }) {
                                 <div className="cr-title" title={headerTitle}>
                                     {headerTitle}
                                     {roomClosed && (
-                                        <span style={{ color: '#ffe066', fontSize: 14, marginLeft: 8, fontWeight: 700 }}>
+                                        <span
+                                            style={{ color: '#ffe066', fontSize: 14, marginLeft: 8, fontWeight: 700 }}
+                                        >
                                             [상담 종료]
                                         </span>
                                     )}
@@ -429,9 +456,13 @@ export default function ChatRoom({ roomId, onBack }) {
                                     </div>
 
                                     {isMyTypeUser && roomInfo?.partner_response_speed !== undefined && (
-                                        <div className={`cr-status-tag cr-response-speed ${responseSpeedClass(roomInfo.partner_response_speed)}`}>
+                                        <div
+                                            className={`cr-status-tag cr-response-speed ${responseSpeedClass(roomInfo.partner_response_speed)}`}
+                                        >
                                             <span className="cr-status-dot" />
-                                            <span className="cr-status-text">평균 응답 {formatResponseSpeed(roomInfo.partner_response_speed)}</span>
+                                            <span className="cr-status-text">
+                                                평균 응답 {formatResponseSpeed(roomInfo.partner_response_speed)}
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -488,7 +519,9 @@ export default function ChatRoom({ roomId, onBack }) {
                             {query.trim() && (
                                 <div className="cr-searchMeta">
                                     <span className="cr-hitCount">
-                                        {hits.length ? `${Math.min(activeHitIdx + 1, hits.length)}/${hits.length}` : '0/0'}
+                                        {hits.length
+                                            ? `${Math.min(activeHitIdx + 1, hits.length)}/${hits.length}`
+                                            : '0/0'}
                                     </span>
                                     <div className="cr-searchNav">
                                         <button
@@ -529,143 +562,214 @@ export default function ChatRoom({ roomId, onBack }) {
                     {loading && <div className="cr-loading">메시지 불러오는 중…</div>}
 
                     {!loading &&
-                        messages.map((m) => {
-                            const isMe = m.from === 'me';
-                            const type = String(m.type).toUpperCase();
-                            const isSystem = type === 'SYSTEM' || m.from === 'system';
-                            const isLastMyMsg = isMe && m.id === lastMyMsgId;
+                        (() => {
+                            let lastDayKey = null;
 
-                            if (isSystem)
-                                return (
-                                    <div key={m.id} className="cr-systemRow">
-                                        <div className="cr-systemPill">{renderHighlightedText(m.text)}</div>
-                                    </div>
-                                );
+                            return messages.map((m) => {
+                                const isMe = m.from === 'me';
+                                const type = String(m.type).toUpperCase();
+                                const isSystem = type === 'SYSTEM' || m.from === 'system';
+                                const isLastMyMsg = isMe && m.id === lastMyMsgId;
 
-                            const dl = dlState[m.id] || null;
-                            const openUrl = m.fileUrl ? (isTxtLike(m) ? getTxtViewerUrl(m.fileUrl) : m.fileUrl) : null;
+                                // ✅ 날짜 헤더: 날짜가 바뀌는 첫 메시지 앞에 1번만
+                                const dk = dayKeyFromTime(m.time);
+                                const showDayPill = dk && dk !== lastDayKey;
+                                if (showDayPill) lastDayKey = dk;
 
-                            // ✅ “말풍선 밖 옆 라벨” 결정 (우선순위: 다운로드 > 만료 > 전송)
-                            let sideLabel = null;
-                            let sideKind = null;
-                            if (dl === 'failed') {
-                                sideLabel = '다운로드 실패';
-                                sideKind = 'err';
-                            } else if (dl === 'expired') {
-                                sideLabel = '보관기간 만료';
-                                sideKind = 'warn';
-                            } else if (isMe && sendFail[m.id]) {
-                                sideLabel = '전송 실패';
-                                sideKind = 'err';
-                            }
-
-                            const timeObj = new Date(m.time);
-                            const timeText = Number.isNaN(timeObj.getTime())
-                                ? ''
-                                : timeObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-
-                            return (
-                                <div key={m.id} id={`msg-${m.id}`} className={`cr-row ${isMe ? 'cr-rowMe' : 'cr-rowOther'}`}>
-                                    <div className={`cr-bubbleWrap ${isMe ? 'isMe' : 'isOther'}`}>
-                                        {/* ✅ 요구사항: 라벨은 “말풍선 바깥 왼쪽” (카톡 느낌) */}
-                                        {sideLabel && (
-                                            <div className={`cr-sideLabel ${sideKind === 'err' ? 'isErr' : 'isWarn'}`}>
-                                                {sideLabel}
+                                if (isSystem)
+                                    return (
+                                        <React.Fragment key={m.id}>
+                                            {showDayPill && (
+                                                <div className="cr-dayPill">{formatKoreanDayHeader(m.time)}</div>
+                                            )}
+                                            <div className="cr-systemRow">
+                                                <div className="cr-systemPill">{renderHighlightedText(m.text)}</div>
                                             </div>
+                                        </React.Fragment>
+                                    );
+
+                                const dl = dlState[m.id] || null;
+                                const openUrl = m.fileUrl
+                                    ? isTxtLike(m)
+                                        ? getTxtViewerUrl(m.fileUrl)
+                                        : m.fileUrl
+                                    : null;
+
+                                let sideLabel = null;
+                                let sideKind = null;
+                                if (dl === 'failed') {
+                                    sideLabel = '다운로드 실패';
+                                    sideKind = 'err';
+                                } else if (dl === 'expired') {
+                                    sideLabel = '보관기간 만료';
+                                    sideKind = 'warn';
+                                } else if (isMe && sendFail[m.id]) {
+                                    sideLabel = '전송 실패';
+                                    sideKind = 'err';
+                                }
+
+                                const timeObj = new Date(m.time);
+                                const timeText = Number.isNaN(timeObj.getTime())
+                                    ? ''
+                                    : timeObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+                                return (
+                                    <React.Fragment key={m.id}>
+                                        {showDayPill && (
+                                            <div className="cr-dayPill">{formatKoreanDayHeader(m.time)}</div>
                                         )}
 
-                                        <div className={`cr-bubble ${isMe ? 'cr-bubbleMe' : 'cr-bubbleOther'}`}>
-                                            {type === 'IMAGE' && m.fileUrl && (
-                                                <div className="cr-imgWrap">
-                                                    <img className="cr-img" src={m.fileUrl} alt={m.fileName || 'image'} />
-                                                    <div className="cr-fileBody">
-                                                        <div className="cr-fileActions">
-                                                            <button
-                                                                type="button"
-                                                                className="cr-downloadBtn"
-                                                                onClick={() => handleDownload(m)}
-                                                                disabled={dl === 'loading'}
-                                                            >
-                                                                {dl === 'loading' ? '다운로드중…' : '다운로드'}
-                                                            </button>
+                                        <div
+                                            id={`msg-${m.id}`}
+                                            className={`cr-row ${isMe ? 'cr-rowMe' : 'cr-rowOther'}`}
+                                        >
+                                            <div className={`cr-bubbleWrap ${isMe ? 'isMe' : 'isOther'}`}>
+                                                {sideLabel && (
+                                                    <div
+                                                        className={`cr-sideLabel ${sideKind === 'err' ? 'isErr' : 'isWarn'}`}
+                                                    >
+                                                        {sideLabel}
+                                                    </div>
+                                                )}
 
-                                                            {openUrl && (
-                                                                <a className="cr-openBtn" href={openUrl} target="_blank" rel="noreferrer">
-                                                                    열기
-                                                                </a>
+                                                <div className={`cr-bubble ${isMe ? 'cr-bubbleMe' : 'cr-bubbleOther'}`}>
+                                                    {type === 'IMAGE' && m.fileUrl && (
+                                                        <div className="cr-imgWrap">
+                                                            <img
+                                                                className="cr-img"
+                                                                src={m.fileUrl}
+                                                                alt={m.fileName || 'image'}
+                                                            />
+                                                            <div className="cr-fileBody">
+                                                                <div className="cr-fileActions">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="cr-downloadBtn"
+                                                                        onClick={() => handleDownload(m)}
+                                                                        disabled={dl === 'loading'}
+                                                                    >
+                                                                        {dl === 'loading' ? '다운로드중…' : '다운로드'}
+                                                                    </button>
+
+                                                                    {openUrl && (
+                                                                        <a
+                                                                            className="cr-openBtn"
+                                                                            href={openUrl}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                        >
+                                                                            열기
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+
+                                                                <div className="cr-fileSub">
+                                                                    <div className="cr-fileSubRow">
+                                                                        <span className="cr-fileLabel">용량:</span>
+                                                                        <span className="cr-fileValue">
+                                                                            {formatBytes(m.fileSize)}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="cr-fileSubRow">
+                                                                        <span className="cr-fileLabel">유효기간:</span>
+                                                                        <span className="cr-fileValue">
+                                                                            {formatExpireDate(m.time)}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {type === 'FILE' && m.fileUrl && (
+                                                        <div className="cr-fileCard">
+                                                            {isTxtLike(m) && (
+                                                                <img
+                                                                    className="cr-txtCornerIcon"
+                                                                    src={txtFileIcon}
+                                                                    alt="txt"
+                                                                />
                                                             )}
-                                                        </div>
-
-                                                        <div className="cr-fileSub">
-                                                            <div className="cr-fileSubRow">
-                                                                <span className="cr-fileLabel">용량:</span>
-                                                                <span className="cr-fileValue">{formatBytes(m.fileSize)}</span>
+                                                            <div className="cr-fileTopRow">
+                                                                <div className="cr-fileBadge">
+                                                                    {isTxtLike(m) ? 'TXT' : 'FILE'}
+                                                                </div>
+                                                                <div
+                                                                    className="cr-fileTitle"
+                                                                    title={m?.fileName || '파일'}
+                                                                >
+                                                                    {renderHighlightedText(
+                                                                        displayFileTitle(m) || '파일',
+                                                                    )}
+                                                                </div>
+                                                                <div className="cr-fileRightSlot" />
                                                             </div>
-                                                            <div className="cr-fileSubRow">
-                                                                <span className="cr-fileLabel">유효기간:</span>
-                                                                <span className="cr-fileValue">{formatExpireDate(m.time)}</span>
+
+                                                            <div className="cr-fileActions">
+                                                                <button
+                                                                    type="button"
+                                                                    className="cr-downloadBtn"
+                                                                    onClick={() => handleDownload(m)}
+                                                                    disabled={dl === 'loading'}
+                                                                >
+                                                                    {dl === 'loading' ? '다운로드중…' : '다운로드'}
+                                                                </button>
+
+                                                                {openUrl && (
+                                                                    <a
+                                                                        className="cr-openBtn"
+                                                                        href={openUrl}
+                                                                        target="_blank"
+                                                                        rel="noreferrer"
+                                                                    >
+                                                                        열기
+                                                                    </a>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="cr-fileSub">
+                                                                <div className="cr-fileSubRow">
+                                                                    <span className="cr-fileLabel">용량:</span>
+                                                                    <span className="cr-fileValue">
+                                                                        {formatBytes(m.fileSize)}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="cr-fileSubRow">
+                                                                    <span className="cr-fileLabel">유효기간:</span>
+                                                                    <span className="cr-fileValue">
+                                                                        {formatExpireDate(m.time)}
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            )}
+                                                    )}
 
-                                            {type === 'FILE' && m.fileUrl && (
-                                                <div className="cr-fileCard">
-                                                    {isTxtLike(m) && <img className="cr-txtCornerIcon" src={txtFileIcon} alt="txt" />}
-                                                    <div className="cr-fileTopRow">
-                                                        <div className="cr-fileBadge">{isTxtLike(m) ? 'TXT' : 'FILE'}</div>
-                                                        <div className="cr-fileTitle" title={m?.fileName || '파일'}>
-                                                            {renderHighlightedText(displayFileTitle(m) || '파일')}
-                                                        </div>
-                                                        <div className="cr-fileRightSlot" />
-                                                    </div>
+                                                    {type === 'TEXT' && (
+                                                        <div className="cr-text">{renderHighlightedText(m.text)}</div>
+                                                    )}
 
-                                                    <div className="cr-fileActions">
-                                                        <button
-                                                            type="button"
-                                                            className="cr-downloadBtn"
-                                                            onClick={() => handleDownload(m)}
-                                                            disabled={dl === 'loading'}
-                                                        >
-                                                            {dl === 'loading' ? '다운로드중…' : '다운로드'}
-                                                        </button>
-
-                                                        {openUrl && (
-                                                            <a className="cr-openBtn" href={openUrl} target="_blank" rel="noreferrer">
-                                                                열기
-                                                            </a>
+                                                    <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>
+                                                        {timeText}
+                                                        {isLastMyMsg && (
+                                                            <span
+                                                                className="cr-readStatus"
+                                                                style={{
+                                                                    marginLeft: 6,
+                                                                    fontSize: '11px',
+                                                                    color: '#5f6f8f',
+                                                                }}
+                                                            >
+                                                                {m.isRead ? '읽음' : '안읽음'}
+                                                            </span>
                                                         )}
                                                     </div>
-
-                                                    <div className="cr-fileSub">
-                                                        <div className="cr-fileSubRow">
-                                                            <span className="cr-fileLabel">용량:</span>
-                                                            <span className="cr-fileValue">{formatBytes(m.fileSize)}</span>
-                                                        </div>
-                                                        <div className="cr-fileSubRow">
-                                                            <span className="cr-fileLabel">유효기간:</span>
-                                                            <span className="cr-fileValue">{formatExpireDate(m.time)}</span>
-                                                        </div>
-                                                    </div>
                                                 </div>
-                                            )}
-
-                                            {type === 'TEXT' && <div className="cr-text">{renderHighlightedText(m.text)}</div>}
-
-                                            <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>
-                                                {timeText}
-                                                {isLastMyMsg && (
-                                                    <span className="cr-readStatus" style={{ marginLeft: 6, fontSize: '11px', color: '#221e1e' }}>
-                                                        {m.isRead ? '읽음' : '안읽음'}
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                    </React.Fragment>
+                                );
+                            });
+                        })()}
                 </div>
 
                 <input

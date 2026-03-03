@@ -2,20 +2,22 @@
 
 /* === page scaffold === */
 .cl-page {
-    min-height: 100vh;
-    background: #dfe6ef; /* 회색+푸른기, 대비 강화 */
-    display: flex;
+    min-height: 0;
+    background: transparent;     /* ✅ 메인 흰 카드 배경 살리려면 투명 */
+    display: flex;               /* ✅ center 정렬용 */
     justify-content: center;
-    padding: 40px 0;
+    padding: 0;                  /* 필요하면 여기 말고 panel에서 여백 */
+    width: 100%;
 }
 
 .cl-panel {
-    width: min(1500px, 98vw);
+    width: 100%;
     max-width: 100%;
+    margin: 0;             /* ✅ 가운데 정렬 */
     background: #f8fafc;
     border: 2px solid #c9d7ee;
     border-radius: 38px;
-    padding: 40px 0 30px;
+    padding: 40px clamp(16px, 2.5vw, 40px) 30px;
     color: #212c39;
     box-shadow: 0 14px 54px rgba(60, 80, 120, 0.10);
 }
@@ -24,7 +26,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 30px;
-    padding: 0 56px 0 56px;
+    padding: 0 clamp(16px, 3vw, 56px);
 }
 
 .cl-title {
@@ -36,16 +38,31 @@
 
 .cl-loading,
 .cl-empty {
-    opacity: 0.85;
-    padding: 60px 0 18px;
+    opacity: 1;                 /* ✅ 더 진하게 */
+    padding: 40px 0 0;          /* ✅ 위로 올림 (아래 여백 제거) */
     text-align: center;
-    font-size: 17px;
-    color: #6f84a8;
+    font-size: 17px;            /* ✅ 글씨 키움 */
+    color: #55657f;             /* ✅ 더 진한 글씨 */
+    font-weight: 800;           /* ✅ 더 굵게 */
+}
+
+/* ✅ 진짜 “가운데(세로)”도 원하면: 패널 안에서 위치 고정 */
+.cl-panel {
+    position: relative;
+}
+
+.cl-empty {
+    position: absolute;
+    left: 50%;
+    top: 58%;                   /* ✅ 살짝 위쪽 가운데 느낌 (원하면 55~62로 조절) */
+    transform: translate(-50%, -50%);
+    width: 100%;
+    padding: 0;                 /* absolute라 padding 필요 없음 */
 }
 
 /* === list card === */
 .cl-card-wrapper {
-    padding: 0 56px;
+    padding: 0 clamp(16px, 3vw, 56px);
 }
 
 .cl-card {
