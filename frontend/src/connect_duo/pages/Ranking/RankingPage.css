@@ -1,20 +1,25 @@
+/* ✅ 스코프 루트 */
+.ranking-root {
+    width: 100%;
+}
+
 /* 컨테이너 */
-.ranking-outer-container {
+.ranking-root .ranking-outer-container {
     width: 100%;
     padding: 20px 0;
 }
 
-.ranking-window {
+.ranking-root .ranking-window {
     width: 100%;
     overflow: hidden;
 }
 
-.ranking-slider-track {
+.ranking-root .ranking-slider-track {
     display: flex;
     transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.ranking-page-group {
+.ranking-root .ranking-page-group {
     min-width: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -24,7 +29,7 @@
 }
 
 /* 카드 스타일 */
-.ranking-profile-card {
+.ranking-root .ranking-profile-card {
     background: #ffffff;
     border-radius: 20px;
     padding: 24px;
@@ -37,24 +42,23 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
-.ranking-profile-card:hover {
+.ranking-root .ranking-profile-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 30px rgba(25, 118, 210, 0.1);
     border-color: #1976d2;
 }
 
 /* 이미지 및 대체 아바타 */
-.ranking-photo,
-.ranking-photo-placeholder {
+.ranking-root .ranking-photo,
+.ranking-root .ranking-photo-placeholder {
     width: 120px;
     height: 150px;
     object-fit: cover;
     border-radius: 16px;
-    margin-bottom: 16px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.ranking-photo-placeholder {
+.ranking-root .ranking-photo-placeholder {
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     display: flex;
     align-items: center;
@@ -65,22 +69,23 @@
 }
 
 /* 텍스트 정보 */
-.ranking-info {
+.ranking-root .ranking-info {
     text-align: center;
     margin-bottom: 15px;
     width: 100%;
 }
 
-.ranking-name {
+.ranking-root .ranking-name {
     font-size: 1.15rem;
     color: #2c3e50;
     margin: 0 0 6px 0;
     font-weight: 700;
 }
 
-.ranking-desc {
+/* ✅ 한줄소개: 회색 조금 더 진하게 + 기존처럼 ... 처리 유지 */
+.ranking-root .ranking-desc {
     font-size: 0.85rem;
-    color: #7f8c8d;
+    color: #6f7f8f;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -88,7 +93,7 @@
 }
 
 /* 스탯 그리드 */
-.ranking-stats-grid {
+.ranking-root .ranking-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
@@ -96,8 +101,8 @@
     margin-bottom: 20px;
 }
 
-.ranking-stat {
-    background: #f8faff;
+.ranking-root .ranking-stat {
+    background: #f3f5f7;
     padding: 8px;
     border-radius: 10px;
     text-align: center;
@@ -105,26 +110,40 @@
     flex-direction: column;
 }
 
-.stat-val {
+.ranking-root .stat-val {
     color: #1976d2;
     font-weight: 700;
     font-size: 0.9rem;
 }
 
-.stat-label {
+.ranking-root .stat-label {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: #7e8fa3;
 }
 
+/* ✅ (요구사항) 카드별로 "결과적으론 비슷한 선명도" 맞추기 */
+.ranking-root .rank-1 .ranking-desc,
+.ranking-root .rank-3 .ranking-desc,
+.ranking-root .ranking-profile-card:not(.rank-1):not(.rank-2):not(.rank-3) .ranking-desc {
+    color: #647486;
+}
+.ranking-root .rank-1 .stat-label,
+.ranking-root .rank-3 .stat-label,
+.ranking-root .ranking-profile-card:not(.rank-1):not(.rank-2):not(.rank-3) .stat-label {
+    color: #6f8299;
+}
+
+
+
 /* 하단 버튼 및 배지 */
-.ranking-footer {
+.ranking-root .ranking-footer {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.ranking-total-badge {
+.ranking-root .ranking-total-badge {
     align-self: center;
     font-size: 0.8rem;
     color: #64748b;
@@ -133,36 +152,30 @@
     border-radius: 20px;
 }
 
-.ranking-total-badge span {
+.ranking-root .ranking-total-badge span {
     color: #1976d2;
     font-weight: 800;
 }
 
-.ranking-action-btn {
+.ranking-root .ranking-action-btn {
     width: 100%;
     padding: 10px;
     border: none;
     border-radius: 12px;
-    background: #1976d2;
+    background:  #4a90e2;
     color: white;
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
 }
 
-.ranking-action-btn:hover {
-    background: #1565c0;
+.ranking-root .ranking-action-btn:hover {
+    background:#3c7ec8;
 }
 
-/* 트로피 및 순위 */
-.rank-badge-area {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    z-index: 3;
-}
 
-.ranking-rank-num {
+
+.ranking-root .ranking-rank-num {
     width: 34px;
     height: 34px;
     background: white;
@@ -177,7 +190,7 @@
 }
 
 /* 페이지네이션 */
-.ranking-pagination {
+.ranking-root .ranking-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -185,7 +198,7 @@
     margin-top: 30px;
 }
 
-.nav-btn {
+.ranking-root .nav-btn {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -197,122 +210,172 @@
     transition: 0.2s;
 }
 
-.nav-btn:hover:not(:disabled) {
+.ranking-root .nav-btn:hover:not(:disabled) {
     background: #1976d2;
     color: white;
 }
 
-.nav-btn:disabled {
+.ranking-root .nav-btn:disabled {
     color: #cbd5e1;
     cursor: not-allowed;
 }
 
-.page-indicator {
+.ranking-root .page-indicator {
     font-size: 0.95rem;
     color: #64748b;
 }
 
-.page-indicator strong {
+.ranking-root .page-indicator strong {
     color: #1976d2;
 }
 
 /* --- 랭킹 1,2,3위 특별 스타일 --- */
-.ranking-profile-card.rank-1 {
+.ranking-root .ranking-profile-card.rank-1 {
     border: 2px solid #ffca28;
     background: linear-gradient(180deg, #fffcf0 0%, #ffffff 100%);
     box-shadow: 0 10px 30px rgba(255, 202, 40, 0.15);
 }
-.ranking-profile-card.rank-2 {
+.ranking-root .ranking-profile-card.rank-2 {
     border: 2px solid #cfd8dc;
-    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #eef2f6 0%, #ffffff 78%);
 }
-.ranking-profile-card.rank-3 {
+
+.ranking-root .ranking-profile-card.rank-3 {
     border: 2px solid #ffccbc;
     background: linear-gradient(180deg, #fff8f6 0%, #ffffff 100%);
 }
 
+.ranking-root .photo-wrap {
+    position: relative;
+    width: 120px;
+    height: 150px;
+    margin-bottom: 16px;
+}
+
 /* 왕관 배지 스타일 */
-.crown-icon {
+.ranking-root .crown-icon {
     position: absolute;
-    top: -25px;
+    top: -22px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 32px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-    z-index: 10;
+    width: 50px;
+    height: 50px;
+    z-index: 5;
+    pointer-events: none;
 }
 
 /* 1등 카드의 메인 액션 버튼 강조 */
-.rank-1 .ranking-action-btn {
-    background: #ffca28;
-    color: #5d4037;
+.ranking-root .rank-1 .ranking-action-btn {
+    background: #f6c453;   /* 기존보다 채도 낮춤 */
+    color: #5a3d1e;
     font-weight: 800;
 }
-.rank-1 .ranking-action-btn:hover {
-    background: #ffb300;
+.ranking-root .rank-1 .ranking-action-btn:hover {
+    background: #e9b63c;   /* 살짝 딥 */
+}
+
+/* ✅ 2등/3등 버튼 */
+.ranking-root .rank-2 .ranking-action-btn {
+    background: #c7d2dc;   /* 블루그레이 실버 */
+    color: #2f3e4d;
+    font-weight: 800;
+}
+.ranking-root .rank-2 .ranking-action-btn:hover {
+     background: #b8c5cf;
+}
+
+.ranking-root .rank-3 .ranking-action-btn {
+    background: #d28a52;   /* 덜 붉은 브론즈 */
+    color: #4a2f1c;
+    font-weight: 800;
+}
+.ranking-root .rank-3 .ranking-action-btn:hover {
+    background: #c2793f;
 }
 
 /* 기존 rank-badge-area 위치 조정 */
-.rank-badge-area {
+.ranking-root .rank-badge-area {
     position: absolute;
     top: 15px;
     left: 15px;
     z-index: 3;
 }
 
-/* 트로피 SVG 애니메이션 */
-.ranking-trophy {
-    width: 45px;
-    height: 45px;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
-}
-
 /* --- 랭킹 1,2,3위 텍스트 강조 --- */
-
-/* 1등 (Gold) */
-.rank-1 .stat-val,
-.rank-1 .ranking-total-badge span {
-    color: #f57f17; /* 진한 황금색 */
+.ranking-root .rank-1 .stat-val,
+.ranking-root .rank-1 .ranking-total-badge span {
+    color: #f57f17;
 }
 
-/* 2등 (Silver) */
-.rank-2 .stat-val,
-.rank-2 .ranking-total-badge span {
-    color: #455a64; /* 세련된 실버 그레이 */
+.ranking-root .rank-2 .stat-val,
+.ranking-root .rank-2 .ranking-total-badge span {
+    color: #455a64;
 }
 
-/* 3등 (Bronze) */
-.rank-3 .stat-val,
-.rank-3 .ranking-total-badge span {
-    color: #bf360c; /* 진한 브론즈/오렌지 */
+.ranking-root .rank-3 .stat-val,
+.ranking-root .rank-3 .ranking-total-badge span {
+    color: #bf360c;
 }
 
-/* 1~3위 공통: 스탯 수치 폰트 살짝 키우기 */
-.rank-1 .stat-val,
-.rank-2 .stat-val,
-.rank-3 .stat-val {
+.ranking-root .rank-1 .stat-val,
+.ranking-root .rank-2 .stat-val,
+.ranking-root .rank-3 .stat-val {
     font-size: 1rem;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-/* 1~3위 푸터 배지 배경색 살짝 강조 */
-.rank-1 .ranking-total-badge {
+.ranking-root .rank-1 .ranking-total-badge {
     background: #fff9c4;
 }
-.rank-2 .ranking-total-badge {
+.ranking-root .rank-2 .ranking-total-badge {
     background: #eceff1;
 }
-.rank-3 .ranking-total-badge {
+.ranking-root .rank-3 .ranking-total-badge {
     background: #fbe9e7;
+}
+
+/* =========================
+   ✅ 추가(요구사항 반영 + 전역CSS 덮임 방지)
+========================= */
+.ranking-root .ranking-profile-card:not(.rank-1):not(.rank-2):not(.rank-3) {
+    border-color:  #a9bfd6;
+}
+
+/* 4등 이후 hover 시 테두리도 톤다운 */
+.ranking-root .ranking-profile-card:not(.rank-1):not(.rank-2):not(.rank-3):hover {
+  border-color: #6f9fe6; /* 파랑이긴 한데 #1976d2보다 훨씬 부드러움 */
+}
+
+.ranking-root .ranking-profile-card .rank-badge-area .ranking-badge-img {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.18));
+}
+
+/* ✅ 실버(2등)만: 밝기 + 그림자 거의 제거(아주 약하게만) */
+.ranking-root .rank-2 .ranking-badge-img{
+  filter: brightness(0.95) !important;
+}
+
+
+.ranking-root .ranking-profile-card .ranking-photo,
+.ranking-root .ranking-profile-card .ranking-photo-placeholder {
+    width: 120px;
+    height: 150px;
+}
+
+.ranking-root .ranking-profile-card .ranking-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+}
+
+.ranking-root .ranking-profile-card .ranking-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

@@ -1,473 +1,682 @@
-/* === 전체 레이아웃 === */
+/* UserProfile.css - FULL (scoped under .uprofile-root) */
+/* NO body / NO :root */
+/* ✅ TaxProfile과 절대 충돌 안 나게: .uprofile-root 하위로만 */
+
 .uprofile-root {
+    --up-font: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* text */
+    --up-text-900: #1a202c;
+    --up-text-800: #1e293b;
+    --up-text-700: #2d3748;
+    --up-text-600: #475569;
+    --up-text-500: #64748b;
+    --up-text-400: #6b7f97;
+
+    /* brand */
+    --up-primary: #3f6fb5;
+    --up-primary-hover: #2d5592;
+
+    /* glass */
+    --up-card: rgba(243, 247, 251, 0.78);
+    --up-card-2: rgba(255, 255, 255, 0.55);
+    --up-item: rgba(255, 255, 255, 0.92);
+
+    --up-line: rgba(63, 111, 181, 0.18);
+    --up-line-strong: rgba(63, 111, 181, 0.56);
+
+    --up-shadow-card: 0 18px 50px rgba(15, 23, 42, 0.1);
+    --up-shadow-item: 0 10px 28px rgba(15, 23, 42, 0.06);
+    --up-shadow-item-hover: 0 14px 32px rgba(15, 23, 42, 0.1);
+
+    --up-radius-card: 24px;
+    --up-radius-item: 18px;
+
+    --up-ease: 0.2s ease;
+
     width: min(1000px, 92%);
     margin: 0 auto;
     padding: 60px 0;
-    font-family:
-        'Pretendard',
-        -apple-system,
-        sans-serif;
+    font-family: var(--up-font);
 }
 
-.uprofile-title {
+/* loading / error (혹시 공통 class가 있어도 이 페이지에서만) */
+.uprofile-root .loading,
+.uprofile-root .error {
+    padding: 60px 0;
+    color: var(--up-text-600);
+    font-family: var(--up-font);
+}
+
+/* -------------------------
+   Title
+------------------------- */
+.uprofile-root .uprofile-title {
     font-size: 32px;
     font-weight: 800;
     margin-bottom: 30px;
-    color: #1a202c;
+    color: var(--up-text-900);
     letter-spacing: -1px;
 }
 
-/* 카드 공통 스타일 */
-.uprofile-card {
-    background: #ffffff;
-    border-radius: 24px;
+/* -------------------------
+   Section Card (공통)
+------------------------- */
+.uprofile-root .uprofile-card {
+    background: var(--up-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    border: 1.5px solid var(--up-line-strong);
+    box-shadow: var(--up-shadow-card);
+
+    border-radius: var(--up-radius-card);
     padding: 35px;
     margin-bottom: 30px;
-    border: 1px solid #eef2f7;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12));
 }
 
-/* 세무사 전용 프로필 버튼 */
-.mytaxpro-btn {
+/* -------------------------
+   TaxPro Button (상단 긴 버튼)
+------------------------- */
+.uprofile-root .mytaxpro-btn {
     width: 100%;
     margin-bottom: 20px;
-    background: #f0f7ff;
-    color: #3f6fb5;
-    font-weight: 700;
-    border-radius: 14px;
     padding: 14px;
-    border: 1px dashed #3f6fb5;
+
+    background: rgba(225, 238, 255, 0.95);
+    color: var(--up-primary);
+    font-weight: 700;
+
+    border-radius: 14px;
+    border: 1px solid rgba(63, 111, 181, 0.42);
+
     cursor: pointer;
-    transition: all 0.2s;
+    transition:
+        background var(--up-ease),
+        color var(--up-ease),
+        transform var(--up-ease),
+        border-color var(--up-ease),
+        box-shadow var(--up-ease);
 }
 
-.mytaxpro-btn:hover {
-    background: #3f6fb5;
+.uprofile-root .mytaxpro-btn:hover {
+    background: var(--up-primary);
     color: #fff;
+    border-color: rgba(63, 111, 181, 0.65);
+    box-shadow: 0 10px 22px rgba(63, 111, 181, 0.16);
+    transform: translateY(-1px);
 }
 
-/* === 상담 신청 & 댓글 리스트 공통 항목 === */
-.list-title {
+/* -------------------------
+   List (상담 신청/댓글 리스트 공통)
+------------------------- */
+.uprofile-root .list-title {
     font-size: 20px;
     font-weight: 800;
-    color: #2d3748;
+    color: var(--up-text-700);
     margin-bottom: 25px;
+
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.list-wrapper {
+.uprofile-root .list-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 19px;
     margin-bottom: 25px;
 }
 
-.item-row {
-    background: #f8fafc;
-    border-radius: 18px;
+/* list item row */
+.uprofile-root .item-row {
+    background: var(--up-item);
+
+    border-radius: var(--up-radius-item);
+    padding: 16px 20px;
+
     display: flex;
     align-items: center;
-    padding: 16px 20px;
-    border: 1px solid #edf2f7;
+
+    border: 1px solid var(--up-line);
+
+    box-shadow:
+        0 -2px 10px rgba(63, 111, 181, 0.03),
+        0 10px 22px rgba(15, 23, 42, 0.06);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
     transition:
-        transform 0.2s,
-        box-shadow 0.2s;
+        transform var(--up-ease),
+        box-shadow var(--up-ease),
+        border-color var(--up-ease);
 }
 
-.item-row:hover {
+.uprofile-root .item-row:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    background: #fff;
-    border-color: #3f6fb5;
+    box-shadow:
+        0 -2px 12px rgba(63, 111, 181, 0.04),
+        0 14px 28px rgba(15, 23, 42, 0.08);
+    border-color: rgba(63, 111, 181, 0.35);
 }
 
-/* 왼쪽 날짜/아이콘 영역 */
-.item-side-info {
-    font-size: 13px;
-    color: #94a3b8;
-    font-weight: 600;
+/* Left info */
+.uprofile-root .item-side-info {
     width: 100px;
+    font-size: 13px;
+    color: var(--up-text-400);
+    font-weight: 600;
 }
 
-/* 중앙 메인 정보 영역 */
-.item-main-info {
+/* Main info */
+.uprofile-root .item-main-info {
     flex: 1;
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.item-avatar {
+.uprofile-root .item-avatar {
     width: 45px;
     height: 45px;
     border-radius: 50%;
     object-fit: cover;
     background: #e2e8f0;
+    border: 1px solid rgba(63, 111, 181, 0.14);
 }
 
-.item-text-wrap {
+.uprofile-root .item-text-wrap {
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
-.item-primary-text {
+.uprofile-root .item-primary-text {
     font-size: 17px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--up-text-800);
 }
 
-.item-secondary-text {
+.uprofile-root .item-secondary-text {
     font-size: 14px;
-    color: #64748b;
+    color: var(--up-text-500);
 }
 
-/* 오른쪽 액션 버튼 영역 */
-.item-actions {
+/* Actions */
+.uprofile-root .item-actions {
     display: flex;
     gap: 8px;
 }
 
-.action-btn {
+.uprofile-root .action-btn {
     padding: 8px 16px;
     border-radius: 10px;
+
     font-size: 14px;
     font-weight: 700;
-    cursor: pointer;
+
     border: none;
-    transition: 0.2s;
+    cursor: pointer;
+
+    transition:
+        background var(--up-ease),
+        color var(--up-ease),
+        transform var(--up-ease);
 }
 
-.btn-accept {
-    background: #3f6fb5;
-    color: white;
+.uprofile-root .btn-accept {
+    background: var(--up-primary);
+    color: #fff;
 }
-.btn-accept:hover {
-    background: #2d5592;
+.uprofile-root .btn-accept:hover {
+    background: var(--up-primary-hover);
+    transform: translateY(-1px);
 }
 
-.btn-reject {
+.uprofile-root .btn-reject {
     background: #fee2e2;
     color: #ef4444;
 }
-.btn-reject:hover {
+.uprofile-root .btn-reject:hover {
     background: #fecaca;
+    transform: translateY(-1px);
 }
 
-.btn-circle {
+.uprofile-root .btn-circle {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #f1f5f9;
-    color: #3f6fb5;
+
+    background: rgba(241, 245, 249, 0.9);
+    color: var(--up-primary);
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     font-size: 18px;
+    border: 1px solid rgba(63, 111, 181, 0.18);
+
+    cursor: pointer;
+
+    transition:
+        background var(--up-ease),
+        color var(--up-ease),
+        transform var(--up-ease),
+        border-color var(--up-ease);
 }
 
-/* 데이터 없음 */
-.no-data-msg {
+.uprofile-root .btn-circle:hover {
+    background: var(--up-primary);
+    color: #fff;
+    border-color: rgba(63, 111, 181, 0.45);
+    transform: translateY(-1px);
+}
+
+/* -------------------------
+   Empty State
+------------------------- */
+.uprofile-root .no-data-msg {
     text-align: center;
     padding: 40px 0;
-    color: #94a3b8;
+    color: var(--up-text-400);
     font-size: 15px;
 }
 
-/* === 페이지네이션 === */
-.custom-pagination {
+/* -------------------------
+   Pagination
+------------------------- */
+.uprofile-root .custom-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
 }
 
-.pg-num-info {
+.uprofile-root .pg-num-info {
     padding: 6px 16px;
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.9);
     border-radius: 20px;
+
     font-size: 14px;
     font-weight: 700;
-    color: #475569;
+    color: var(--up-text-600);
+
+    border: 1px solid rgba(63, 111, 181, 0.18);
 }
 
-.pg-ctrl-btn {
+/* ✅ 기본 (이전/다음) */
+.uprofile-root .pg-ctrl-btn {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid #e2e8f0;
-    background: white;
+
+    color: var(--up-primary); /* 파랑 */
+    border: 1px solid rgba(63, 111, 181, 0.28);
+    background: rgba(255, 255, 255, 0.95);
+
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: 0.2s;
+
+    transition:
+        background var(--up-ease),
+        color var(--up-ease),
+        border-color var(--up-ease),
+        transform var(--up-ease);
 }
 
-.pg-ctrl-btn:disabled {
-    opacity: 0.3;
+/* ✅ 맨처음 / 맨뒤 (조금 더 진한 파랑) */
+.uprofile-root .custom-pagination .pg-ctrl-btn:first-child,
+.uprofile-root .custom-pagination .pg-ctrl-btn:last-child {
+    color: var(--up-primary-hover);
+    border-color: rgba(63, 111, 181, 0.45);
+}
+
+/* disabled */
+.uprofile-root .pg-ctrl-btn:disabled {
+    opacity: 0.35;
     cursor: not-allowed;
+    color: rgba(63, 111, 181, 0.35);
+    border-color: rgba(63, 111, 181, 0.14);
 }
 
-.pg-ctrl-btn:not(:disabled):hover {
-    background: #3f6fb5;
-    color: white;
-    border-color: #3f6fb5;
+/* hover */
+.uprofile-root .pg-ctrl-btn:not(:disabled):hover {
+    background: var(--up-primary);
+    color: #fff;
+    border-color: var(--up-primary);
+    transform: translateY(-1px);
 }
 
-/* 반응형 모바일 */
+/* -------------------------
+   Responsive (List)
+------------------------- */
 @media (max-width: 768px) {
-    .item-row {
+    .uprofile-root .item-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
     }
-    .item-side-info {
+
+    .uprofile-root .item-side-info {
         width: 100%;
     }
-    .item-actions {
+
+    .uprofile-root .item-actions {
         width: 100%;
         justify-content: flex-end;
     }
 }
 
-/* =========================
-   사용자 프로필 카드 (UserProfileCard)
-========================= */
-.usercard {
+/* =========================================================
+   UserProfileCard (components/UserProfileCard)
+========================================================= */
+.uprofile-root .usercard {
     display: grid;
     grid-template-columns: 180px 1fr 180px;
     gap: 40px;
     align-items: center;
-    background: #ffffff;
+
+    background: rgba(255, 255, 255, 0.92);
     border-radius: 20px;
-    padding: 10px 5px; /* 내부 여백 최적화 */
+    padding: 10px 5px;
+
+    border: 1px solid rgba(63, 111, 181, 0.12);
+    box-shadow:
+        0 -4px 12px rgba(63, 111, 181, 0.05),
+        0 10px 22px rgba(63, 111, 181, 0.07);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-/* 왼쪽: 아바타 영역 */
-.usercard-left {
+.uprofile-root .usercard-left {
     position: relative;
     display: flex;
     justify-content: center;
 }
 
-.user-avatar img {
+.uprofile-root .user-avatar img {
     width: 150px;
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #fff;
+
+    border: 4px solid rgba(255, 255, 255, 0.95);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-.user-avatar-fallback {
+.uprofile-root .user-avatar-fallback {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3f6fb5 0%, #2d5592 100%);
-    color: white;
+
+    background: linear-gradient(135deg, var(--up-primary) 0%, var(--up-primary-hover) 100%);
+    color: #fff;
+
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+
     font-size: 54px;
     font-weight: 800;
+
     box-shadow: 0 8px 20px rgba(63, 111, 181, 0.2);
 }
 
-/* 사진 수정 아이콘 버튼 (플로팅) */
-.edit-photo {
+/* 사진 수정 아이콘 버튼 */
+.uprofile-root .edit-photo {
     position: absolute;
     bottom: 5px;
     right: 15px;
+
     width: 38px;
     height: 38px;
-    background: #ffffff !important;
-    color: #3f6fb5;
     border-radius: 50% !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--up-primary);
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     font-size: 16px;
-    border: 1px solid #eef2f7 !important;
+    border: 1px solid rgba(238, 242, 247, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
     cursor: pointer;
-    transition: all 0.2s;
+    transition:
+        transform var(--up-ease),
+        background var(--up-ease),
+        color var(--up-ease);
 }
 
-.edit-photo:hover {
+.uprofile-root .edit-photo:hover {
     transform: scale(1.1);
-    background: #3f6fb5 !important;
+    background: var(--up-primary) !important;
     color: #fff;
 }
 
-/* 가운데: 정보 섹션 */
-.usercard-mid {
+.uprofile-root .usercard-mid {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.user-name {
+.uprofile-root .user-name {
     font-size: 26px;
     font-weight: 800;
-    color: #1a202c;
+    color: var(--up-text-900);
+
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.user-role-badge {
+.uprofile-root .user-role-badge {
     font-size: 12px;
-    background: #eef4ff;
-    color: #3f6fb5;
-    padding: 4px 12px;
-    border-radius: 8px;
     font-weight: 700;
     text-transform: uppercase;
+
+    background: rgba(238, 244, 255, 0.95);
+    color: var(--up-primary);
+
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(63, 111, 181, 0.12);
 }
 
-.user-sub-id {
+.uprofile-root .user-sub-id {
     font-size: 15px;
-    color: #94a3b8;
+    color: var(--up-text-400);
     font-weight: 500;
     margin-bottom: 5px;
 }
 
-.user-bio-display {
+.uprofile-root .user-bio-display {
     font-size: 15px;
-    color: #475569;
+    color: var(--up-text-600);
     line-height: 1.6;
-    background: #f8fafc;
+
+    background: rgba(248, 250, 252, 0.9);
     padding: 15px 20px;
     border-radius: 14px;
-    border-left: 4px solid #3f6fb5;
+
+    border-left: 4px solid var(--up-primary);
     margin: 10px 0;
+
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
 }
 
-.edit-info-btn {
+/* 편집 버튼 */
+.uprofile-root .edit-info-btn {
     align-self: flex-start;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    padding: 8px 18px;
+
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--up-text-500);
+
+    border: 1px solid rgba(63, 111, 181, 0.28);
     border-radius: 10px;
+    padding: 8px 18px;
+
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    color: #64748b;
-    transition: all 0.2s;
+
+    transition:
+        background var(--up-ease),
+        color var(--up-ease),
+        border-color var(--up-ease),
+        transform var(--up-ease);
 }
 
-.edit-info-btn:hover {
-    background: #f1f5f9;
-    color: #1e293b;
-    border-color: #cbd5e0;
+.uprofile-root .edit-info-btn:hover {
+    background: rgba(241, 245, 249, 0.95);
+    color: var(--up-text-800);
+    border-color: rgba(203, 213, 224, 1);
+    transform: translateY(-1px);
 }
 
-/* 수정 모드 폼 스타일 */
-.user-edit-form {
+/* 수정 폼 */
+.uprofile-root .user-edit-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
     padding: 10px 0;
 }
 
-.edit-row {
+.uprofile-root .edit-row {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-.edit-row span {
+.uprofile-root .edit-row span {
     font-size: 13px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--up-text-500);
     margin-left: 4px;
 }
 
-.edit-row input,
-.edit-row textarea,
-.photo-edit-input input {
+.uprofile-root .edit-row input,
+.uprofile-root .edit-row textarea,
+.uprofile-root .photo-edit-input input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #e2e8f0;
+
+    border: 1px solid rgba(226, 232, 240, 1);
     border-radius: 12px;
+
     font-size: 15px;
-    background: #fcfdfe;
-    transition: all 0.2s;
+    background: rgba(252, 253, 254, 0.98);
+
+    transition:
+        border-color var(--up-ease),
+        background var(--up-ease),
+        box-shadow var(--up-ease);
 }
 
-.edit-row input:focus,
-.edit-row textarea:focus {
+.uprofile-root .edit-row textarea {
+    resize: vertical;
+}
+
+.uprofile-root .edit-row input:focus,
+.uprofile-root .edit-row textarea:focus {
     outline: none;
-    border-color: #3f6fb5;
+    border-color: var(--up-primary);
     background: #fff;
     box-shadow: 0 0 0 4px rgba(63, 111, 181, 0.08);
 }
 
-.photo-edit-input {
+.uprofile-root .photo-edit-input {
     margin-top: 15px;
 }
 
-.photo-edit-input input {
+.uprofile-root .photo-edit-input input {
     font-size: 13px;
     border-style: dashed;
-    background: #f8fafc;
+    background: rgba(248, 250, 252, 0.9);
 }
 
-/* 오른쪽: 액션 버튼 */
-.usercard-right {
+/* 오른쪽 영역 */
+/* ✅ 오른쪽 버튼 영역을 "왼쪽 정렬" + 약간 안쪽으로 */
+.uprofile-root .usercard-right {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start; /* stretch → flex-start */
     gap: 10px;
+
+    padding-left: 14px; /* ✅ 오른쪽 컬럼 안에서 왼쪽으로 이동한 느낌 */
+    padding-right: 6px; /* (선택) 오른쪽 여백도 살짝 */
 }
 
-.withdraw-link {
-    font-size: 13px;
-    color: #94a3b8;
-    text-decoration: none;
+/* (선택) 버튼이 너무 넓으면 폭 고정 */
+.uprofile-root .usercard-right button {
+    width: 165px; /* 원하는 값으로 조절 */
+}
+
+.uprofile-root .withdraw-link {
+    font-size: 15px;
+    color: var(--up-text-400);
     font-weight: 500;
-    cursor: pointer;
+
     background: none;
     border: none;
     padding: 8px;
-    transition: 0.2s;
+
+    cursor: pointer;
+    transition:
+        color var(--up-ease),
+        text-decoration-color var(--up-ease);
 }
 
-.withdraw-link:hover {
+.uprofile-root .withdraw-link:hover {
     color: #ef4444;
     text-decoration: underline;
 }
 
-/* 반응형 모바일 */
+/* 반응형 */
 @media (max-width: 850px) {
-    .usercard {
+    .uprofile-root .usercard {
         grid-template-columns: 1fr;
         text-align: center;
         gap: 25px;
+        padding: 18px 16px;
     }
-    .usercard-left,
-    .usercard-mid,
-    .usercard-right {
+
+    .uprofile-root .usercard-left,
+    .uprofile-root .usercard-mid,
+    .uprofile-root .usercard-right {
         justify-content: center;
         align-items: center;
     }
-    .user-name {
+
+    .uprofile-root .user-name {
         justify-content: center;
     }
-    .edit-info-btn {
+
+    .uprofile-root .edit-info-btn {
         align-self: center;
     }
 }
 
-.fallback-avatar {
+/* fallback avatar (리스트 등에서 쓰는 경우) */
+.uprofile-root .fallback-avatar {
     background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-    color: #64748b;
+    color: var(--up-text-500);
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     font-weight: 700;
     font-size: 16px;
-    border: 1px solid #edf2f7;
+
+    border: 1px solid rgba(237, 242, 247, 1);
 }
