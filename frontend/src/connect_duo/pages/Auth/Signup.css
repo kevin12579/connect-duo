@@ -1,0 +1,263 @@
+/* Signup.css - scoped (Signup 화면에서만 디자인 적용) */
+
+.signup-page .loginform {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    flex-direction: column;
+}
+
+/* 바깥 카드(signup-box 느낌) -> signup 페이지에서는 loginbox를 이 스타일로 */
+.signup-page .loginbox {
+    background: #fff;
+    border-radius: 22px;
+    width: min(720px, 92vw);
+    padding: 56px 52px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 1px solid rgba(30, 41, 59, 0.08);
+    box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+    margin-top: 0;
+}
+
+.signup-page .logintitle {
+    width: 320px;
+    height: auto;
+    margin-bottom: 24px;
+    object-fit: contain;
+}
+
+/* 역할 선택 버튼 */
+.signup-page .role-selector {
+    display: flex;
+    width: 72%;
+    margin-bottom: 25px;
+    background: #f3f6fb;
+    border-radius: 999px;
+    padding: 5px;
+    border: 1px solid rgba(30, 41, 59, 0.08);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.signup-page .role-selector button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 999px;
+    font-weight: 700;
+    color: #111;
+    transition: all 0.3s;
+}
+
+.signup-page .role-selector button.active {
+    background: #6f9fe6;
+    color: #fff;
+}
+
+/* 입력 영역 박스 */
+.signup-page .input-group {
+    background: #f5f8ff;
+    border-radius: 18px;
+    padding: 34px 28px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+
+    border: 1px solid rgba(30, 41, 59, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* 입력 row */
+.signup-page .loginid,
+.signup-page .loginpw,
+.signup-page .input-wrapper {
+    width: 100%;
+    position: relative;
+}
+
+/* 중복확인/인증 버튼 row */
+.signup-page .with-btn {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.signup-page .inner-btn {
+    width: 100px;
+    height: 60px;
+    background-color: #6f95c3;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px rgba(35, 74, 140, 0.14);
+    transition:
+        transform 0.15s,
+        background 0.2s,
+        box-shadow 0.2s;
+}
+
+.signup-page .inner-btn:hover {
+    background-color: #5f86b5;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px rgba(35, 74, 140, 0.18);
+}
+
+.signup-page .inner-btn:disabled {
+    background-color: #b7c6d8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* input */
+.signup-page .loginid input,
+.signup-page .loginpw input {
+    width: 100%;
+    height: 60px;
+    padding: 20px 22px 5px 22px;
+    border: 1px solid rgba(30, 41, 59, 0.1);
+    border-radius: 999px;
+    font-size: 1.1rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    outline: none;
+    transition: all 0.3s;
+    color: #222;
+    font-weight: 500;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.signup-page .loginid input:focus,
+.signup-page .loginpw input:focus {
+    border-color: #4a90e2;
+    box-shadow:
+        0 14px 28px rgba(74, 144, 226, 0.16),
+        0 0 0 4px rgba(74, 144, 226, 0.1);
+}
+
+/* label */
+.signup-page .loginid label,
+.signup-page .loginpw label {
+    position: absolute;
+    top: 50%;
+    left: 22px;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #7f8aa1;
+    transition: all 0.3s;
+    pointer-events: none;
+}
+
+.signup-page .loginid input:focus + label,
+.signup-page .loginpw input:focus + label,
+.signup-page .loginid input:not(:placeholder-shown) + label,
+.signup-page .loginpw input:not(:placeholder-shown) + label {
+    top: 12px;
+    font-size: 12px;
+    color: #4a90e2;
+    transform: translateY(0);
+}
+
+/* 약관 줄 (너 JSX는 loginkeep 사용) */
+.signup-page .loginkeep {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+/* 가입하기 버튼(너 JSX는 loginbutton 사용) */
+.signup-page .loginbutton {
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    height: 62px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    width: 72%;
+    margin: 10px auto 0;
+    cursor: pointer;
+    transition:
+        transform 0.15s,
+        background 0.2s,
+        box-shadow 0.2s;
+    box-shadow: 0 18px 44px rgba(74, 144, 226, 0.22);
+}
+
+.signup-page .loginbutton:hover {
+    background: #357ab8;
+    transform: translateY(-1px);
+    box-shadow: 0 22px 52px rgba(74, 144, 226, 0.26);
+}
+
+.signup-page .loginbutton:disabled {
+    background-color: #cfcfcf;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* 메시지 */
+.signup-page .err-msg,
+.signup-page .success-msg {
+    font-size: 13.5px;
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 500;
+}
+
+.signup-page .err-msg {
+    color: #ff4d4d;
+}
+.signup-page .success-msg {
+    color: #28a745;
+}
+
+/* disabled */
+.signup-page input:disabled {
+    background-color: #ededed !important;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* ✅ 약관 체크박스 크기 키우기 */
+.signup-page .loginkeep input[type='checkbox'] {
+    transform: scale(1.3);
+    transform-origin: left center;
+    accent-color: #4a90e2; /* 체크 색(푸른계열) */
+    cursor: pointer;
+}
+
+/* 체크박스가 커지면 줄 높이도 살짝 */
+.signup-page .loginkeep {
+    gap: 12px; /* 기존 8px -> 12px */
+}
+
+@media (max-width: 520px) {
+    .signup-page .loginbox {
+        width: 94vw;
+        padding: 40px 18px 28px;
+    }
+    .signup-page .input-group {
+        padding: 26px 16px 20px;
+    }
+    .signup-page .loginbutton {
+        width: 82%;
+        height: 56px;
+    }
+}

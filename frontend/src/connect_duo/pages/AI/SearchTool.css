@@ -1,13 +1,22 @@
+/* =========================
+   SearchTool Container
+========================= */
 .search-tool-inner {
     display: flex;
     flex-direction: column;
     height: 520px;
-    background: #fff;
-    border-radius: 0 0 26px 26px; /* 위쪽은 검색창과 붙으므로 아래만 둥글게 */
-    border: 1.5px solid #dedede;
+    background: #ffffff;
+    border-radius: 0 0 26px 26px;
+    border: 2px solid #c7d6ea;
     border-top: none;
     overflow: hidden;
     animation: slideDown 0.4s ease-out;
+
+    /* ✅ 흐림 느낌 제거 */
+    text-shadow: none;
+    filter: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 @keyframes slideDown {
@@ -21,14 +30,20 @@
     }
 }
 
+/* =========================
+   Chat Window
+========================= */
 .chat-window {
+    background: #fbfdff;
+
     flex: 1;
-    padding: 30px;
+    padding: 28px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    background: #fcfcfd; /* 아주 연한 배경으로 가독성 확보 */
+    gap: 18px;
+
+    box-shadow: inset 0 0 0 1px rgba(185, 205, 232, 0.35);
 }
 
 .empty-chat {
@@ -37,88 +52,168 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #8a94a6;
+    color: #7b8aa3;
     text-align: center;
+
+    text-shadow: none;
+    filter: none;
 }
 
 .empty-chat p {
-    font-weight: 800;
-    font-size: 1.1rem;
+    font-weight: 900;
+    font-size: 1.08rem;
     margin-bottom: 8px;
-    color: #5a8cf1;
-}
-.empty-chat span {
-    font-size: 0.95rem;
-    opacity: 0.7;
+    color: #3f73d6;
+    text-shadow: none;
 }
 
-/* 말풍선 디자인 */
+.empty-chat span {
+    font-size: 0.95rem;
+    opacity: 0.92;
+}
+
+/* =========================
+   Bubbles Layout
+========================= */
 .message-bubble {
     display: flex;
-    max-width: 85%;
+    max-width: 86%;
     gap: 12px;
+
+    /* ✅ 아이콘/말풍선 레이아웃 고정 */
+    align-items: flex-start;
+    flex-wrap: nowrap;
+
+    text-shadow: none;
+    filter: none;
 }
+
 .message-bubble.user {
     align-self: flex-end;
     flex-direction: row-reverse;
 }
 
+/* ✅ 내용 영역이 길어질 때 레이아웃 안정 */
+.content-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+/* =========================
+   Avatar
+========================= */
 .avatar {
     width: 42px;
     height: 42px;
+
+    /* ✅ 핵심: 말풍선이 길어져도 아바타가 절대 줄어들지 않게 */
+    flex: none;           /* flex: 0 0 42px 보다 더 확실 */
+    flex-shrink: 0;
+    min-width: 42px;
+    min-height: 42px;
+
+    /* ✅ 동그라미 찌그러짐 방지 */
+    aspect-ratio: 1 / 1;
+
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    background: #f2f3f7;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    overflow: hidden;
+
+    background: #e7eef7;
+    border: 2px solid #b9cbe3;
+
+    box-shadow: 0 2px 10px rgba(20, 40, 80, 0.06);
 }
 
+.avatar-img {
+    width: 32px; /* ✅ 요구: 32px */
+    height: 32px;
+
+    /* ✅ 이미지 자체도 줄어/찌그러짐 방지 */
+    flex-shrink: 0;
+
+    object-fit: contain;
+    display: block;
+}
+
+.avatar-emoji {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+/* ✅ AI(assistant) 동그라미 배경: 더 연한 스카이블루 느낌 */
 .message-bubble.assistant .avatar {
-    background: linear-gradient(135deg, #a3bffa 0%, #7d9df5 100%);
+    background: linear-gradient(135deg, #cfeaff 0%, #86c3ff 100%);
+    border-color: #6fb3ff;
     color: #fff;
 }
 
+/* =========================
+   Sender
+========================= */
 .sender {
     font-size: 0.85rem;
-    font-weight: 800;
-    margin-bottom: 4px;
-    color: #666;
-}
-.message-bubble.user .sender {
-    text-align: right;
+    font-weight: 900;
+    margin-bottom: 5px;
+    color: #5f6f86;
+    text-shadow: none;
 }
 
+.message-bubble.user .sender {
+    text-align: right;
+    color: #4a5f7a;
+}
+
+/* =========================
+   Text Bubble
+========================= */
 .text {
     padding: 14px 18px;
     border-radius: 20px;
     font-size: 1rem;
-    line-height: 1.6;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(60, 60, 60, 0.05);
+    line-height: 1.65;
+    font-weight: 650;
+
+    text-shadow: none !important;
+    filter: none !important;
+
+    border: 2px solid transparent;
+    box-shadow: 0 6px 18px rgba(30, 60, 120, 0.06);
 }
 
 .message-bubble.user .text {
-    background: #a3bffa;
-    color: #fff;
-    border-top-right-radius: 4px;
+    background: linear-gradient(135deg, #6f97ea 0%, #5c8fe8 55%, #4f86e3 100%);
+    color: #f8fbff;
+    border-color: #3f73d6;
+    border-top-right-radius: 6px;
+    font-weight: 800;
 }
 
 .message-bubble.assistant .text {
-    background: #fff;
-    color: #222;
-    border: 1px solid #eee;
-    border-top-left-radius: 4px;
+    background: #eef2f7;
+    color: #1f2f44;
+    border-color: #c7d6ea;
+    border-top-left-radius: 6px;
 }
 
+.message-bubble.assistant.loading .text {
+    opacity: 0.95;
+}
+
+/* =========================
+   Assistant rich text
+========================= */
 :is(.chat-answer, .message-bubble.assistant .text) {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: break-word;
     line-height: 1.75;
     font-size: 0.98rem;
-    color: #1f2937;
+    color: #1f2f44;
+    text-shadow: none !important;
 }
 
 :is(.chat-answer, .message-bubble.assistant .text) p {
@@ -131,25 +226,15 @@
 :is(.chat-answer, .message-bubble.assistant .text) h4 {
     margin: 1.1rem 0 0.6rem;
     line-height: 1.35;
-    color: #111827;
-    font-weight: 800;
+    color: #132338;
+    font-weight: 900;
+    text-shadow: none !important;
 }
 
-:is(.chat-answer, .message-bubble.assistant .text) h1 {
-    font-size: 1.25rem;
-}
-
-:is(.chat-answer, .message-bubble.assistant .text) h2 {
-    font-size: 1.14rem;
-}
-
-:is(.chat-answer, .message-bubble.assistant .text) h3 {
-    font-size: 1.04rem;
-}
-
-:is(.chat-answer, .message-bubble.assistant .text) h4 {
-    font-size: 0.98rem;
-}
+:is(.chat-answer, .message-bubble.assistant .text) h1 { font-size: 1.25rem; }
+:is(.chat-answer, .message-bubble.assistant .text) h2 { font-size: 1.14rem; }
+:is(.chat-answer, .message-bubble.assistant .text) h3 { font-size: 1.04rem; }
+:is(.chat-answer, .message-bubble.assistant .text) h4 { font-size: 0.98rem; }
 
 :is(.chat-answer, .message-bubble.assistant .text) ul,
 :is(.chat-answer, .message-bubble.assistant .text) ol {
@@ -172,7 +257,7 @@
 
 :is(.chat-answer, .message-bubble.assistant .text) th,
 :is(.chat-answer, .message-bubble.assistant .text) td {
-    border: 1px solid #e5e7eb;
+    border: 1.5px solid #c7d6ea;
     padding: 0.55rem 0.6rem;
     text-align: left;
     vertical-align: top;
@@ -180,8 +265,8 @@
 }
 
 :is(.chat-answer, .message-bubble.assistant .text) th {
-    background: #f8fafc;
-    font-weight: 700;
+    background: #f6f8fc;
+    font-weight: 800;
 }
 
 :is(.chat-answer, .message-bubble.assistant .text) pre {
@@ -214,117 +299,88 @@
     overflow-wrap: anywhere;
 }
 
-/* 내부 입력창 (하단) */
+/* =========================
+   Input Area
+========================= */
 .chat-input-area {
-    padding: 20px 30px;
-    background: #fff;
-    border-top: 1px solid #eee;
+    padding: 18px 26px;
+    background: #ffffff;
+    border-top: 2px solid #c7d6ea;
     display: flex;
     gap: 12px;
 }
 
 .chat-input-area input {
     flex: 1;
-    padding: 12px 20px;
+    padding: 12px 18px;
     border-radius: 25px;
-    border: 1.5px solid #eee;
+    border: 2px solid #c7d6ea;
     outline: none;
     font-size: 0.95rem;
-    transition: border-color 0.2s;
+    font-weight: 650;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-shadow: none;
+}
+
+.chat-input-area input::placeholder {
+    color: #7f90aa;
+    opacity: 0.95;
 }
 
 .chat-input-area input:focus {
-    border-color: #a3bffa;
+    border-color: #5c8fe8;
+    box-shadow: 0 0 0 4px rgba(92, 143, 232, 0.16);
 }
 
 .chat-input-area button {
-    padding: 0 25px;
-    background: #222;
+    padding: 0 22px;
+    background: #1f2f44;
     color: #fff;
-    border: none;
+    border: 2px solid #1f2f44;
     border-radius: 25px;
-    font-weight: 800;
+    font-weight: 900;
     cursor: pointer;
+    transition: 0.15s;
 }
 
 .chat-input-area button:hover {
-    background: #444;
+    background: #162235;
+    border-color: #162235;
 }
 
-/* 스크롤바 */
+.chat-input-area button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* =========================
+   Scrollbar
+========================= */
 .chat-window::-webkit-scrollbar {
-    width: 6px;
+    width: 10px;
+}
+.chat-window::-webkit-scrollbar-track {
+    background: rgba(185, 205, 232, 0.22);
+    border-radius: 999px;
 }
 .chat-window::-webkit-scrollbar-thumb {
-    background: #eee;
-    border-radius: 10px;
+    background: rgba(90, 120, 160, 0.48);
+    border-radius: 999px;
+    border: 2px solid rgba(242, 245, 249, 0.9);
 }
-
-/* ... 기존 스타일 ... */
-
-.search-wrapper {
-    width: min(1100px, 92%);
-    margin: 0 auto;
-    transition: all 0.3s ease;
+.chat-window::-webkit-scrollbar-thumb:hover {
+    background: rgba(90, 120, 160, 0.62);
 }
-
-.search-bar-container {
-    position: relative;
-    width: 100%;
-}
-
-.mainpage-search-input {
-    width: 100%;
-    padding: 18px 60px 18px 26px;
-    border-radius: 34px;
-    border: 1.5px solid #dedede;
-    background: #fff;
-    font-size: 1.1rem;
-    font-weight: 600;
-    outline: none;
-    box-shadow: 0 4px 12px rgba(60, 60, 60, 0.06);
-    transition: all 0.2s ease;
-}
-
-/* 채팅창이 열렸을 때 검색창 하단 모서리 각지게 */
-.search-wrapper.is-open .mainpage-search-input {
-    border-radius: 26px 26px 0 0;
-    border-bottom: 1px solid #eee;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-}
-
-.expand-arrow {
-    position: absolute;
-    right: 25px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #a3bffa;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-
-.expand-arrow.up {
-    transform: translateY(-50%) rotate(180deg);
-    color: #7d9df5;
-}
-
-.search-expand-content {
-    width: 100%;
-    /* SearchTool 내부의 디자인과 결합됨 */
-}
-
-/* ... 나머지 기존 스타일 ... */
 
 @media (max-width: 768px) {
     :is(.chat-answer, .message-bubble.assistant .text) {
         font-size: 0.94rem;
         line-height: 1.8;
     }
-
     :is(.chat-answer, .message-bubble.assistant .text) table {
         font-size: 0.88rem;
+    }
+    .chat-window {
+        padding: 18px;
     }
 }

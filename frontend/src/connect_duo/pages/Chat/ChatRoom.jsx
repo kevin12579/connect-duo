@@ -8,7 +8,7 @@ import {
     closeRoom,
     absolutizeFileUrl,
     listRooms,
-    ensureSocket, // ✅ FIX BUG4: getSocket 대신 ensureSocket 사용
+    ensureSocket,
 } from '../../api/chatAxios';
 
 import {
@@ -30,13 +30,19 @@ import {
 import './ChatRoom.css';
 import txtPanelIcon from '../../assets/txt.png';
 import pictureIcon from '../../assets/picture.png';
-import txtFileIcon from '../../assets/txt-img.png';
+import txtFileIcon from '../../assets/txt-icon.png';
+import leftArrowIcon from '../../assets/left-arrow.png';
+
+/* ✅ (2) 돋보기 검색용 up/down 아이콘(32px) */
+import upIcon from '../../assets/up.png';
+import downIcon from '../../assets/down.png';
+
 import { formatResponseSpeed, responseSpeedClass } from '../../utils/formatResponseSpeed';
 
 export default function ChatRoom({ roomId, onBack }) {
     const rid = useMemo(() => String(roomId ?? ''), [roomId]);
     const listRef = useRef(null);
-    const markReadTimerRef = useRef(null); // markRead 디바운스용
+    const markReadTimerRef = useRef(null);
 
     const [showAttach, setShowAttach] = useState(false);
     const txtInputRef = useRef(null);
@@ -51,12 +57,13 @@ export default function ChatRoom({ roomId, onBack }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [roomClosed, setRoomClosed] = useState(false);
     const [onlineUsers, setOnlineUsers] = useState(new Set());
-    const [roomInfo, setRoomInfo] = useState(null); // ★ 파트너명 + 응답속도
+    const [roomInfo, setRoomInfo] = useState(null);
+
+    // ✅ 실패 라벨(메시지 id별) - 성공 전까지 유지
+    const [sendFail, setSendFail] = useState({}); // { [msgId]: true }
 
     const MY_ID = useMemo(() => getMyIdFallback1(), []);
 
-    // ★ 내가 일반 유저(USER)일 때만 파트너(세무사)의 응답속도를 표시
-    // 세무사가 채팅할 때는 상대(일반유저)의 응답속도를 표시하지 않음
     const isMyTypeUser = useMemo(() => {
         try {
             const backup = JSON.parse(localStorage.getItem('userBackup') || '{}');
@@ -69,14 +76,12 @@ export default function ChatRoom({ roomId, onBack }) {
     const isAgentOnline = useMemo(() => {
         return [...onlineUsers].some((uid) => uid !== String(MY_ID));
     }, [onlineUsers, MY_ID]);
-    console.log('온라인 유저 목록:', onlineUsers, '내 ID:', MY_ID, '상대방 온라인 여부:', isAgentOnline);
 
     const scrollToBottom = useCallback(() => {
         const el = listRef.current;
         if (el) el.scrollTop = el.scrollHeight;
     }, []);
 
-    // markRead 디바운스: 연속 호출 방지 (500ms)
     const debouncedMarkRead = useCallback(() => {
         if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
         markReadTimerRef.current = setTimeout(() => {
@@ -92,7 +97,6 @@ export default function ChatRoom({ roomId, onBack }) {
     useEffect(() => {
         if (!rid) return;
 
-        // ✅ FIX BUG4: ensureSocket()으로 새로고침 후에도 소켓 자동 복구
         const socket = ensureSocket();
         if (!socket) {
             console.warn('[ChatRoom] 소켓 초기화 실패. 로그인 상태를 확인하세요.');
@@ -102,55 +106,52 @@ export default function ChatRoom({ roomId, onBack }) {
         const onReceiveMessage = (rawMsg) => {
             const uiMsg = mapRowToUiMessage(rawMsg, MY_ID, absolutizeFileUrl);
             if (!uiMsg) return;
-            console.log('[소켓 onReceiveMessage] 도착:', uiMsg);
+
             setMessages((prev) => {
-                // ① 이미 같은 id가 있으면 skip (케이스 A의 소켓 중복 처리)
                 if (prev.some((m) => String(m.id) === String(uiMsg.id))) return prev;
 
-                // ② 내가 보낸 메시지인 경우
                 if (uiMsg.from === 'me') {
                     const tempIdx = prev.findIndex((m) => typeof m.id === 'string' && m.id.startsWith('temp-'));
                     if (tempIdx !== -1) {
-                        // 텍스트 채팅: tempId 자리에 실제 서버 메시지 삽입
                         const next = [...prev];
+                        const tempId = next[tempIdx]?.id;
+
                         next[tempIdx] = uiMsg;
+
+                        // ✅ 성공으로 temp 교체되면 “전송 실패” 라벨 제거
+                        if (tempId) {
+                            setSendFail((sf) => {
+                                if (!sf || !sf[tempId]) return sf;
+                                const n = { ...sf };
+                                delete n[tempId];
+                                return n;
+                            });
+                        }
                         return next;
                     }
-
-                    // 🔥 [수정됨] tempId가 없는 경우 (예: 파일 업로드)
-                    // 무시(return prev)하지 말고, 상대방 메시지처럼 배열 끝에 추가해 줍니다!
                     return [...prev, uiMsg];
                 }
 
-                // ③ 상대방 메시지: 목록 끝에 추가
                 if (uiMsg.from !== 'me') debouncedMarkRead();
                 return [...prev, uiMsg];
             });
 
             setTimeout(scrollToBottom, 0);
 
-            // 상대방 메시지 수신 시에만 읽음 처리
             if (uiMsg.from !== 'me') {
                 debouncedMarkRead();
             }
         };
 
-        // 상담 종료 실시간 수신
-        const onRoomClosed = () => {
-            setRoomClosed(true);
-        };
+        const onRoomClosed = () => setRoomClosed(true);
 
-        // 상대방이 읽으면 내 메시지들 읽음 표시
         const onReadUpdated = ({ userId }) => {
             if (String(userId) !== String(MY_ID)) {
                 setMessages((prev) => prev.map((m) => (m.from === 'me' ? { ...m, isRead: true } : m)));
             }
         };
 
-        // 온라인/오프라인 상태 수신
-        const onUserOnline = ({ userId }) => {
-            setOnlineUsers((prev) => new Set([...prev, String(userId)]));
-        };
+        const onUserOnline = ({ userId }) => setOnlineUsers((prev) => new Set([...prev, String(userId)]));
         const onUserOffline = ({ userId }) => {
             setOnlineUsers((prev) => {
                 const next = new Set(prev);
@@ -158,11 +159,7 @@ export default function ChatRoom({ roomId, onBack }) {
                 return next;
             });
         };
-        // ✅ 추가: 방에 이미 있던 유저 목록을 받았을 때 처리
-        const onCurrentUsers = ({ users }) => {
-            const normalized = users.map((id) => String(id));
-            setOnlineUsers(new Set(normalized));
-        };
+        const onCurrentUsers = ({ users }) => setOnlineUsers(new Set((users || []).map((id) => String(id))));
 
         socket.on('receive_message', onReceiveMessage);
         socket.on('ROOM_CLOSED', onRoomClosed);
@@ -185,7 +182,6 @@ export default function ChatRoom({ roomId, onBack }) {
         };
     }, [rid, MY_ID, scrollToBottom, debouncedMarkRead]);
 
-    // 마지막 내 메시지 id (읽음/안읽음 표시용)
     const lastMyMsgId = useMemo(() => {
         for (let i = messages.length - 1; i >= 0; i--) {
             if (messages[i].from === 'me') return messages[i].id;
@@ -193,7 +189,6 @@ export default function ChatRoom({ roomId, onBack }) {
         return null;
     }, [messages]);
 
-    // 방 상태(ACTIVE/CLOSED) 확인
     const fetchRoomStatus = useCallback(async () => {
         if (!rid) return;
         try {
@@ -201,14 +196,13 @@ export default function ChatRoom({ roomId, onBack }) {
             if (Array.isArray(res.data)) {
                 const meRoom = res.data.find((r) => String(r.id) === rid);
                 setRoomClosed(meRoom?.status === 'CLOSED');
-                if (meRoom) setRoomInfo(meRoom); // ★ partner_name, partner_response_speed 저장
+                if (meRoom) setRoomInfo(meRoom);
             }
         } catch {
             setRoomClosed(false);
         }
     }, [rid]);
 
-    // 메시지 목록 로드
     const loadMessages = useCallback(async () => {
         if (!rid) return;
         try {
@@ -228,7 +222,6 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     }, [rid, scrollToBottom, MY_ID, fetchRoomStatus, debouncedMarkRead]);
 
-    // 방 입장 시 초기화
     useEffect(() => {
         if (!rid) {
             setLoading(false);
@@ -241,13 +234,16 @@ export default function ChatRoom({ roomId, onBack }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rid]);
 
-    // 임시 저장
     useEffect(() => {
         if (!rid) return;
         saveDraft(rid, input);
     }, [rid, input]);
 
-    // ─── 텍스트 메시지 전송 ─────────────────────────────────────────
+    // ✅ 전송 실패 라벨: 성공 전까지 유지(자동 제거 X)
+    const markSendFail = useCallback((msgId) => {
+        setSendFail((prev) => ({ ...(prev || {}), [msgId]: true }));
+    }, []);
+
     const sendMessage = async (overrideText) => {
         if (roomClosed) return;
         const text = (overrideText ?? input).trim();
@@ -256,7 +252,6 @@ export default function ChatRoom({ roomId, onBack }) {
         setInput('');
         const tempId = `temp-${Date.now()}`;
 
-        // 낙관적 UI: 임시 메시지 먼저 표시
         setMessages((prev) => [
             ...prev,
             {
@@ -272,56 +267,58 @@ export default function ChatRoom({ roomId, onBack }) {
 
         try {
             const res = await apiSendMessage(rid, text);
-            // axiosAuth → r.data → { result:'success', data:{ id, sender_id, ... } }
             const serverMsg = res?.data;
             if (serverMsg?.id) {
                 const uiMsg = mapRowToUiMessage(serverMsg, MY_ID, absolutizeFileUrl);
-                // tempId를 실제 서버 메시지로 교체
-                // (소켓이 먼저 케이스 B 처리를 했다면 tempId가 없어 no-op)
+
                 setMessages((prev) => prev.map((m) => (m.id === tempId ? uiMsg : m)));
+
+                // ✅ 성공이면 실패 라벨 제거
+                setSendFail((prev) => {
+                    if (!prev || !prev[tempId]) return prev;
+                    const next = { ...prev };
+                    delete next[tempId];
+                    return next;
+                });
             }
         } catch {
-            setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, text: `${text} (전송 실패)` } : m)));
+            // ✅ 실패면 “말풍선 옆 라벨”로 유지
+            markSendFail(tempId);
         }
     };
 
-    // ─── 파일 업로드 ────────────────────────────────────────────────
     const addFileMessages = async (files) => {
         if (roomClosed) return;
         if (!files || files.length === 0 || !rid) return;
         try {
             await uploadRoomFiles(rid, files);
-            // 서버가 소켓으로 receive_message emit → onReceiveMessage에서 자동 수신
-            // (파일 업로드는 낙관적 UI 없이 소켓 수신으로만 처리)
         } catch (e) {
             console.error('파일 업로드 실패:', e);
-            // 실패 시 수동 갱신
             await loadMessages();
         } finally {
             setShowAttach(false);
         }
     };
 
-    // ─── 파일 다운로드 ──────────────────────────────────────────────
     const handleDownload = async (m) => {
         if (!m?.fileUrl) return;
         setDlState((prev) => ({ ...prev, [m.id]: 'loading' }));
         try {
             await downloadFile(m.fileUrl, m.fileName || 'download');
+
+            // ✅ 성공이면 제거
             setDlState((prev) => {
                 const next = { ...prev };
                 delete next[m.id];
                 return next;
             });
         } catch (e) {
-            setDlState((prev) => ({
-                ...prev,
-                [m.id]: e?.code === 410 || e?.message === 'EXPIRED' ? 'expired' : 'failed',
-            }));
+            // ✅ 실패/만료도 성공 전까지 유지(자동 제거 X)
+            const nextState = e?.code === 410 || e?.message === 'EXPIRED' ? 'expired' : 'failed';
+            setDlState((prev) => ({ ...prev, [m.id]: nextState }));
         }
     };
 
-    // ─── 채팅방 나가기 (상담 종료) ──────────────────────────────────
     const leaveRoom = async () => {
         if (!window.confirm('정말 나가시겠습니까? 채팅방이 종료됩니다.')) return;
         try {
@@ -333,7 +330,6 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     };
 
-    // ─── 키보드 입력 ────────────────────────────────────────────────
     const onKeyDown = (e) => {
         if (roomClosed) return;
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -342,7 +338,6 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     };
 
-    // ─── 검색 ───────────────────────────────────────────────────────
     const hits = useMemo(() => {
         const q = query.trim();
         if (!q) return [];
@@ -385,7 +380,6 @@ export default function ChatRoom({ roomId, onBack }) {
 
     const headerTitle = useMemo(() => roomInfo?.partner_name || `세무챗 (방 ${rid || '-'})`, [rid, roomInfo]);
 
-    // rid 없음 fallback
     if (!rid) {
         return (
             <div className="cr-page">
@@ -393,11 +387,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     <div style={{ fontWeight: 900, marginBottom: 10 }}>채팅방을 열 수 없어요</div>
                     <div style={{ opacity: 0.8, lineHeight: 1.4 }}>roomId가 비어있거나 잘못 전달되었습니다.</div>
                     <div style={{ marginTop: 12 }}>
-                        <button
-                            type="button"
-                            className="cr-send"
-                            onClick={() => typeof onBack === 'function' && onBack()}
-                        >
+                        <button type="button" className="cr-send" onClick={() => typeof onBack === 'function' && onBack()}>
                             리스트로
                         </button>
                     </div>
@@ -409,7 +399,6 @@ export default function ChatRoom({ roomId, onBack }) {
     return (
         <div className="cr-page">
             <div className="cr-wrap">
-                {/* ─── 헤더 ─────────────────────────────────────── */}
                 <div className="cr-header">
                     {!searchOpen ? (
                         <>
@@ -420,48 +409,34 @@ export default function ChatRoom({ roomId, onBack }) {
                                 aria-label="뒤로가기"
                                 title="리스트로 돌아가기"
                             >
-                                ←
+                                <img className="cr-backIcon" src={leftArrowIcon} alt="back" />
                             </button>
+
                             <div className="cr-header-info">
                                 <div className="cr-title" title={headerTitle}>
                                     {headerTitle}
                                     {roomClosed && (
-                                        <span
-                                            style={{
-                                                color: '#ffe066',
-                                                fontSize: 14,
-                                                marginLeft: 8,
-                                                fontWeight: 700,
-                                            }}
-                                        >
+                                        <span style={{ color: '#ffe066', fontSize: 14, marginLeft: 8, fontWeight: 700 }}>
                                             [상담 종료]
                                         </span>
                                     )}
                                 </div>
 
-                                {/* 온라인 상태 + 평균 응답속도 한 줄 */}
                                 <div className="cr-header-meta">
-                                    {/* 온라인 상태 점 */}
                                     <div className={`cr-status-tag ${isAgentOnline ? 'is-online' : ''}`}>
                                         <span className="cr-status-dot"></span>
                                         <span className="cr-status-text">{isAgentOnline ? '접속 중' : '오프라인'}</span>
                                     </div>
 
-                                    {/* ★ 평균 응답속도 뱃지 - 일반 유저일 때만 표시 (파트너가 세무사인 경우) */}
                                     {isMyTypeUser && roomInfo?.partner_response_speed !== undefined && (
-                                        <div
-                                            className={`cr-status-tag cr-response-speed ${responseSpeedClass(
-                                                roomInfo.partner_response_speed,
-                                            )}`}
-                                        >
+                                        <div className={`cr-status-tag cr-response-speed ${responseSpeedClass(roomInfo.partner_response_speed)}`}>
                                             <span className="cr-status-dot" />
-                                            <span className="cr-status-text">
-                                                평균 응답 {formatResponseSpeed(roomInfo.partner_response_speed)}
-                                            </span>
+                                            <span className="cr-status-text">평균 응답 {formatResponseSpeed(roomInfo.partner_response_speed)}</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
+
                             <div className="cr-headerActions" style={{ marginLeft: 'auto' }}>
                                 <button
                                     type="button"
@@ -513,9 +488,7 @@ export default function ChatRoom({ roomId, onBack }) {
                             {query.trim() && (
                                 <div className="cr-searchMeta">
                                     <span className="cr-hitCount">
-                                        {hits.length
-                                            ? `${Math.min(activeHitIdx + 1, hits.length)}/${hits.length}`
-                                            : '0/0'}
+                                        {hits.length ? `${Math.min(activeHitIdx + 1, hits.length)}/${hits.length}` : '0/0'}
                                     </span>
                                     <div className="cr-searchNav">
                                         <button
@@ -525,7 +498,8 @@ export default function ChatRoom({ roomId, onBack }) {
                                             onClick={() => setActiveHitIdx((x) => Math.max(0, x - 1))}
                                             title="이전"
                                         >
-                                            ↑
+                                            {/* ✅ (2) up 아이콘 */}
+                                            <img className="cr-navIcon" src={upIcon} alt="up" />
                                         </button>
                                         <button
                                             type="button"
@@ -534,7 +508,8 @@ export default function ChatRoom({ roomId, onBack }) {
                                             onClick={() => setActiveHitIdx((x) => Math.min(hits.length - 1, x + 1))}
                                             title="다음"
                                         >
-                                            ↓
+                                            {/* ✅ (2) down 아이콘 */}
+                                            <img className="cr-navIcon" src={downIcon} alt="down" />
                                         </button>
                                     </div>
                                 </div>
@@ -543,7 +518,6 @@ export default function ChatRoom({ roomId, onBack }) {
                     )}
                 </div>
 
-                {/* ─── 메시지 목록 ──────────────────────────────── */}
                 <div
                     ref={listRef}
                     className="cr-chat"
@@ -553,6 +527,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     }}
                 >
                     {loading && <div className="cr-loading">메시지 불러오는 중…</div>}
+
                     {!loading &&
                         messages.map((m) => {
                             const isMe = m.from === 'me';
@@ -569,26 +544,83 @@ export default function ChatRoom({ roomId, onBack }) {
 
                             const dl = dlState[m.id] || null;
                             const openUrl = m.fileUrl ? (isTxtLike(m) ? getTxtViewerUrl(m.fileUrl) : m.fileUrl) : null;
+
+                            // ✅ “말풍선 밖 옆 라벨” 결정 (우선순위: 다운로드 > 만료 > 전송)
+                            let sideLabel = null;
+                            let sideKind = null;
+                            if (dl === 'failed') {
+                                sideLabel = '다운로드 실패';
+                                sideKind = 'err';
+                            } else if (dl === 'expired') {
+                                sideLabel = '보관기간 만료';
+                                sideKind = 'warn';
+                            } else if (isMe && sendFail[m.id]) {
+                                sideLabel = '전송 실패';
+                                sideKind = 'err';
+                            }
+
                             const timeObj = new Date(m.time);
                             const timeText = Number.isNaN(timeObj.getTime())
                                 ? ''
-                                : timeObj.toLocaleTimeString('ko-KR', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                  });
+                                : timeObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 
                             return (
-                                <div
-                                    key={m.id}
-                                    id={`msg-${m.id}`}
-                                    className={`cr-row ${isMe ? 'cr-rowMe' : 'cr-rowOther'}`}
-                                >
-                                    <div className={`cr-bubble ${isMe ? 'cr-bubbleMe' : 'cr-bubbleOther'}`}>
-                                        {/* IMAGE */}
-                                        {type === 'IMAGE' && m.fileUrl && (
-                                            <div className="cr-imgWrap">
-                                                <img className="cr-img" src={m.fileUrl} alt={m.fileName || 'image'} />
-                                                <div className="cr-fileBody">
+                                <div key={m.id} id={`msg-${m.id}`} className={`cr-row ${isMe ? 'cr-rowMe' : 'cr-rowOther'}`}>
+                                    <div className={`cr-bubbleWrap ${isMe ? 'isMe' : 'isOther'}`}>
+                                        {/* ✅ 요구사항: 라벨은 “말풍선 바깥 왼쪽” (카톡 느낌) */}
+                                        {sideLabel && (
+                                            <div className={`cr-sideLabel ${sideKind === 'err' ? 'isErr' : 'isWarn'}`}>
+                                                {sideLabel}
+                                            </div>
+                                        )}
+
+                                        <div className={`cr-bubble ${isMe ? 'cr-bubbleMe' : 'cr-bubbleOther'}`}>
+                                            {type === 'IMAGE' && m.fileUrl && (
+                                                <div className="cr-imgWrap">
+                                                    <img className="cr-img" src={m.fileUrl} alt={m.fileName || 'image'} />
+                                                    <div className="cr-fileBody">
+                                                        <div className="cr-fileActions">
+                                                            <button
+                                                                type="button"
+                                                                className="cr-downloadBtn"
+                                                                onClick={() => handleDownload(m)}
+                                                                disabled={dl === 'loading'}
+                                                            >
+                                                                {dl === 'loading' ? '다운로드중…' : '다운로드'}
+                                                            </button>
+
+                                                            {openUrl && (
+                                                                <a className="cr-openBtn" href={openUrl} target="_blank" rel="noreferrer">
+                                                                    열기
+                                                                </a>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="cr-fileSub">
+                                                            <div className="cr-fileSubRow">
+                                                                <span className="cr-fileLabel">용량:</span>
+                                                                <span className="cr-fileValue">{formatBytes(m.fileSize)}</span>
+                                                            </div>
+                                                            <div className="cr-fileSubRow">
+                                                                <span className="cr-fileLabel">유효기간:</span>
+                                                                <span className="cr-fileValue">{formatExpireDate(m.time)}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {type === 'FILE' && m.fileUrl && (
+                                                <div className="cr-fileCard">
+                                                    {isTxtLike(m) && <img className="cr-txtCornerIcon" src={txtFileIcon} alt="txt" />}
+                                                    <div className="cr-fileTopRow">
+                                                        <div className="cr-fileBadge">{isTxtLike(m) ? 'TXT' : 'FILE'}</div>
+                                                        <div className="cr-fileTitle" title={m?.fileName || '파일'}>
+                                                            {renderHighlightedText(displayFileTitle(m) || '파일')}
+                                                        </div>
+                                                        <div className="cr-fileRightSlot" />
+                                                    </div>
+
                                                     <div className="cr-fileActions">
                                                         <button
                                                             type="button"
@@ -598,110 +630,37 @@ export default function ChatRoom({ roomId, onBack }) {
                                                         >
                                                             {dl === 'loading' ? '다운로드중…' : '다운로드'}
                                                         </button>
-                                                        {dl === 'failed' && (
-                                                            <div className="cr-dlFail">다운로드 실패</div>
-                                                        )}
-                                                        {dl === 'expired' && (
-                                                            <div className="cr-dlExpired">보관기간 만료</div>
-                                                        )}
+
                                                         {openUrl && (
-                                                            <a
-                                                                className="cr-openBtn"
-                                                                href={openUrl}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                            >
+                                                            <a className="cr-openBtn" href={openUrl} target="_blank" rel="noreferrer">
                                                                 열기
                                                             </a>
                                                         )}
                                                     </div>
+
                                                     <div className="cr-fileSub">
                                                         <div className="cr-fileSubRow">
                                                             <span className="cr-fileLabel">용량:</span>
-                                                            <span className="cr-fileValue">
-                                                                {formatBytes(m.fileSize)}
-                                                            </span>
+                                                            <span className="cr-fileValue">{formatBytes(m.fileSize)}</span>
                                                         </div>
                                                         <div className="cr-fileSubRow">
                                                             <span className="cr-fileLabel">유효기간:</span>
-                                                            <span className="cr-fileValue">
-                                                                {formatExpireDate(m.time)}
-                                                            </span>
+                                                            <span className="cr-fileValue">{formatExpireDate(m.time)}</span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        )}
-
-                                        {/* FILE */}
-                                        {type === 'FILE' && m.fileUrl && (
-                                            <div className="cr-fileCard">
-                                                {isTxtLike(m) && (
-                                                    <img className="cr-txtCornerIcon" src={txtFileIcon} alt="txt" />
-                                                )}
-                                                <div className="cr-fileTopRow">
-                                                    <div className="cr-fileBadge">{isTxtLike(m) ? 'TXT' : 'FILE'}</div>
-                                                    <div className="cr-fileTitle" title={m?.fileName || '파일'}>
-                                                        {renderHighlightedText(displayFileTitle(m) || '파일')}
-                                                    </div>
-                                                    <div className="cr-fileRightSlot" />
-                                                </div>
-                                                <div className="cr-fileActions">
-                                                    <button
-                                                        type="button"
-                                                        className="cr-downloadBtn"
-                                                        onClick={() => handleDownload(m)}
-                                                        disabled={dl === 'loading'}
-                                                    >
-                                                        {dl === 'loading' ? '다운로드중…' : '다운로드'}
-                                                    </button>
-                                                    {dl === 'failed' && <div className="cr-dlFail">다운로드 실패</div>}
-                                                    {dl === 'expired' && (
-                                                        <div className="cr-dlExpired">보관기간 만료</div>
-                                                    )}
-                                                    {openUrl && (
-                                                        <a
-                                                            className="cr-openBtn"
-                                                            href={openUrl}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                        >
-                                                            열기
-                                                        </a>
-                                                    )}
-                                                </div>
-                                                <div className="cr-fileSub">
-                                                    <div className="cr-fileSubRow">
-                                                        <span className="cr-fileLabel">용량:</span>
-                                                        <span className="cr-fileValue">{formatBytes(m.fileSize)}</span>
-                                                    </div>
-                                                    <div className="cr-fileSubRow">
-                                                        <span className="cr-fileLabel">유효기간:</span>
-                                                        <span className="cr-fileValue">{formatExpireDate(m.time)}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* TEXT */}
-                                        {type === 'TEXT' && (
-                                            <div className="cr-text">{renderHighlightedText(m.text)}</div>
-                                        )}
-
-                                        <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>
-                                            {timeText}
-                                            {isLastMyMsg && (
-                                                <span
-                                                    className="cr-readStatus"
-                                                    style={{
-                                                        marginLeft: 6,
-                                                        fontSize: '11px',
-                                                        color: '#221e1e',
-                                                    }}
-                                                >
-                                                    {m.isRead ? '읽음' : '안읽음'}
-                                                </span>
                                             )}
+
+                                            {type === 'TEXT' && <div className="cr-text">{renderHighlightedText(m.text)}</div>}
+
+                                            <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>
+                                                {timeText}
+                                                {isLastMyMsg && (
+                                                    <span className="cr-readStatus" style={{ marginLeft: 6, fontSize: '11px', color: '#221e1e' }}>
+                                                        {m.isRead ? '읽음' : '안읽음'}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -709,7 +668,6 @@ export default function ChatRoom({ roomId, onBack }) {
                         })}
                 </div>
 
-                {/* ─── 파일 첨부 hidden input ───────────────────── */}
                 <input
                     ref={txtInputRef}
                     type="file"
@@ -734,7 +692,6 @@ export default function ChatRoom({ roomId, onBack }) {
                     disabled={roomClosed}
                 />
 
-                {/* ─── 첨부 패널 ───────────────────────────────── */}
                 {showAttach && !roomClosed && (
                     <div className="cr-attachPanel">
                         <button type="button" className="cr-attachItem" onClick={() => txtInputRef.current?.click()}>
@@ -752,7 +709,6 @@ export default function ChatRoom({ roomId, onBack }) {
                     </div>
                 )}
 
-                {/* ─── 입력 바 ──────────────────────────────────── */}
                 <div className="cr-inputBar">
                     <button
                         type="button"
@@ -782,7 +738,6 @@ export default function ChatRoom({ roomId, onBack }) {
                     </button>
                 </div>
 
-                {/* ─── 메뉴 오버레이 ───────────────────────────── */}
                 {menuOpen && (
                     <div className="cr-menuOverlay" onClick={() => setMenuOpen(false)}>
                         <div className="cr-menuSheet" onClick={(e) => e.stopPropagation()}>

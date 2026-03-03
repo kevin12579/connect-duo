@@ -2,18 +2,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getAiHistory, postAskAi } from '../../api/axios';
 import './SearchTool.css';
 
+// ✅ 내 프로필 아이콘(요구: ai-profile 32px)
+import myAvatarImg from '../../assets/ai-profile.png';
+
+// ✅ AI 프로필 아이콘(요구: 사진 넣기, 32px)
+import aiAvatarImg from '../../assets/ai-bot.png';
+
 export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // 💡 핵심 추가: 과거 대화 기록이 다 불러와졌는지 확인하는 상태
     const [isHistoryLoaded, setIsHistoryLoaded] = useState(false);
     const scrollRef = useRef();
 
-    // 1. 대화 기록 로드 (마운트 될 때 한 번만 실행)
+    // 1) 대화 기록 로드
     useEffect(() => {
         let isMounted = true;
+
         const fetchHistory = async () => {
             try {
                 const data = await getAiHistory();
@@ -21,31 +27,30 @@ export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
             } catch (err) {
                 console.error('기록 로드 실패', err);
             } finally {
-                if (isMounted) setIsHistoryLoaded(true); // 기록 로딩 완료 표시
+                if (isMounted) setIsHistoryLoaded(true);
             }
         };
-        fetchHistory();
 
+        fetchHistory();
         return () => {
             isMounted = false;
         };
     }, []);
 
-    // 2. 메인페이지 검색어 감지하여 질문 발송 (기록 로딩이 끝난 후에만 실행!)
+    // 2) 메인페이지 검색어 감지 → 질문 발송 (기록 로딩 끝난 후만)
     useEffect(() => {
-        // 기록을 다 불러왔고, 넘겨받은 질문이 있을 때만 실행 (덮어쓰기 방지)
         if (isHistoryLoaded && initialQuery && initialQuery.trim() !== '') {
             const queryToProcess = initialQuery;
 
-            // 💡 무한 루프(DB 도배) 방지를 위해 부모의 쿼리를 즉시 초기화!
+            // ✅ 무한루프 방지: 부모 query 초기화
             if (setChatQuery) setChatQuery('');
 
-            // 질문 전송
             handleSend(null, queryToProcess);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isHistoryLoaded, initialQuery, setChatQuery]);
 
-    // 3. 자동 스크롤
+    // 3) 자동 스크롤
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -57,7 +62,6 @@ export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
         const query = directInput || input;
         if (!query.trim() || loading) return;
 
-        // 1. 내 메시지를 즉시 화면에 추가 (이제 덮어써지지 않습니다!)
         const userMsg = { role: 'user', content: query };
         setMessages((prev) => [...prev, userMsg]);
 
@@ -67,7 +71,6 @@ export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
         try {
             const res = await postAskAi(query);
             const aiMsg = { role: 'assistant', content: res.answer };
-            // 2. AI 답변 추가
             setMessages((prev) => [...prev, aiMsg]);
         } catch (err) {
             console.error(err);
@@ -78,7 +81,7 @@ export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
     };
 
     return (
-        <div className="search-tool-inner">
+        <div className={`search-tool-inner ${isOpen ? 'is-open' : ''}`}>
             <div className="chat-window" ref={scrollRef}>
                 {messages.length === 0 && !loading && (
                     <div className="empty-chat">
@@ -86,19 +89,33 @@ export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
                         <span>궁금한 세무 지식을 아래에 입력해 보세요.</span>
                     </div>
                 )}
+
                 {messages.map((m, i) => (
                     <div key={i} className={`message-bubble ${m.role}`}>
-                        <div className="avatar">{m.role === 'user' ? '👤' : '⚖️'}</div>
+                        <div className="avatar" aria-hidden>
+                            {m.role === 'user' ? (
+                                <img className="avatar-img" src={myAvatarImg} alt="내 프로필" />
+                            ) : (
+                                <img className="avatar-img" src={aiAvatarImg} alt="AI 프로필" />
+                            )}
+                        </div>
+
                         <div className="content-wrapper">
                             <div className="sender">{m.role === 'user' ? '나' : '전문 세무비서'}</div>
                             <div className="text">{m.content}</div>
                         </div>
                     </div>
                 ))}
+
                 {loading && (
                     <div className="message-bubble assistant loading">
-                        <div className="avatar">⚖️</div>
-                        <div className="text">분석 중...</div>
+                        <div className="avatar" aria-hidden>
+                            <img className="avatar-img" src={aiAvatarImg} alt="AI 프로필" />
+                        </div>
+                        <div className="content-wrapper">
+                            <div className="sender">전문 세무비서</div>
+                            <div className="text">분석 중...</div>
+                        </div>
                     </div>
                 )}
             </div>

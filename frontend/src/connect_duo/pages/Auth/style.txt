@@ -1,4 +1,4 @@
-/* 전체 루트 컨테이너 */
+전체 루트 컨테이너
 .loginform {
     min-height: 80vh;
     display: flex;

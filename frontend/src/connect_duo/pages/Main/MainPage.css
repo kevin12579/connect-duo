@@ -43,16 +43,19 @@ body {
     width: min(1700px, 96%);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 200px 1fr; /* 로고 영역 확보 */
+    grid-template-columns: 260px 1fr; /* ✅ 로고 칸 조금만 넓힘 */
     align-items: center;
     padding: 34px 0;
-    min-height: 190px;
+
+    padding-left: 40px; /* ✅ 전체를 살짝 왼쪽 느낌 */
 }
 
 .mainpage-logo {
-    width: 200px;
-    cursor: pointer;
+    width: 360px; /* (원하면 380~420도 OK) */
+    justify-self: start; /* ✅ grid에서 왼쪽 정렬 */
+    margin-left: 0; /* 혹시 남아있으면 제거 */
     object-fit: contain;
+    cursor: pointer;
 }
 
 .mainpage-top-center {
@@ -123,8 +126,8 @@ body {
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #a3bffa;
-    font-size: 1.2rem;
+    color: #4da3ff;
+    font-size: 1.5rem;
     cursor: pointer;
     transition: transform 0.3s ease;
 }
