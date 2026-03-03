@@ -1,5 +1,5 @@
-# 오픈마켓 <img src="frontend/src/connect_duo/assets/connectDuo_logo.png" width="240" alt="ConnectDuo Logo"/>
-
+<img src="frontend/src/connect_duo/assets/connectDuo_logo.png" width="240" alt="ConnectDuo Logo"/>
+# 연결해듀오
 ### 소상공인을 위한 공공데이터 기반 **AI 세무 상담 및 전문가 매칭 플랫폼**
 
 ---
