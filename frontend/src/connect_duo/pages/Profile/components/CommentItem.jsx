@@ -1,17 +1,24 @@
 import React from 'react';
 import UserAvatar from './UserAvatar';
 function formatKoreanDate(createdAt) {
-    // createdAt 예: "2024-07-09 08:11"
     if (!createdAt) return '';
-    const [datePart, timePart] = createdAt.split(' ');
-    if (!timePart) return createdAt;
 
-    const [hh, mm] = timePart.split(':').map((x) => parseInt(x, 10));
-    const isAM = hh < 12;
-    const h12 = ((hh + 11) % 12) + 1;
-    const label = isAM ? '오전' : '오후';
+    const d = new Date(createdAt);
+    if (Number.isNaN(d.getTime())) return String(createdAt); // 파싱 실패하면 원문
 
-    return `${datePart} ${label} ${String(h12).padStart(2, '0')}시 ${String(mm).padStart(2, '0')}분`;
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+
+    const h24 = d.getHours();
+    const ampm = h24 < 12 ? '오전' : '오후';
+    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+
+    const hh = String(h12).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd} ${ampm} ${hh}시 ${mi}분 ${ss}초`;
 }
 
 export default function CommentItem({ me, comment, onDelete, canDelete = true }) {

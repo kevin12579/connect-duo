@@ -350,30 +350,58 @@
 }
 
 /* ✅ 댓글 토글 색감만 주변 톤에 맞게(동작/효과는 그대로) */
+/* ✅ 댓글 목록 토글(접힘/펼침) 버튼 */
 .profile-root .comment-toggle {
     width: 42px;
     height: 42px;
-    border-radius: 50%;
-    border: 1px solid rgba(63, 111, 181, 0.22);
-    background: rgba(255, 255, 255, 0.82);
-    color: rgba(63, 111, 181, 0.92);
-    font-weight: 900;
-    cursor: pointer;
+    border-radius: 999px;
 
+    /* ✅ 주변 유리톤이랑 어울리는 회색-푸른 보더 (조금 더 또렷) */
+    border: 1.6px solid rgba(115, 155, 205, 0.6);
+    background: rgba(255, 255, 255, 0.86);
+
+    /* ▲ 글자(문자) 색 */
+    color: rgba(47, 78, 132, 0.92);
+
+    font-weight: 900;
+
+    /* ✅ 세모 크기 키움 */
+    font-size: 16px; /* 기존보다 UP */
+    line-height: 1; /* 세로 정렬 안정 */
+
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
 
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+
     transition:
         transform 0.2s ease,
         background 0.2s ease,
-        color 0.2s ease;
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .profile-root .comment-toggle:hover {
     transform: translateY(-1px);
-    background: var(--tp-primary);
+
+    /* ✅ 진한 브랜드 블루 대신 맑은 하늘블루 */
+    background: #5f8fd6;
+
+    border-color: rgba(115, 155, 205, 0.95);
     color: #fff;
+
+    box-shadow: 0 12px 26px rgba(95, 143, 214, 0.25);
+}
+
+/* disabled(혹시 쓰는 경우 대비) */
+.profile-root .comment-toggle:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .profile-root .comment-expanded {
@@ -504,22 +532,21 @@
 /* pagination */
 .profile-root .comment-pagination {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     gap: 8px;
     padding-top: 6px;
 }
 
+/* ✅ 버튼 (UserProfile과 동일한 크기/톤) */
 .profile-root .pg-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
 
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(63, 111, 181, 0.28);
-
-    color: var(--tp-primary);   /* 기본 파랑 */
-    font-weight: 900;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(47, 78, 132, 0.25);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
 
     cursor: pointer;
     display: flex;
@@ -528,40 +555,95 @@
 
     transition:
         background 0.2s ease,
-        color 0.2s ease,
         border-color 0.2s ease,
-        transform 0.2s ease;
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
 }
 
-/* ✅ 맨처음 / 맨뒤 (조금 더 진한 파랑) */
+/* ✅ pagination icon (TaxProfile) */
+.profile-root .pg-btn .pg-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+
+    /* 기본 남색톤 (UserProfile과 동일) */
+    filter: brightness(0) saturate(100%) invert(23%) sepia(21%) saturate(1300%) hue-rotate(185deg) brightness(92%)
+        contrast(94%);
+    opacity: 0.95;
+
+    transition:
+        filter 0.2s ease,
+        opacity 0.2s ease;
+}
+
+/* ✅ 왼쪽 방향(이전/처음) */
+.profile-root .pg-btn .pg-rotate {
+    transform: rotate(180deg);
+}
+
+/* ✅ 맨처음/맨끝: 기본 상태에서 테두리 살짝 강조 */
 .profile-root .comment-pagination .pg-btn:first-child,
 .profile-root .comment-pagination .pg-btn:last-child {
-    color: #2d5592; /* tp-primary-hover 느낌 */
-    border-color: rgba(63, 111, 181, 0.45);
+    border-color: rgba(34, 60, 104, 0.34);
 }
+
+/* =========================
+   Hover (단계 차이 확실히)
+   - hover 시 아이콘 흰색
+========================= */
+
+.profile-root .pg-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
+.profile-root .pg-btn:not(:disabled):hover .pg-icon {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+/* ⏮, ◀ : 밝은 파랑(조금 옅게) */
+.profile-root .comment-pagination .pg-btn:first-child:not(:disabled):hover,
+.profile-root .comment-pagination .pg-btn:nth-child(2):not(:disabled):hover {
+    background: #3f7fd6;
+    border-color: #3f7fd6;
+}
+
+/* ▶ : 브랜드 기본 파랑 */
+.profile-root .comment-pagination .pg-info + .pg-btn:not(:disabled):hover {
+    background: #3f6fb5;
+    border-color: #3f6fb5;
+}
+
+/* ⏭ : 더 진한 네이비 */
+.profile-root .comment-pagination .pg-btn:last-child:not(:disabled):hover {
+    background: #2d5592;
+    border-color: #2d5592;
+}
+
+/* =========================
+   Disabled
+========================= */
 
 .profile-root .pg-btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
-    color: rgba(63, 111, 181, 0.35);
-    border-color: rgba(63, 111, 181, 0.14);
+    transform: none;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(47, 78, 132, 0.12);
 }
 
-.profile-root .pg-btn:not(:disabled):hover {
-    background: var(--tp-primary);
-    color: #fff;
-    border-color: var(--tp-primary);
-    transform: translateY(-1px);
+.profile-root .pg-btn:disabled .pg-icon {
+    opacity: 0.35;
+    filter: none;
 }
 
-.profile-root .pg-info {
-    padding: 6px 14px;
-    background: rgba(241, 245, 249, 0.9);
-    border-radius: 999px;
-    font-weight: 900;
-    color: var(--tp-text-600);
-    border: 1px solid rgba(63, 111, 181, 0.15);
-}
+
 
 /* =========================================================
    ✅ 내가 쓴 댓글(최신) 헤더 토글 위치 FIX
@@ -1007,7 +1089,35 @@
     font-size: 14px;
     font-weight: 700;
 }
+/* ================================
+   ✅ TaxProfile Pagination 통일
+   (UserProfile 톤과 동일)
+================================ */
 
+/* 1 / 2 pill 전체 */
+.profile-root .comment-pagination .pg-info {
+    padding: 6px 14px !important;
+    border-radius: 999px !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    color: #5a6b80 !important;
+    background: rgba(63, 111, 181, 0.08) !important;
+    border: 1px solid rgba(63, 111, 181, 0.22) !important;
+}
+
+/* 현재 페이지 숫자 (pg-current가 있는 경우) */
+.profile-root .comment-pagination .pg-info .pg-current {
+    color: #356ec9 !important;
+    font-weight: 900 !important;
+}
+
+/* pg-current가 없는 경우 대비 (1 / 2의 첫 글자) */
+.profile-root .comment-pagination .pg-info::first-letter {
+    color: #356ec9 !important;
+    font-weight: 900 !important;
+}
 /* =========================================================
    Responsive extras
 ========================================================= */

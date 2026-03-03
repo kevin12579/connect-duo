@@ -8,13 +8,20 @@ import myAvatarImg from '../../assets/ai-profile.png';
 // ✅ AI 프로필 아이콘(요구: 사진 넣기, 32px)
 import aiAvatarImg from '../../assets/ai-bot.png';
 
-export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
+export default function SearchTool({ initialQuery, setChatQuery, isOpen, onToggleLock }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
 
     const [isHistoryLoaded, setIsHistoryLoaded] = useState(false);
     const scrollRef = useRef();
+
+    // ✅ 토글 열리면: 위 검색창 잠금 / 닫히면 해제
+    useEffect(() => {
+        if (typeof onToggleLock === 'function') {
+            onToggleLock(!!isOpen);
+        }
+    }, [isOpen, onToggleLock]);
 
     // 1) 대화 기록 로드
     useEffect(() => {
@@ -124,7 +131,7 @@ export default function SearchTool({ initialQuery, setChatQuery, isOpen }) {
                 <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="추가 질문을 입력하세요..."
+                    placeholder="질문을 입력하세요"
                     disabled={loading}
                 />
                 <button type="submit" disabled={loading || !input.trim()}>

@@ -5,7 +5,7 @@
     background: #dfe6ef;
     display: flex;
     justify-content: center;
-    padding: 48px 0;
+    padding: clamp(6px, 1.2vw, 16px) 0;
 }
 
 .cr-wrap {
@@ -14,13 +14,13 @@
     color: #232c3b;
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 96px);
+    height: calc(100dvh - clamp(12px, 2vw, 32px));
     position: relative;
     background: #ffffff;
     border-radius: 46px;
     border: 2px solid #c9d7ee;
     box-shadow: 0 16px 70px rgba(110, 130, 170, 0.16);
-    padding: 45px 0 20px 0;
+    padding: clamp(18px, 2.2vw, 32px) 0 clamp(12px, 1.6vw, 22px) 0;
     overflow: hidden;
 }
 
@@ -28,20 +28,20 @@
    Header
 ========================= */
 .cr-header {
-    padding: 0 82px 0 82px;
+    padding: 0 clamp(16px, 3vw, 82px);
     display: flex;
     align-items: center;
     gap: 12px;
     flex: 0 0 auto;
     background: none;
     border: none;
-    min-height: 75px;
-    margin-bottom: 26px;
+    min-height: 62px;
+    margin-bottom: 14px;
 
     /* ✅ (1) 구분선 “조금 더 진하게” */
     border-bottom: 1.6px solid rgba(183, 207, 246, 0.95);
 
-    padding-bottom: 18px;
+    padding-bottom: 12px;
 }
 
 .cr-back {
@@ -334,16 +334,16 @@
    Chat Body
 ========================= */
 .cr-chat {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     overflow-y: auto;
     background: #f6f9ff;
     border-radius: 30px;
-    margin: 0 82px 26px 82px;
-    padding: 35px;
+    margin: 0 clamp(16px, 3vw, 82px) 16px;
+    padding: 28px;
     border: 2.4px solid #cfe0f5;
     scroll-behavior: smooth;
     overflow-x: hidden;
-    min-height: 330px;
+    min-height: 0;
 }
 
 .cr-chat::-webkit-scrollbar {
@@ -373,6 +373,30 @@
     white-space: pre-wrap;
     word-break: keep-all;
     color: #63759a;
+}
+
+
+/* 날짜 pill (카톡 느낌) */
+.cr-dayPill {
+    display: block;                 /* 핵심 */
+    width: fit-content;             /* 내용만큼 */
+    margin: 18px auto;              /* 자동 가운데 */
+
+    padding: 9px 16px;
+    border-radius: 999px;
+
+    background: rgba(43, 111, 224, 0.92);
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 950;
+    letter-spacing: -0.2px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+
+    text-align: center;
+    pointer-events: none;
 }
 
 /* row */
@@ -511,8 +535,8 @@
     position: absolute;
     top: 15px;
     right: 19px;
-    width: 65px;
-    height: 65px;
+    width: 55px;
+    height: 55px;
     opacity: 0.92;
     pointer-events: none;
 }
@@ -629,10 +653,10 @@
     flex: 0 0 auto;
     gap: 15px;
     background: #ffffff;
-    border-radius: 25px;
-    margin: 0 82px;
+    border-radius: clamp(16px, 2vw, 24px);
+    margin: 0 clamp(16px, 3vw, 82px);
     border: 2.4px solid #cfe0f5;
-    padding: 22px 37px 19px 37px;
+    padding: clamp(10px, 1.4vw, 16px) clamp(14px, 2.2vw, 26px);
     box-shadow: 0 6px 20px rgba(179, 205, 248, 0.1);
 }
 
@@ -729,8 +753,9 @@
     display: flex;
     gap: 22px;
     padding: 18px;
-    margin: 16px 0 20px;
+    margin: 16px clamp(16px, 3vw, 82px) 20px;
     border-radius: 20px;
+    flex-wrap: wrap;
 
     background: #f2f5f9; /* 회색계(푸른기 살짝) */
     border: 2px solid #d4deeb; /* 회색계 보더 */
@@ -746,6 +771,7 @@
     justify-content: center;
     padding: 17px 13px;
     border-radius: 20px;
+    min-width: 240px;
 
     background: #e6f1ff;
     border: 2px solid #9dbbf3;

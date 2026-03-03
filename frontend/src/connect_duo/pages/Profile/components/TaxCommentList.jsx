@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import CommentItem from './CommentItem';
 
+// ✅ pagination icons
+import rightNext from '../../../assets/right-next.png';
+import rightEnd from '../../../assets/right-end.png';
+
 const sortDesc = (arr) => [...arr].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 
 export default function TaxCommentList({ comments = [], pageSize = 3 }) {
@@ -36,21 +40,25 @@ export default function TaxCommentList({ comments = [], pageSize = 3 }) {
                     ))
                 )}
             </div>
+
+            {/* ✅ pagination: 아이콘 버전 */}
             <div className="comment-pagination">
-                <button className="pg-btn" onClick={goFirst} disabled={isFirst}>
-                    ⏮
+                <button className="pg-btn" onClick={goFirst} disabled={isFirst} aria-label="first" title="처음">
+                    <img className="pg-icon pg-rotate" src={rightEnd} alt="" aria-hidden="true" />
                 </button>
-                <button className="pg-btn" onClick={goPrev} disabled={isFirst}>
-                    ◀
+                <button className="pg-btn" onClick={goPrev} disabled={isFirst} aria-label="prev" title="이전">
+                    <img className="pg-icon pg-rotate" src={rightNext} alt="" aria-hidden="true" />
                 </button>
+
                 <div className="pg-info">
                     <span>{page}</span> / <span>{totalPages}</span>
                 </div>
-                <button className="pg-btn" onClick={goNext} disabled={isLast}>
-                    ▶
+
+                <button className="pg-btn" onClick={goNext} disabled={isLast} aria-label="next" title="다음">
+                    <img className="pg-icon" src={rightNext} alt="" aria-hidden="true" />
                 </button>
-                <button className="pg-btn" onClick={goLast} disabled={isLast}>
-                    ⏭
+                <button className="pg-btn" onClick={goLast} disabled={isLast} aria-label="last" title="마지막">
+                    <img className="pg-icon" src={rightEnd} alt="" aria-hidden="true" />
                 </button>
             </div>
         </div>

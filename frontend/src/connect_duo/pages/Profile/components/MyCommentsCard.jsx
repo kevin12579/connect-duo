@@ -1,4 +1,8 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
+
+// ✅ pagination icons
+import rightNext from '../../../assets/right-next.png';
+import rightEnd from '../../../assets/right-end.png';
 
 export default function MyCommentsCard({ user, items = [], onOpenTaxProProfile, pageSize = 2 }) {
     const [page, setPage] = useState(1);
@@ -57,24 +61,40 @@ export default function MyCommentsCard({ user, items = [], onOpenTaxProProfile, 
 
             {items.length > pageSize && (
                 <div className="custom-pagination">
-                    <button className="pg-ctrl-btn" onClick={() => setPage(1)} disabled={page === 1}>
-                        ⏮
+                    <button className="pg-ctrl-btn" onClick={() => setPage(1)} disabled={page === 1} aria-label="first" title="처음">
+                        <img className="pg-icon pg-rotate" src={rightEnd} alt="" aria-hidden="true" />
                     </button>
-                    <button className="pg-ctrl-btn" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>
-                        ◀
+                    <button
+                        className="pg-ctrl-btn"
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        aria-label="prev"
+                        title="이전"
+                    >
+                        <img className="pg-icon pg-rotate" src={rightNext} alt="" aria-hidden="true" />
                     </button>
+
                     <div className="pg-num-info">
                         {page} / {totalPages}
                     </div>
+
                     <button
                         className="pg-ctrl-btn"
-                        onClick={() => setPage((p) => p + 1)}
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         disabled={page === totalPages}
+                        aria-label="next"
+                        title="다음"
                     >
-                        ▶
+                        <img className="pg-icon" src={rightNext} alt="" aria-hidden="true" />
                     </button>
-                    <button className="pg-ctrl-btn" onClick={() => setPage(totalPages)} disabled={page === totalPages}>
-                        ⏭
+                    <button
+                        className="pg-ctrl-btn"
+                        onClick={() => setPage(totalPages)}
+                        disabled={page === totalPages}
+                        aria-label="last"
+                        title="마지막"
+                    >
+                        <img className="pg-icon" src={rightEnd} alt="" aria-hidden="true" />
                     </button>
                 </div>
             )}

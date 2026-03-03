@@ -287,8 +287,10 @@
 }
 
 /* -------------------------
-   Pagination
+   Pagination (UserProfile)
+   - PNG 아이콘이라 color 대신 filter로 톤 조절
 ------------------------- */
+
 .uprofile-root .custom-pagination {
     display: flex;
     justify-content: center;
@@ -296,27 +298,45 @@
     gap: 8px;
 }
 
+/* 1 / 2 pill (통일 버전) */
 .uprofile-root .pg-num-info {
-    padding: 6px 16px;
-    background: rgba(241, 245, 249, 0.9);
-    border-radius: 20px;
+    padding: 6px 14px;
+    border-radius: 999px;
 
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--up-text-600);
+    font-size: 13px;
+    font-weight: 800;
 
-    border: 1px solid rgba(63, 111, 181, 0.18);
+    /* 전체 기본 텍스트 */
+    color: #5a6b80;
+
+    /* 배경/테두리 - 브랜드 톤으로 정리 */
+    background: rgba(63, 111, 181, 0.08);
+    border: 1px solid rgba(63, 111, 181, 0.22);
+
+    position: relative;
 }
 
-/* ✅ 기본 (이전/다음) */
+/* 첫 번째 숫자(현재 페이지)만 강조 */
+.uprofile-root .pg-num-info::first-letter {
+    color: #356ec9;          /* 브랜드 파랑 */
+    font-weight: 900;
+}
+
+/* pill 배경을 살짝 더 맑게 */
+.uprofile-root .pg-num-info {
+    background: rgba(63, 111, 181, 0.08);
+    border: 1px solid rgba(63, 111, 181, 0.22);
+}
+
+/* ✅ 버튼 (조금 더 작게 + 남색톤) */
 .uprofile-root .pg-ctrl-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
 
-    color: var(--up-primary); /* 파랑 */
-    border: 1px solid rgba(63, 111, 181, 0.28);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(47, 78, 132, 0.25);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
 
     cursor: pointer;
     display: flex;
@@ -325,33 +345,94 @@
 
     transition:
         background var(--up-ease),
-        color var(--up-ease),
         border-color var(--up-ease),
-        transform var(--up-ease);
+        transform var(--up-ease),
+        box-shadow var(--up-ease),
+        opacity var(--up-ease);
 }
 
-/* ✅ 맨처음 / 맨뒤 (조금 더 진한 파랑) */
+/* ✅ PNG 아이콘: 기본 남색 느낌 (color가 안 먹으니 filter 사용) */
+.uprofile-root .pg-ctrl-btn .pg-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+
+    /* 검정 → 남색톤 */
+    filter: brightness(0) saturate(100%) invert(23%) sepia(21%) saturate(1300%)
+        hue-rotate(185deg) brightness(92%) contrast(94%);
+    opacity: 0.95;
+
+    transition: filter var(--up-ease), opacity var(--up-ease);
+}
+
+/* 왼쪽 방향(이전/처음) */
+.uprofile-root .pg-ctrl-btn .pg-rotate {
+    transform: rotate(180deg);
+}
+
+/* ✅ 맨처음/맨끝: 기본 상태에서 테두리만 살짝 강조 */
 .uprofile-root .custom-pagination .pg-ctrl-btn:first-child,
 .uprofile-root .custom-pagination .pg-ctrl-btn:last-child {
-    color: var(--up-primary-hover);
-    border-color: rgba(63, 111, 181, 0.45);
+    border-color: rgba(34, 60, 104, 0.32);
 }
 
-/* disabled */
+/* =========================
+   Hover (티 나게)
+   - hover 시 아이콘은 흰색(invert)
+========================= */
+
+.uprofile-root .pg-ctrl-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
+}
+
+.uprofile-root .pg-ctrl-btn:not(:disabled):hover .pg-icon {
+    /* 어떤 배경이든 흰색처럼 보이게 */
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+/* ✅ 이전/처음 hover: 중간 파랑 */
+.uprofile-root .custom-pagination .pg-ctrl-btn:first-child:not(:disabled):hover,
+.uprofile-root .custom-pagination .pg-ctrl-btn:nth-child(2):not(:disabled):hover {
+    background: #3f7fd6;
+    border-color: #3f7fd6;
+}
+
+/* ✅ 다음 hover: 주변과 어울리는 파랑 */
+.uprofile-root .custom-pagination .pg-num-info + .pg-ctrl-btn:not(:disabled):hover {
+    background: #3f6fb5;
+    border-color: #3f6fb5;
+}
+
+/* ✅ 맨끝 hover: 다음보다 조금 더 진하게 */
+.uprofile-root .custom-pagination .pg-ctrl-btn:last-child:not(:disabled):hover {
+    background: #2d5592;
+    border-color: #2d5592;
+}
+
+/* =========================
+   Disabled
+========================= */
+
 .uprofile-root .pg-ctrl-btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
-    color: rgba(63, 111, 181, 0.35);
-    border-color: rgba(63, 111, 181, 0.14);
+    transform: none;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(47, 78, 132, 0.12);
 }
 
-/* hover */
-.uprofile-root .pg-ctrl-btn:not(:disabled):hover {
-    background: var(--up-primary);
-    color: #fff;
-    border-color: var(--up-primary);
-    transform: translateY(-1px);
+.uprofile-root .pg-ctrl-btn:disabled .pg-icon {
+    opacity: 0.35;
+    filter: none; /* 회색 느낌으로 자연스럽게 */
 }
+
+
 
 /* -------------------------
    Responsive (List)
