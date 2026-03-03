@@ -1,0 +1,224 @@
+/* Login.css (Login 전용 - 충돌 방지 버전) */
+/* 기존 loginid/loginpw/loginbox 같은 이름 사용 안 함 */
+
+.login-page .lp-wrap {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    box-sizing: border-box;
+    flex-direction: column;
+}
+
+/* 로고 */
+.login-page .lp-logo {
+    width: 350px;
+    height: auto;
+    margin-bottom: 23px;
+    object-fit: contain;
+}
+
+/* 하늘색 카드 */
+.login-page .lp-card {
+    width: min(820px, 92vw);
+    /* ✅ 세로 느낌 늘리기 */
+    min-height: 450px; /* 380~480 사이로 취향 조절 */
+    padding: 68px 56px 60px; /* 위/아래 여백 더 줘서 세로로 커 보이게 */
+    border-radius: 22px;
+
+    background: #f5f8ff;
+    border: 1px solid rgba(30, 41, 59, 0.08);
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.065);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* ✅ 안의 3개를 카드 가운데로 */
+    justify-content: center;
+}
+
+/* ✅ 여기서 폭이 결정됨 */
+.login-page .lp-fields {
+    width: 100%;
+    /* max-width: 560px;  */
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin: 0 auto 26px;
+}
+
+.login-page .lp-field {
+    width: 100%;
+    position: relative;
+}
+
+/* ✅ input 폭 “강제” */
+.login-page .lp-input {
+    width: 100%;
+    /* max-width: 560px;  */
+    display: block;
+    margin: 0 auto;
+
+    height: 64px;
+    padding: 22px 24px 7px 24px;
+
+    border: 1px solid rgba(30, 41, 59, 0.1);
+    border-radius: 999px;
+
+    font-size: 1.12rem;
+    background: #fff;
+    box-sizing: border-box;
+    outline: none;
+
+    color: #1e293b;
+    font-weight: 500;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.login-page .lp-input:focus {
+    border-color: #4a90e2;
+    box-shadow:
+        0 14px 28px rgba(74, 144, 226, 0.16),
+        0 0 0 4px rgba(74, 144, 226, 0.1);
+}
+
+/* 라벨 */
+.login-page .lp-label {
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    transform: translateY(-50%);
+    font-size: 1.02rem;
+    color: #7f8aa1;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    font-weight: 600;
+}
+
+.login-page .lp-input:focus + .lp-label,
+.login-page .lp-input:not(:placeholder-shown) + .lp-label {
+    top: 12px;
+    font-size: 12px;
+    color: #4a90e2;
+    transform: translateY(0);
+}
+
+/* ✅ 로그인 버튼: input보다 "조금만" 길게 */
+.login-page .lp-btn {
+    width: 100%;
+    /* max-width: 610px;  */
+    height: 66px;
+
+    border: none;
+    border-radius: 999px;
+    background: #4a90e2;
+    color: #fff;
+
+    font-size: 1.18rem;
+    font-weight: 800;
+
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+
+    transition:
+        transform 0.15s,
+        background 0.2s,
+        box-shadow 0.2s;
+    box-shadow: 0 18px 44px rgba(74, 144, 226, 0.22);
+}
+
+.login-page .lp-btn:hover {
+    background: #357ab8;
+    transform: translateY(-1px);
+    box-shadow: 0 22px 52px rgba(74, 144, 226, 0.26);
+}
+
+/* 회원가입 링크: 밑줄 X, hover 시 글씨만 연해짐 */
+.login-page .lp-linkRow {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.login-page .lp-link {
+    color: #2f5fa8;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.login-page .lp-link:hover {
+    color: #6f95c3;
+}
+
+/* 로딩 */
+.login-page .lp-loading {
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #334155;
+    font-weight: 700;
+}
+
+/* 모바일 */
+@media (max-width: 520px) {
+    .login-page .lp-logo {
+        width: 250px;
+        margin-bottom: 22px;
+    }
+
+    .login-page .lp-card {
+        width: 94vw;
+        padding: 42px 18px 34px;
+    }
+
+    .login-page .lp-fields {
+        max-width: 92%;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .login-page .lp-input {
+        max-width: 92%;
+        height: 58px;
+        font-size: 1.05rem;
+    }
+
+    .login-page .lp-btn {
+        max-width: 96%;
+        height: 58px;
+        font-size: 1.1rem;
+    }
+
+    .login-page .lp-linkRow {
+        font-size: 16px;
+    }
+}
+
+/* 🔥 강제 폭 고정(다른 CSS 전부 이김) */
+.login-page .lp-fields {
+    max-width: 420px !important; /* <- 여기 숫자 줄일수록 더 짧아짐 */
+    width: 100% !important;
+}
+.login-page input.lp-input {
+    width: 100% !important;
+    max-width: 450px !important; /* <- 핵심 */
+    min-width: 0 !important; /* <- "안 줄어드는" 주범 제거 */
+    box-sizing: border-box !important;
+}
+.login-page button.lp-btn {
+    width: 100% !important;
+    max-width: 530px !important; /* input보다 "조금만" 길게 */
+    min-width: 0 !important;
+    display: block !important;
+    margin: 0 auto !important;
+}

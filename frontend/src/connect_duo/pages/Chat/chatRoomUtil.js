@@ -1,9 +1,12 @@
 export const LAST_READ_MS_KEY = (rid) => `chat_last_read_at_${rid}`;
 
+const DRAFT_KEY = 'cd_chat_drafts_v1';
+const DRAFT_EVENT = 'cd_draft_updated';
+
 export function getDraft(roomId) {
     if (typeof window === 'undefined') return '';
     try {
-        const map = JSON.parse(localStorage.getItem('cd_chat_drafts_v1') || '{}');
+        const map = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
         return String(map?.[String(roomId)] || '');
     } catch {
         return '';
@@ -13,19 +16,15 @@ export function getDraft(roomId) {
 export function saveDraft(roomId, text) {
     if (typeof window === 'undefined') return;
     try {
-        const key = 'cd_chat_drafts_v1';
-        const map = JSON.parse(localStorage.getItem(key) || '{}');
+        const map = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
         const rid = String(roomId);
         const v = String(text || '').trim();
 
-        if (v) {
-            map[rid] = v;
-        } else {
-            delete map[rid];
-        }
+        if (v) map[rid] = v;
+        else delete map[rid];
 
-        localStorage.setItem(key, JSON.stringify(map));
-        window.dispatchEvent(new Event('cd_draft_updated'));
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(map));
+        window.dispatchEvent(new Event(DRAFT_EVENT));
     } catch (error) {
         console.error('Failed to save draft:', error);
     }
@@ -40,32 +39,44 @@ export function mapRowToUiMessage(row, myId, absolutizeFileUrl) {
     const rawUrl = row.file_url ?? row.fileUrl ?? row.url ?? row.downloadUrl ?? null;
     const absUrl = rawUrl ? (absolutizeFileUrl ? absolutizeFileUrl(rawUrl) : rawUrl) : null;
 
-    // ✅ 파일명 추출 로직 강화: row에 이름이 없으면 URL에서 추출
     let fileName = row.file_name ?? row.fileName ?? row.originalName ?? row.name ?? '';
     if (!fileName && absUrl) {
-        const parts = absUrl.split('/');
-        fileName = parts[parts.length - 1]; // URL의 마지막 부분(파일명)을 가져옴
+        const parts = String(absUrl).split('/');
+        fileName = parts[parts.length - 1] || '';
+        try {
+            fileName = decodeURIComponent(fileName);
+        } catch {}
     }
 
-    // ✅ 타입 보정 로직: fileUrl이 있으면 TEXT가 아니라 FILE(또는 IMAGE)로 취급
-    let type = (row.type ?? row.message_type ?? row.messageType ?? 'TEXT').toUpperCase();
+    // type normalize
+    let type = String(row.type ?? row.message_type ?? row.messageType ?? 'TEXT').toUpperCase();
+    if (!['TEXT', 'FILE', 'IMAGE', 'SYSTEM'].includes(type)) type = 'TEXT';
+
+    // url이 있는데 TEXT로 오면 확장자로 보정
     if (absUrl && type === 'TEXT') {
-        // 이미지 확장자인지 체크
-        const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+        const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(String(fileName));
         type = isImg ? 'IMAGE' : 'FILE';
     }
+
+    const isRead =
+        row?.is_read === true ||
+        row?.is_read === 1 ||
+        row?.isRead === true ||
+        row?.isRead === 1 ||
+        row?.read === true ||
+        row?.read === 1;
 
     return {
         id: row.id ?? row.message_id ?? row.messageId ?? `unknown-${Math.random().toString(36).substring(2, 11)}`,
         from: isMe ? 'me' : 'agent',
-        type: type, // 수정된 타입 적용
+        type,
         text: row.content ?? row.text ?? row.message ?? '',
         fileUrl: absUrl,
-        fileName: fileName, // 추출된 파일명 적용
+        fileName,
         fileMime: row.file_mime ?? row.fileMime ?? row.mime ?? null,
         fileSize: row.fileSize ?? row.file_size ?? row.size ?? row.filesize ?? null,
         time: row.created_at ?? row.createdAt ?? row.createdAtUtc ?? row.time ?? new Date().toISOString(),
-        isRead: row?.is_read === true || row?.is_read === 1,
+        isRead,
     };
 }
 
@@ -110,37 +121,75 @@ export function displayFileTitle(m) {
     return isTxtLike(m) ? raw.replace(/\.txt$/i, '') : raw;
 }
 
+/**
+ * ✅ TXT 뷰어 URL 생성
+ * - fileUrl의 마지막 파일명을 가져와 decode->encode(1회)로 정규화
+ * - origin 기준 /uploads/{filename} 로 붙임
+ */
 export function getTxtViewerUrl(fileUrl) {
     const u = String(fileUrl || '');
+    if (!u) return '';
 
-    const build = (origin, filenameMaybeEncoded) => {
-        let decoded = filenameMaybeEncoded;
+    const getFilename = (pathnameOrUrl) => {
+        const s = String(pathnameOrUrl || '');
+        const idx = s.lastIndexOf('/');
+        const name = idx >= 0 ? s.slice(idx + 1) : s;
+        let decoded = name;
         try {
-            decoded = decodeURIComponent(String(filenameMaybeEncoded));
+            decoded = decodeURIComponent(name);
         } catch {}
-        const onceEncoded = encodeURIComponent(decoded);
-
-        return `${origin}/uploads/${onceEncoded}`;
+        return encodeURIComponent(decoded);
     };
 
-    if (typeof window === 'undefined') return build('', u);
-
-    try {
-        const url = new URL(u, window.location.origin);
-        const pathname = url.pathname || '';
-        const idx = pathname.lastIndexOf('/');
-        const filename = idx >= 0 ? pathname.slice(idx + 1) : pathname;
-        return build(url.origin, filename);
-    } catch {
-        const idx = u.lastIndexOf('/');
-        const filename = idx >= 0 ? u.slice(idx + 1) : u;
-        // catch 블록에서도 경로 수정
-        return build('', filename).replace(/^\/?uploads-ui\/view/, '/uploads');
+    // 브라우저면 origin 기준으로 안전 조립
+    if (typeof window !== 'undefined') {
+        try {
+            const url = new URL(u, window.location.origin);
+            const filename = getFilename(url.pathname);
+            return `${url.origin}/uploads/${filename}`;
+        } catch {
+            // 상대/깨진 url도 filename만 뽑아서 origin에 붙임
+            const filename = getFilename(u);
+            return `${window.location.origin}/uploads/${filename}`;
+        }
     }
+
+    // SSR/Node 환경: 그냥 /uploads/filename 형태
+    const filename = getFilename(u);
+    return `/uploads/${filename}`;
+}
+
+// ✅ 다운로드 파일명 안전 처리(슬래시/특수문자)
+function safeDownloadName(name) {
+    const raw = String(name || 'download');
+    return raw.replace(/[\\/:*?"<>|]/g, '_');
+}
+
+// ✅ Content-Disposition에서 파일명 추출(있으면 우선)
+function extractFilenameFromDisposition(disposition) {
+    const d = String(disposition || '');
+    if (!d) return '';
+    // filename*=UTF-8''...
+    const m1 = d.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+    if (m1?.[1]) {
+        try {
+            return decodeURIComponent(m1[1]);
+        } catch {
+            return m1[1];
+        }
+    }
+    // filename="..."
+    const m2 = d.match(/filename\s*=\s*"([^"]+)"/i);
+    if (m2?.[1]) return m2[1];
+    // filename=...
+    const m3 = d.match(/filename\s*=\s*([^;]+)/i);
+    if (m3?.[1]) return m3[1].trim();
+    return '';
 }
 
 export async function downloadFile(url, fileName) {
     const res = await fetch(url, { credentials: 'include' });
+
     if (res.status === 410) {
         const err = new Error('EXPIRED');
         err.code = 410;
@@ -149,15 +198,21 @@ export async function downloadFile(url, fileName) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const blob = await res.blob();
+
+    // ✅ 서버가 파일명을 내려주면 그걸 우선
+    const dispo = res.headers.get('content-disposition');
+    const fromHeader = extractFilenameFromDisposition(dispo);
+    const finalName = safeDownloadName(fromHeader || fileName || 'download');
+
     const a = document.createElement('a');
     const objectUrl = URL.createObjectURL(blob);
 
     a.href = objectUrl;
-    a.download = fileName || 'download';
+    a.download = finalName;
     document.body.appendChild(a);
     a.click();
 
-    document.body.removeChild(a); // 메모리 누수 방지를 위한 DOM 정리
+    document.body.removeChild(a);
     URL.revokeObjectURL(objectUrl);
 }
 
@@ -174,7 +229,6 @@ export function extractMessagesSafely(res, extractMessagesFromAxiosResponse) {
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.messages)) return data.messages;
     if (Array.isArray(res?.data?.messages)) return res.data.messages;
-
     return [];
 }
 
@@ -182,9 +236,7 @@ export function getMyIdFallback1() {
     if (typeof window === 'undefined') return 1;
     try {
         const userBackup = JSON.parse(localStorage.getItem('userBackup') || 'null');
-        if (userBackup && userBackup.id) {
-            return userBackup.id;
-        }
+        if (userBackup && userBackup.id) return userBackup.id;
 
         const user =
             JSON.parse(localStorage.getItem('auth') || '{}').user ||
