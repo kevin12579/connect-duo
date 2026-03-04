@@ -6,6 +6,8 @@ import {
     getTaxProProfile,
     updateUserProfile,
     deleteUserAccount,
+    chargeCredit,
+    getCredit,
 } from '../../api/axios';
 import { useAuthStore } from '../../stores/authStore';
 import './UserProfile.css';
@@ -23,18 +25,23 @@ export default function UserProfile({ onOpenTaxProProfile }) {
     const fetchProfileData = async () => {
         setLoading(true);
         const storedUser = JSON.parse(localStorage.getItem('userBackup') || 'null');
-
         if (!storedUser || !storedUser.id) {
             setLoading(false);
             return;
         }
 
         try {
-            // 1. 기본 사용자 정보 가져오기
             const response = await getUserProfile(storedUser.id);
-
             if (response.result === 'success') {
                 const userData = response.data.user;
+
+                // 크레딧 최신 잔액 조회
+                let credit = userData.credit || 0;
+                try {
+                    const creditRes = await getCredit(userData.id);
+                    if (creditRes.result === 'success') credit = creditRes.credit;
+                } catch (_) {}
+
                 setUser({
                     id: userData.id,
                     name: userData.name,
@@ -42,15 +49,22 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                     avatarUrl: userData.profile_img || '',
                     bio: userData.bio_one_line || '',
                     userType: userData.user_type,
+                    credit,
+                    // 세무사 확장 필드
+                    company_name: userData.company_name || '',
+                    office_address: userData.office_address || '',
+                    experience_years: userData.experience_years || 0,
+                    monthly_fee: userData.monthly_fee || 0,
+                    chat_rate_per_10min: userData.chat_rate_per_10min || 0,
+                    available_hours: userData.available_hours || '',
+                    categories: Array.isArray(userData.categories) ? userData.categories : [],
+                    consult_schedule: Array.isArray(userData.consult_schedule) ? userData.consult_schedule : [],
                 });
                 setMyComments(response.data.comments);
 
-                // 2. 세무사일 경우 본인에게 들어온 상담 신청 리스트 패칭
                 if (userData.user_type === 'TAX_ACCOUNTANT') {
-                    // ★ 수정 포인트: 두 번째 인자로 본인의 ID(viewerId)를 함께 전달
                     const res = await getTaxProProfile(userData.id, userData.id);
                     if (res.result === 'success') {
-                        // 백엔드에서 넘겨주는 requests 데이터 확인
                         setRequests(res.data.requests || []);
                     }
                 }
@@ -66,6 +80,20 @@ export default function UserProfile({ onOpenTaxProProfile }) {
         fetchProfileData();
         // eslint-disable-next-line
     }, []);
+
+    const handleChargeCredit = async (amount, description) => {
+        try {
+            const res = await chargeCredit(user.id, amount, description);
+            if (res.result === 'success') {
+                alert(
+                    `✅ ${amount.toLocaleString()} 크레딧이 충전되었습니다!\n현재 잔액: ${res.credit.toLocaleString()}`,
+                );
+                setUser((prev) => ({ ...prev, credit: res.credit }));
+            }
+        } catch (e) {
+            alert('충전 중 오류가 발생했습니다.');
+        }
+    };
 
     const handleAccept = async (requestId) => {
         if (!window.confirm('상담을 수락하시겠습니까?')) return;
@@ -99,6 +127,14 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                 name: updated.name,
                 profile_img: updated.avatarUrl,
                 bio_one_line: updated.bio,
+                company_name: updated.company_name,
+                office_address: updated.office_address,
+                experience_years: updated.experience_years,
+                monthly_fee: updated.monthly_fee,
+                chat_rate_per_10min: updated.chat_rate_per_10min,
+                available_hours: updated.available_hours,
+                categories: updated.categories,
+                consult_schedule: updated.consult_schedule,
             });
             if (res.result === 'success') {
                 alert('성공적으로 수정되었습니다.');
@@ -140,7 +176,12 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                         내 세무사 프로필 공개 페이지 확인
                     </button>
                 )}
-                <UserProfileCard user={user} onSave={handleSave} onDeleteAccount={handleDeleteAccount} />
+                <UserProfileCard
+                    user={user}
+                    onSave={handleSave}
+                    onDeleteAccount={handleDeleteAccount}
+                    onChargeCredit={handleChargeCredit}
+                />
             </div>
 
             {user.userType === 'TAX_ACCOUNTANT' && (

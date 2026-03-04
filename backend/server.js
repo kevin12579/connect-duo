@@ -12,6 +12,7 @@ const loginRouter = require('./src/routes/loginRouter');
 const profileRouter = require('./src/routes/profileRouter');
 const aiRouter = require('./src/routes/aiRouter');
 const chatRouter = require('./src/routes/chatRouter');
+const creditRouter = require('./src/routes/creditRouter'); // ★ 추가
 const socketHandler = require('./src/services/chatSocket');
 
 const port = process.env.PORT || 7777;
@@ -45,6 +46,7 @@ app.use('/api/accounts/signup', signupRouter);
 app.use('/api/accounts', loginRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/credit', creditRouter); // ★ 추가
 
 socketHandler(io);
 

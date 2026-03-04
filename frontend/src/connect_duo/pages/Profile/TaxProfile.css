@@ -493,7 +493,7 @@
     width: 28px;
     height: 28px;
     border-radius: 8px;
-    border: 1px solid rgba(226, 85, 95, 0.28);
+    border: 1px solid rgba(226, 85, 95, 0.36);
     background: rgba(255, 255, 255, 0.86);
     color: #e2555f;
     cursor: pointer;
@@ -520,8 +520,8 @@
 
 /* ✅ 내 댓글 말풍선: 살짝 유리 느낌 */
 .profile-root .comment-item.mine .comment-content {
-    background: rgba(63, 111, 181, 0.1); /* ✅ 파란 유리 틴트 */
-    border: 1px solid rgba(63, 111, 181, 0.28); /* ✅ 테두리 조금 진하게 */
+    background: rgba(63, 111, 181, 0.14); /* ✅ 파란 유리 틴트 */
+    border: 1px solid rgba(63, 111, 181, 0.42); /* ✅ 테두리 조금 진하게 */
     border-radius: 14px;
     padding: 12px 14px;
     box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
@@ -584,12 +584,6 @@
     transform: rotate(180deg);
 }
 
-/* ✅ 맨처음/맨끝: 기본 상태에서 테두리 살짝 강조 */
-.profile-root .comment-pagination .pg-btn:first-child,
-.profile-root .comment-pagination .pg-btn:last-child {
-    border-color: rgba(34, 60, 104, 0.34);
-}
-
 /* =========================
    Hover (단계 차이 확실히)
    - hover 시 아이콘 흰색
@@ -643,8 +637,6 @@
     filter: none;
 }
 
-
-
 /* =========================================================
    ✅ 내가 쓴 댓글(최신) 헤더 토글 위치 FIX
    - "내가 쓴 댓글(최신)" 텍스트와 같은 줄에서,
@@ -653,8 +645,8 @@
 
 /* 박스 */
 .profile-root .my-comments-box {
-    background: rgba(243, 247, 251, 0.86);
-    border: 1px solid rgba(63, 111, 181, 0.28); /* ✅ 테두리 대비 업 */
+    background: rgba(243, 247, 251, 0.9);
+    border: 1px solid rgba(63, 111, 181, 0.34); /* ✅ 테두리 대비 업 */
     box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
     border-radius: 18px;
     padding: 14px;
@@ -682,7 +674,7 @@
     width: 36px;
     height: 36px;
     border-radius: 12px;
-    border: 1px solid rgba(63, 111, 181, 0.22);
+    border-color: rgba(63, 111, 181, 0.32) !important;
     background: rgba(255, 255, 255, 0.82);
     box-shadow: var(--tp-shadow-soft);
     cursor: pointer;
@@ -773,11 +765,11 @@
     color: #ffc107;
 }
 .profile-root .stats-value.chip {
-    background: #f1f5f9;
+    background: rgba(47, 134, 255, 0.2);
     padding: 6px 10px;
     border-radius: 999px;
     font-size: 12px;
-    color: var(--tp-text-700);
+    color: #163a6a;
 }
 
 /* donut */
@@ -1089,6 +1081,46 @@
     font-size: 14px;
     font-weight: 700;
 }
+
+/* ================================
+   ✅ 내부 흰색칸 보더 '조금만' 진하게
+   (stats-row / legend-row / rating-box / comment bubble 등)
+================================ */
+.profile-root {
+    /* 내부 아이템 보더 공통(조금만 진하게) */
+    --tp-item-line: rgba(63, 111, 181, 0.26);
+}
+
+/* 통계 줄(왼쪽 카드) */
+.profile-root .stats-row {
+    border-color: var(--tp-item-line) !important;
+}
+
+/* 도넛 레전드 줄(오른쪽 카드) */
+.profile-root .legend-row {
+    border-color: var(--tp-item-line) !important;
+}
+
+/* 평가 박스(별점 박스) */
+.profile-root .rating-box {
+    border-color: var(--tp-item-line) !important;
+}
+
+/* 댓글 접힘 미리보기 말풍선 */
+.profile-root .comment-bubble {
+    border-color: var(--tp-item-line) !important;
+}
+
+/* 댓글 리스트 아이템(펼쳤을 때 흰 박스) */
+.profile-root .comment-item {
+    border-color: var(--tp-item-line) !important;
+}
+
+/* 댓글 입력 textarea(원하면 포함) */
+.profile-root .comment-input {
+    border-color: var(--tp-item-line) !important;
+}
+
 /* ================================
    ✅ TaxProfile Pagination 통일
    (UserProfile 톤과 동일)
@@ -1104,7 +1136,7 @@
 
     color: #5a6b80 !important;
     background: rgba(63, 111, 181, 0.08) !important;
-    border: 1px solid rgba(63, 111, 181, 0.22) !important;
+    border: 1px solid rgba(63, 111, 181, 0.29) !important;
 }
 
 /* 현재 페이지 숫자 (pg-current가 있는 경우) */
@@ -1117,6 +1149,13 @@
 .profile-root .comment-pagination .pg-info::first-letter {
     color: #356ec9 !important;
     font-weight: 900 !important;
+}
+
+/* ✅ TaxProfile - pagination 끝/다음 보더 조금 더 진하게 (UserProfile과 동일 톤) */
+.profile-root .comment-pagination .pg-btn:first-child,
+.profile-root .comment-pagination .pg-btn:nth-last-child(2),
+.profile-root .comment-pagination .pg-btn:last-child {
+    border-color: rgba(34, 60, 104, 0.42) !important;
 }
 /* =========================================================
    Responsive extras
@@ -1133,5 +1172,166 @@
     /* 모바일에서 textarea 너무 길면 부담이라 살짝만 줄임(원하면 삭제 가능) */
     .profile-root .comment-input {
         min-height: 140px;
+    }
+}
+
+/* =========================================================
+   ProfileHeaderCard — 확장 필드 (회사/주소/카테고리/경력/요금)
+========================================================= */
+
+/* 이름 + 세무사 뱃지 한 줄 */
+.profile-root .taxpro-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* "세무사" 뱃지 */
+.profile-root .taxpro-role-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--tp-primary);
+    background: rgba(63, 111, 181, 0.1);
+    border: 1px solid rgba(63, 111, 181, 0.28);
+    border-radius: 8px;
+    padding: 3px 10px;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+/* 회사명 | 주소 메타 한 줄 */
+.profile-root .taxpro-meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    font-size: 14px;
+    color: var(--tp-text-600);
+    font-weight: 600;
+}
+
+.profile-root .taxpro-company {
+    font-weight: 700;
+    color: var(--tp-text-700);
+}
+
+.profile-root .taxpro-addr {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--tp-text-600);
+}
+
+/* 작은 아이콘 (이모지) */
+.profile-root .taxpro-meta-icon {
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* 카테고리 칩 모음 */
+.profile-root .taxpro-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 2px;
+}
+
+.profile-root .taxpro-cat-chip {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--tp-text-700);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1.5px solid rgba(63, 111, 181, 0.22);
+    border-radius: 20px;
+    padding: 4px 13px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    transition:
+        border-color 0.15s,
+        background 0.15s;
+}
+
+.profile-root .taxpro-cat-chip:hover {
+    border-color: rgba(63, 111, 181, 0.55);
+    background: rgba(238, 244, 255, 0.95);
+}
+
+/* 경력 · 시간 · 일정 가로 행 */
+.profile-root .taxpro-detail-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    margin-top: 2px;
+}
+
+.profile-root .taxpro-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tp-text-700);
+}
+
+/* 상담 가능일 뱃지 — 초록 강조 */
+.profile-root .taxpro-schedule-badge {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    border-radius: 20px;
+    padding: 3px 10px;
+    color: #166534;
+}
+
+/* 요금 테이블 */
+.profile-root .taxpro-fee-table {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 12px 16px;
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(63, 111, 181, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.profile-root .taxpro-fee-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.profile-root .taxpro-fee-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tp-text-600);
+    white-space: nowrap;
+}
+
+.profile-root .taxpro-fee-value {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--tp-primary);
+    white-space: nowrap;
+}
+
+/* 반응형 */
+@media (max-width: 920px) {
+    .profile-root .taxpro-name-row,
+    .profile-root .taxpro-meta-row,
+    .profile-root .taxpro-categories,
+    .profile-root .taxpro-detail-row {
+        justify-content: center;
+    }
+    .profile-root .taxpro-fee-table {
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
     }
 }

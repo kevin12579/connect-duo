@@ -40,4 +40,11 @@ router.post('/consult/reject', profileController.rejectConsult);
 //랭킹 가져오기
 router.get('/ranking', profileController.getRanking);
 
+// ── 광고 ──────────────────────────────────────────────────
+// 광고 구매 (크레딧 차감)
+router.post('/ad/purchase', profileController.purchaseAd);
+
+// 광고 취소
+router.post('/ad/cancel', profileController.cancelAd);
+
 module.exports = router;
