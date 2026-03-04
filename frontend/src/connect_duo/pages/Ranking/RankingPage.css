@@ -133,8 +133,6 @@
     color: #6f8299;
 }
 
-
-
 /* 하단 버튼 및 배지 */
 .ranking-root .ranking-footer {
     width: 100%;
@@ -162,7 +160,7 @@
     padding: 10px;
     border: none;
     border-radius: 12px;
-    background:  #4a90e2;
+    background: #4a90e2;
     color: white;
     font-weight: 600;
     cursor: pointer;
@@ -170,14 +168,14 @@
 }
 
 .ranking-root .ranking-action-btn:hover {
-    background:#3c7ec8;
+    background: #3c7ec8;
 }
 
 /* ✅ 맨처음/맨끝: 조금 더 진한 톤(기본보다 강조) */
 .ranking-root .nav-btn.first,
 .ranking-root .nav-btn.last {
-    border-color: #6f9fe6;   /* 더 진한 파랑 보더 */
-    color: #1d5cc6;          /* 화살표도 조금 더 진하게 */
+    border-color: #6f9fe6; /* 더 진한 파랑 보더 */
+    color: #1d5cc6; /* 화살표도 조금 더 진하게 */
 }
 
 /* (선택) first/last hover는 기존 hover 그대로 타게 두되, 색감 더 또렷하게 */
@@ -186,7 +184,6 @@
     background: #1976d2; /* 너가 말한 “어울리는 파란색” 계열 */
     color: #fff;
 }
-
 
 .ranking-root .ranking-rank-num {
     width: 34px;
@@ -232,14 +229,14 @@
 
 /* ✅ 기본 hover(이전/다음): 스카이블루 계열 */
 .ranking-root .nav-btn:hover:not(:disabled) {
-    background: #eef6ff;     /* 스카이블루 느낌 */
+    background: #eef6ff; /* 스카이블루 느낌 */
     border-color: #8fb6f3;
 }
 
 /* ✅ first/last hover는 "조금 더 진하게" */
 .ranking-root .nav-btn.first:hover:not(:disabled),
 .ranking-root .nav-btn.last:hover:not(:disabled) {
-    background: #cfe6ff;   /* 기존보다 한 단계 더 진한 스카이 */
+    background: #cfe6ff; /* 기존보다 한 단계 더 진한 스카이 */
     border-color: #3f82e0; /* 살짝 더 또렷한 블루 */
 }
 
@@ -251,19 +248,21 @@
 
 /* ✅ 아이콘 크기 조금 더 줄임 + 남색/푸른계 톤 입히기 */
 .ranking-root .nav-icon {
-    width: 16px;            /* 18 -> 16 */
+    width: 16px; /* 18 -> 16 */
     height: 16px;
     object-fit: contain;
     display: block;
     pointer-events: none;
 
     /* ✅ 검정 PNG를 "남색/푸른계"로 보이게 */
-    filter: brightness(0) saturate(100%) invert(22%) sepia(40%) saturate(2200%) hue-rotate(195deg) brightness(93%) contrast(98%);
+    filter: brightness(0) saturate(100%) invert(22%) sepia(40%) saturate(2200%) hue-rotate(195deg) brightness(93%)
+        contrast(98%);
 }
 
 /* hover 때 아이콘도 조금 더 또렷하게 */
 .ranking-root .nav-btn:hover:not(:disabled) .nav-icon {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(55%) saturate(2800%) hue-rotate(200deg) brightness(96%) contrast(105%);
+    filter: brightness(0) saturate(100%) invert(18%) sepia(55%) saturate(2800%) hue-rotate(200deg) brightness(96%)
+        contrast(105%);
 }
 
 /* disabled 때 아이콘 흐리게 */
@@ -278,14 +277,14 @@
 
 /* ✅ 가운데 페이지 텍스트 키우고 톤 맞추기 */
 .ranking-root .page-indicator {
-    font-size: 1.05rem;     /* 0.95 -> 1.05 */
-    color: #4f6fa6;         /* 버튼 톤과 어울리는 블루그레이 */
+    font-size: 1.05rem; /* 0.95 -> 1.05 */
+    color: #4f6fa6; /* 버튼 톤과 어울리는 블루그레이 */
     font-weight: 800;
     letter-spacing: -0.2px;
 }
 
 .ranking-root .page-indicator strong {
-    color: #1d5cc6;         /* 아이콘 톤과 맞춘 딥 블루 */
+    color: #1d5cc6; /* 아이콘 톤과 맞춘 딥 블루 */
     font-weight: 900;
 }
 
@@ -326,26 +325,26 @@
 
 /* 1등 카드의 메인 액션 버튼 강조 */
 .ranking-root .rank-1 .ranking-action-btn {
-    background: #f6c453;   /* 기존보다 채도 낮춤 */
+    background: #f6c453; /* 기존보다 채도 낮춤 */
     color: #5a3d1e;
     font-weight: 800;
 }
 .ranking-root .rank-1 .ranking-action-btn:hover {
-    background: #e9b63c;   /* 살짝 딥 */
+    background: #e9b63c; /* 살짝 딥 */
 }
 
 /* ✅ 2등/3등 버튼 */
 .ranking-root .rank-2 .ranking-action-btn {
-    background: #c7d2dc;   /* 블루그레이 실버 */
+    background: #c7d2dc; /* 블루그레이 실버 */
     color: #2f3e4d;
     font-weight: 800;
 }
 .ranking-root .rank-2 .ranking-action-btn:hover {
-     background: #b8c5cf;
+    background: #b8c5cf;
 }
 
 .ranking-root .rank-3 .ranking-action-btn {
-    background: #d28a52;   /* 덜 붉은 브론즈 */
+    background: #d28a52; /* 덜 붉은 브론즈 */
     color: #4a2f1c;
     font-weight: 800;
 }
@@ -398,12 +397,12 @@
    ✅ 추가(요구사항 반영 + 전역CSS 덮임 방지)
 ========================= */
 .ranking-root .ranking-profile-card:not(.rank-1):not(.rank-2):not(.rank-3) {
-    border-color:  #a9bfd6;
+    border-color: #a9bfd6;
 }
 
 /* 4등 이후 hover 시 테두리도 톤다운 */
 .ranking-root .ranking-profile-card:not(.rank-1):not(.rank-2):not(.rank-3):hover {
-  border-color: #6f9fe6; /* 파랑이긴 한데 #1976d2보다 훨씬 부드러움 */
+    border-color: #6f9fe6; /* 파랑이긴 한데 #1976d2보다 훨씬 부드러움 */
 }
 
 .ranking-root .ranking-profile-card .rank-badge-area .ranking-badge-img {
@@ -415,10 +414,9 @@
 }
 
 /* ✅ 실버(2등)만: 밝기 + 그림자 거의 제거(아주 약하게만) */
-.ranking-root .rank-2 .ranking-badge-img{
-  filter: brightness(0.95) !important;
+.ranking-root .rank-2 .ranking-badge-img {
+    filter: brightness(0.95) !important;
 }
-
 
 .ranking-root .ranking-profile-card .ranking-photo,
 .ranking-root .ranking-profile-card .ranking-photo-placeholder {
@@ -438,4 +436,621 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+/* =============================================================
+   광고(AD) 카드 — 프리미엄 배너
+============================================================= */
+
+/* ── 공통 진입 애니메이션 ── */
+@keyframes adShimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+@keyframes adPulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+/* ── AD 카드 외형 ── */
+.ranking-root .ad-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 20px 24px;
+    cursor: pointer;
+
+    /* 그라디언트 보더 트릭 */
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(120deg, #f59e0b 0%, #fbbf24 30%, #6366f1 70%, #3b82f6 100%) border-box;
+    border: 2px solid transparent;
+
+    box-shadow:
+        0 6px 28px rgba(245, 158, 11, 0.18),
+        0 2px 8px rgba(99, 102, 241, 0.1);
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.ranking-root .ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 16px 44px rgba(245, 158, 11, 0.24),
+        0 4px 14px rgba(99, 102, 241, 0.16);
+}
+
+/* 배경 글로우 장식 */
+.ranking-root .ad-card-glow {
+    position: absolute;
+    top: -70px;
+    right: -70px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.16) 0%, transparent 70%);
+    pointer-events: none;
+}
+.ranking-root .ad-card-glow2 {
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ── AD 뱃지 & SPONSORED ── */
+.ranking-root .ad-badge {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 3px 11px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45);
+    animation: adPulse 3s ease-in-out infinite;
+}
+
+.ranking-root .ad-sponsored {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+/* ── AD 카드 내부 레이아웃 ── */
+.ranking-root .ad-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+/* ── AD 아바타 ── */
+.ranking-root .ad-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.ranking-root .ad-avatar-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fbbf24;
+    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35);
+}
+
+.ranking-root .ad-avatar-fallback {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.8rem;
+    border: 3px solid #fbbf24;
+    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35);
+}
+
+/* 온라인 도트 */
+.ranking-root .ad-online-dot {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2.5px solid #fff;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+/* ── AD 정보 영역 ── */
+.ranking-root .ad-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ranking-root .ad-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.ranking-root .ad-name {
+    font-size: 1.18rem;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.ranking-root .ad-role-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #4f46e5;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 2px 9px;
+    border-radius: 8px;
+}
+
+.ranking-root .ad-exp-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #92400e;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    padding: 2px 9px;
+    border-radius: 8px;
+}
+
+.ranking-root .ad-meta {
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.ranking-root .ad-sep {
+    color: #d1d5db;
+    margin: 0 4px;
+}
+
+.ranking-root .ad-bio {
+    font-size: 0.9rem;
+    color: #334155;
+    margin-bottom: 9px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.ranking-root .ad-cat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.ranking-root .ad-cat-chip {
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(99, 102, 241, 0.07);
+    color: #4f46e5;
+    font-size: 0.74rem;
+    font-weight: 700;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* ── AD 통계 열 ── */
+.ranking-root .ad-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.ranking-root .ad-stat-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 6px 13px;
+    min-width: 72px;
+}
+
+.ranking-root .ad-stat-pill.gold {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.ranking-root .ad-stat-val {
+    font-size: 0.87rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.ranking-root .ad-stat-label {
+    font-size: 0.67rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* ── AD 요금 박스 ── */
+.ranking-root .ad-fee-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(99, 102, 241, 0.14);
+    border-radius: 12px;
+}
+
+.ranking-root .ad-fee-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.ranking-root .ad-fee-label {
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.ranking-root .ad-fee-val {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #4f46e5;
+}
+
+/* ── AD 관리 버튼 ── */
+.ranking-root .ad-manage-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 12px;
+    padding: 7px 18px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ranking-root .ad-manage-btn:hover {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+/* ── 상단 광고 등록 버튼 ── */
+.ranking-root .ad-top-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.87rem;
+    transition: all 0.15s;
+}
+
+.ranking-root .ad-top-btn.buy {
+    border: 2px solid rgba(245, 158, 11, 0.55);
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    color: #92400e;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+.ranking-root .ad-top-btn.buy:hover {
+    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+    transform: translateY(-1px);
+}
+
+.ranking-root .ad-top-btn.active {
+    border: 2px solid rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    color: #166534;
+}
+.ranking-root .ad-top-btn.active:hover {
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.2);
+    transform: translateY(-1px);
+}
+
+/* ── 일반 카드의 광고 유도 버튼 ── */
+.ranking-root .ad-upsell-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 5px 14px;
+    border-radius: 10px;
+    border: 1.5px dashed rgba(245, 158, 11, 0.6);
+    background: rgba(255, 251, 235, 0.8);
+    color: #92400e;
+    font-weight: 700;
+    font-size: 0.77rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ranking-root .ad-upsell-btn:hover {
+    background: rgba(254, 243, 199, 0.95);
+}
+
+/* =============================================================
+   광고 모달
+============================================================= */
+
+.ranking-root .ad-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.ranking-root .ad-modal {
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px 28px;
+    width: 500px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+    animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.ranking-root .ad-modal-header {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.ranking-root .ad-modal-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+}
+
+.ranking-root .ad-modal-title {
+    margin: 0 0 4px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.ranking-root .ad-modal-sub {
+    margin: 0;
+    font-size: 0.87rem;
+    color: #64748b;
+}
+
+/* 혜택 박스 */
+.ranking-root .ad-benefit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    margin-bottom: 22px;
+}
+
+.ranking-root .ad-benefit-item {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* 플랜 그리드 */
+.ranking-root .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.ranking-root .plan-card {
+    position: relative;
+    padding: 18px 10px;
+    border-radius: 16px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+}
+
+.ranking-root .plan-card:hover {
+    border-color: #fbbf24;
+}
+
+.ranking-root .plan-card.selected {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb, #fef9c3);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+
+.ranking-root .plan-tag {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.67rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.ranking-root .plan-card.selected .plan-tag {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.ranking-root .plan-days {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+.ranking-root .plan-price {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #f59e0b;
+}
+.ranking-root .plan-unit {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.ranking-root .plan-note {
+    font-size: 0.82rem;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+/* 모달 버튼 */
+.ranking-root .ad-modal-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ranking-root .btn-ad-confirm {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    transition: opacity 0.15s;
+}
+
+.ranking-root .btn-ad-confirm:hover {
+    opacity: 0.9;
+}
+.ranking-root .btn-ad-confirm:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ranking-root .btn-ad-extend {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #3f6fb5;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.ranking-root .btn-ad-cancel-ad {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid #fca5a5;
+    background: #fff5f5;
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 0.87rem;
+    cursor: pointer;
+}
+.ranking-root .btn-ad-cancel-ad:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ranking-root .btn-ad-close {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.87rem;
+    cursor: pointer;
+}
+
+/* 취소 모달 정보 박스 */
+.ranking-root .ad-cancel-info {
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ranking-root .ad-cancel-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #334155;
 }
