@@ -34,13 +34,16 @@
 
     --up-ease: 0.2s ease;
 
+    /* ✅ 살짝만 진한 라인 */
+    --up-item-line: rgba(63, 111, 181, 0.25);
+
     width: min(1000px, 92%);
     margin: 0 auto;
     padding: 60px 0;
     font-family: var(--up-font);
 }
 
-/* loading / error (혹시 공통 class가 있어도 이 페이지에서만) */
+/* loading / error */
 .uprofile-root .loading,
 .uprofile-root .error {
     padding: 60px 0;
@@ -140,7 +143,7 @@
     display: flex;
     align-items: center;
 
-    border: 1px solid var(--up-line);
+    border: 1px solid var(--up-item-line) !important;
 
     box-shadow:
         0 -2px 10px rgba(63, 111, 181, 0.03),
@@ -288,9 +291,7 @@
 
 /* -------------------------
    Pagination (UserProfile)
-   - PNG 아이콘이라 color 대신 filter로 톤 조절
 ------------------------- */
-
 .uprofile-root .custom-pagination {
     display: flex;
     justify-content: center;
@@ -298,40 +299,33 @@
     gap: 8px;
 }
 
-/* 1 / 2 pill (통일 버전) */
+/* 1 / 2 pill */
 .uprofile-root .pg-num-info {
     padding: 6px 14px;
     border-radius: 999px;
 
     font-size: 13px;
     font-weight: 800;
-
-    /* 전체 기본 텍스트 */
     color: #5a6b80;
 
-    position: relative;
-}
-
-/* 첫 번째 숫자(현재 페이지)만 강조 */
-.uprofile-root .pg-num-info::first-letter {
-    color: #356ec9;          /* 브랜드 파랑 */
-    font-weight: 900;
-}
-
-/* pill 배경을 살짝 더 맑게 */
-.uprofile-root .pg-num-info {
     background: rgba(63, 111, 181, 0.08);
     border: 1px solid rgba(63, 111, 181, 0.29);
 }
 
-/* ✅ 버튼 (조금 더 작게 + 남색톤) */
+/* 첫 번째 숫자(현재 페이지)만 강조 */
+.uprofile-root .pg-num-info::first-letter {
+    color: #356ec9;
+    font-weight: 900;
+}
+
+/* 버튼 */
 .uprofile-root .pg-ctrl-btn {
     width: 32px;
     height: 32px;
     border-radius: 50%;
 
     background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(47, 78, 132, 0.25);
+    border: 1px solid rgba(47, 78, 132, 0.25) !important;
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
 
     cursor: pointer;
@@ -347,7 +341,6 @@
         opacity var(--up-ease);
 }
 
-/* ✅ PNG 아이콘: 기본 남색 느낌 (color가 안 먹으니 filter 사용) */
 .uprofile-root .pg-ctrl-btn .pg-icon {
     width: 14px;
     height: 14px;
@@ -355,7 +348,6 @@
     pointer-events: none;
     user-select: none;
 
-    /* 검정 → 남색톤 */
     filter: brightness(0) saturate(100%) invert(23%) sepia(21%) saturate(1300%)
         hue-rotate(185deg) brightness(92%) contrast(94%);
     opacity: 0.95;
@@ -363,21 +355,9 @@
     transition: filter var(--up-ease), opacity var(--up-ease);
 }
 
-/* 왼쪽 방향(이전/처음) */
 .uprofile-root .pg-ctrl-btn .pg-rotate {
     transform: rotate(180deg);
 }
-
-.uprofile-root .custom-pagination .pg-ctrl-btn:first-child,
-.uprofile-root .custom-pagination .pg-ctrl-btn:nth-last-child(2),
-.uprofile-root .custom-pagination .pg-ctrl-btn:last-child {
-    border-color: rgba(34, 60, 104, 0.42);
-}
-
-/* =========================
-   Hover (티 나게)
-   - hover 시 아이콘은 흰색(invert)
-========================= */
 
 .uprofile-root .pg-ctrl-btn:not(:disabled):hover {
     transform: translateY(-1px);
@@ -385,33 +365,25 @@
 }
 
 .uprofile-root .pg-ctrl-btn:not(:disabled):hover .pg-icon {
-    /* 어떤 배경이든 흰색처럼 보이게 */
     filter: brightness(0) invert(1);
     opacity: 1;
 }
 
-/* ✅ 이전/처음 hover: 중간 파랑 */
 .uprofile-root .custom-pagination .pg-ctrl-btn:first-child:not(:disabled):hover,
 .uprofile-root .custom-pagination .pg-ctrl-btn:nth-child(2):not(:disabled):hover {
     background: #3f7fd6;
     border-color: #3f7fd6;
 }
 
-/* ✅ 다음 hover: 주변과 어울리는 파랑 */
 .uprofile-root .custom-pagination .pg-num-info + .pg-ctrl-btn:not(:disabled):hover {
     background: #3f6fb5;
     border-color: #3f6fb5;
 }
 
-/* ✅ 맨끝 hover: 다음보다 조금 더 진하게 */
 .uprofile-root .custom-pagination .pg-ctrl-btn:last-child:not(:disabled):hover {
     background: #2d5592;
     border-color: #2d5592;
 }
-
-/* =========================
-   Disabled
-========================= */
 
 .uprofile-root .pg-ctrl-btn:disabled {
     opacity: 0.35;
@@ -425,10 +397,31 @@
 
 .uprofile-root .pg-ctrl-btn:disabled .pg-icon {
     opacity: 0.35;
-    filter: none; /* 회색 느낌으로 자연스럽게 */
+    filter: none;
 }
 
+/* ================================
+   ✅ UserProfile Pagination 보더 강화 (TaxProfile과 동일 컨셉)
+   - 아이콘 버튼(처음/이전/다음/끝)만 보더 살짝 진하게
+================================ */
 
+/* 아이콘 버튼 공통: 기본 보더보다 살짝 또렷하게 */
+.uprofile-root .custom-pagination .pg-ctrl-btn {
+    border-color: rgba(47, 78, 132, 0.32) !important; /* 기본 0.25 → 0.32 */
+}
+
+/* 맨앞/맨뒤 쪽(보통 ⏮, ⏭)은 더 또렷하게 */
+.uprofile-root .custom-pagination .pg-ctrl-btn:first-child,
+.uprofile-root .custom-pagination .pg-ctrl-btn:last-child {
+    border-color: rgba(34, 60, 104, 0.42) !important; /* Tax와 동일 톤 */
+}
+
+/* (만약 구조가: [⏮][◀][1/2][▶][⏭] 처럼 5개면
+   2번째(◀)와 4번째(▶)도 중간 정도로 살짝 올려줄 수 있음 */
+.uprofile-root .custom-pagination .pg-ctrl-btn:nth-child(2),
+.uprofile-root .custom-pagination .pg-num-info + .pg-ctrl-btn {
+    border-color: rgba(47, 78, 132, 0.36) !important;
+}
 
 /* -------------------------
    Responsive (List)
@@ -450,320 +443,6 @@
     }
 }
 
-/* =========================================================
-   UserProfileCard (components/UserProfileCard)
-========================================================= */
-.uprofile-root .usercard {
-    display: grid;
-    grid-template-columns: 180px 1fr 180px;
-    gap: 40px;
-    align-items: center;
-
-    background: rgba(255, 255, 255, 0.92);
-    border-radius: 20px;
-    padding: 10px 5px;
-
-    border: 1px solid rgba(63, 111, 181, 0.12);
-    box-shadow:
-        0 -4px 12px rgba(63, 111, 181, 0.05),
-        0 10px 22px rgba(63, 111, 181, 0.07);
-
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-.uprofile-root .usercard-left {
-    position: relative;
-    display: flex;
-    justify-content: center;
-}
-
-.uprofile-root .user-avatar img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-
-    border: 4px solid rgba(255, 255, 255, 0.95);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-.uprofile-root .user-avatar-fallback {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-
-    background: linear-gradient(135deg, var(--up-primary) 0%, var(--up-primary-hover) 100%);
-    color: #fff;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 54px;
-    font-weight: 800;
-
-    box-shadow: 0 8px 20px rgba(63, 111, 181, 0.2);
-}
-
-/* 사진 수정 아이콘 버튼 */
-.uprofile-root .edit-photo {
-    position: absolute;
-    bottom: 5px;
-    right: 15px;
-
-    width: 38px;
-    height: 38px;
-    border-radius: 50% !important;
-
-    background: rgba(255, 255, 255, 0.95) !important;
-    color: var(--up-primary);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 16px;
-    border: 1px solid rgba(238, 242, 247, 1) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-
-    cursor: pointer;
-    transition:
-        transform var(--up-ease),
-        background var(--up-ease),
-        color var(--up-ease);
-}
-
-.uprofile-root .edit-photo:hover {
-    transform: scale(1.1);
-    background: var(--up-primary) !important;
-    color: #fff;
-}
-
-.uprofile-root .usercard-mid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.uprofile-root .user-name {
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--up-text-900);
-
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.uprofile-root .user-role-badge {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-
-    background: rgba(238, 244, 255, 0.95);
-    color: var(--up-primary);
-
-    padding: 4px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(63, 111, 181, 0.22);
-}
-
-.uprofile-root .user-sub-id {
-    font-size: 15px;
-    color: var(--up-text-400);
-    font-weight: 500;
-    margin-bottom: 5px;
-}
-
-.uprofile-root .user-bio-display {
-    font-size: 15px;
-    color: var(--up-text-600);
-    line-height: 1.6;
-
-    background: rgba(248, 250, 252, 0.9);
-    padding: 15px 20px;
-    border-radius: 14px;
-
-    border-left: 4px solid var(--up-primary);
-    margin: 10px 0;
-
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
-}
-
-/* 편집 버튼 */
-.uprofile-root .edit-info-btn {
-    align-self: flex-start;
-
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--up-text-500);
-
-    border: 1px solid rgba(63, 111, 181, 0.28);
-    border-radius: 10px;
-    padding: 8px 18px;
-
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-
-    transition:
-        background var(--up-ease),
-        color var(--up-ease),
-        border-color var(--up-ease),
-        transform var(--up-ease);
-}
-
-.uprofile-root .edit-info-btn:hover {
-    background: rgba(241, 245, 249, 0.95);
-    color: var(--up-text-800);
-    border-color: rgba(203, 213, 224, 1);
-    transform: translateY(-1px);
-}
-
-/* 수정 폼 */
-.uprofile-root .user-edit-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 10px 0;
-}
-
-.uprofile-root .edit-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.uprofile-root .edit-row span {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--up-text-500);
-    margin-left: 4px;
-}
-
-.uprofile-root .edit-row input,
-.uprofile-root .edit-row textarea,
-.uprofile-root .photo-edit-input input {
-    width: 100%;
-    padding: 12px 16px;
-
-    border: 1px solid rgba(226, 232, 240, 1);
-    border-radius: 12px;
-
-    font-size: 15px;
-    background: rgba(252, 253, 254, 0.98);
-
-    transition:
-        border-color var(--up-ease),
-        background var(--up-ease),
-        box-shadow var(--up-ease);
-}
-
-.uprofile-root .edit-row textarea {
-    resize: vertical;
-}
-
-.uprofile-root .edit-row input:focus,
-.uprofile-root .edit-row textarea:focus {
-    outline: none;
-    border-color: var(--up-primary);
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(63, 111, 181, 0.08);
-}
-
-.uprofile-root .photo-edit-input {
-    margin-top: 15px;
-}
-
-.uprofile-root .photo-edit-input input {
-    font-size: 13px;
-    border-style: dashed;
-    background: rgba(248, 250, 252, 0.9);
-}
-
-/* 오른쪽 영역 */
-/* ✅ 오른쪽 버튼 영역을 "왼쪽 정렬" + 약간 안쪽으로 */
-.uprofile-root .usercard-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* stretch → flex-start */
-    gap: 10px;
-
-    padding-left: 14px; /* ✅ 오른쪽 컬럼 안에서 왼쪽으로 이동한 느낌 */
-    padding-right: 6px; /* (선택) 오른쪽 여백도 살짝 */
-}
-
-/* (선택) 버튼이 너무 넓으면 폭 고정 */
-.uprofile-root .usercard-right button {
-    width: 165px; /* 원하는 값으로 조절 */
-}
-
-.uprofile-root .withdraw-link {
-    font-size: 15px;
-    color: var(--up-text-400);
-    font-weight: 500;
-
-    background: none;
-    border: none;
-    padding: 8px;
-
-    cursor: pointer;
-    transition:
-        color var(--up-ease),
-        text-decoration-color var(--up-ease);
-}
-
-.uprofile-root .withdraw-link:hover {
-    color: #ef4444;
-    text-decoration: underline;
-}
-
-/* =========================================
-   ✅ UserProfile: 안 흰카드 보더 '조금만' 진하게
-   + 24시간 문구 박스 그림자 조금 더 진하게
-========================================= */
-
-/* 공통 아이템 보더를 살짝만 진하게 */
-.uprofile-root {
-  --up-item-line: rgba(63, 111, 181, 0.25); /* 기존 0.18보다 '조금' */
-}
-
-/* 상담 신청 리스트 / 리뷰 리스트 같은 흰 카드 */
-.uprofile-root .item-row {
-  border-color: var(--up-item-line) !important;
-}
-
-/* 상단 프로필 흰 카드(큰 카드)도 조금만 */
-.uprofile-root .usercard {
-  border-color: var(--up-item-line) !important; /* 기존 0.12 → 0.18 */
-}
-
-
-/* 반응형 */
-@media (max-width: 850px) {
-    .uprofile-root .usercard {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 25px;
-        padding: 18px 16px;
-    }
-
-    .uprofile-root .usercard-left,
-    .uprofile-root .usercard-mid,
-    .uprofile-root .usercard-right {
-        justify-content: center;
-        align-items: center;
-    }
-
-    .uprofile-root .user-name {
-        justify-content: center;
-    }
-
-    .uprofile-root .edit-info-btn {
-        align-self: center;
-    }
-}
-
 /* fallback avatar (리스트 등에서 쓰는 경우) */
 .uprofile-root .fallback-avatar {
     background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
@@ -777,4 +456,953 @@
     font-size: 16px;
 
     border: 1px solid rgba(237, 242, 247, 1);
+}
+
+/* =========================================================
+   ✅ UserProfileCard - NEW (matches your JSX)
+   - uses user-profile-... classNames
+========================================================= */
+
+.uprofile-root .user-profile-view-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
+    padding: 18px 18px;
+
+    border: 1px solid rgba(63, 111, 181, 0.18);
+    box-shadow:
+        0 -4px 12px rgba(63, 111, 181, 0.05),
+        0 10px 22px rgba(15, 23, 42, 0.07);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* Avatar */
+.uprofile-root .user-profile-avatar-col {
+    flex-shrink: 0;
+}
+
+.uprofile-root .user-profile-avatar-img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.uprofile-root .user-profile-avatar-fallback {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--up-primary) 0%, var(--up-primary-hover) 100%);
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 42px;
+    font-weight: 800;
+
+    box-shadow: 0 8px 20px rgba(63, 111, 181, 0.2);
+}
+
+/* Info */
+.uprofile-root .user-profile-view-info {
+    flex: 1;
+    min-width: 240px;
+}
+
+.uprofile-root .user-profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.uprofile-root .user-profile-name-text {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--up-text-900);
+}
+
+.uprofile-root .user-profile-role-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(238, 244, 255, 0.95);
+    color: var(--up-primary);
+    padding: 3px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(63, 111, 181, 0.22);
+}
+
+.uprofile-root .user-profile-username {
+    font-size: 0.9rem;
+    color: var(--up-text-400);
+    margin-bottom: 10px;
+}
+
+/* Credit bar */
+.uprofile-root .user-profile-credit-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: linear-gradient(135deg, #eef2ff, #e0e9ff);
+    border-radius: 14px;
+    padding: 10px 14px;
+
+    border: 1.5px solid #b6c9f5;
+}
+
+.uprofile-root .user-profile-credit-icon {
+    font-size: 1.3rem;
+}
+
+.uprofile-root .user-profile-credit-meta {
+    flex: 1;
+    min-width: 120px;
+}
+
+.uprofile-root .user-profile-credit-label {
+    font-size: 0.72rem;
+    color: #7a92c0;
+    font-weight: 600;
+}
+
+.uprofile-root .user-profile-credit-value {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #3d6fd9;
+}
+
+/* credit buttons */
+.uprofile-root .user-profile-btn-charge {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: none;
+    background: #3d6fd9;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.uprofile-root .user-profile-btn-history {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #b1c4e2;
+    background: #fff;
+    color: #4a6fa5;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+
+    transition:
+        background var(--up-ease),
+        border-color var(--up-ease),
+        color var(--up-ease),
+        transform var(--up-ease),
+        box-shadow var(--up-ease);
+}
+
+.uprofile-root .user-profile-btn-history:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 14px rgba(63, 111, 181, 0.15),
+        0 2px 4px rgba(15, 23, 42, 0.05);
+    border-color: rgba(63, 111, 181, 0.45);
+}
+
+/* right actions */
+.uprofile-root .user-profile-view-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.uprofile-root .user-profile-btn-edit {
+    padding: 10px 18px;
+    border-radius: 12px;
+
+    background: rgba(231, 242, 255, 0.88);
+    color: #2f5f9f;
+
+    border: 1px solid rgba(63, 111, 181, 0.30);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+
+    transition:
+        background var(--up-ease),
+        color var(--up-ease),
+        border-color var(--up-ease),
+        transform var(--up-ease),
+        box-shadow var(--up-ease);
+}
+
+.uprofile-root .user-profile-btn-edit:hover {
+    background: rgba(210, 230, 255, 0.95);
+    color: #244e86;
+    border-color: rgba(63, 111, 181, 0.40);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
+}
+
+.uprofile-root .user-profile-btn-withdraw {
+    margin-top: 6px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: rgba(71, 85, 105, 0.85);
+
+    background: none;
+    border: none;
+    padding: 8px 6px;
+    cursor: pointer;
+
+    transition: color var(--up-ease), text-decoration-color var(--up-ease);
+}
+
+.uprofile-root .user-profile-btn-withdraw:hover {
+    color: #ef4444;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+/* Tax grid */
+.uprofile-root .user-profile-tax-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.uprofile-root .user-profile-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(63, 111, 181, 0.22);
+    border-radius: 16px;
+
+    padding: 12px 16px;
+
+    box-shadow:
+        0 -2px 10px rgba(63, 111, 181, 0.03),
+        0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.uprofile-root .user-profile-info-box.wide {
+    grid-column: 1 / -1;
+}
+
+.uprofile-root .user-profile-info-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.uprofile-root .user-profile-info-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.uprofile-root .user-profile-info-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: rgba(71, 85, 105, 0.72);
+    margin-bottom: 3px;
+}
+
+.uprofile-root .user-profile-info-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--up-text-800);
+}
+
+.uprofile-root .user-profile-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.uprofile-root .user-profile-tag-blue {
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(238, 242, 255, 0.95);
+    color: #3d6fd9;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 1px solid rgba(63, 111, 181, 0.20);
+}
+
+.uprofile-root .user-profile-tag-green {
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(232, 245, 233, 0.95);
+    color: #2e7d32;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 1px solid rgba(46, 125, 50, 0.22);
+}
+
+.uprofile-root .user-profile-user-bio-display {
+    margin-top: 16px;
+
+    font-size: 15px;
+    color: var(--up-text-600);
+    line-height: 1.6;
+
+    background: rgba(255, 255, 255, 0.96);
+    padding: 15px 20px;
+    border-radius: 16px;
+
+    border: 1px solid rgba(63, 111, 181, 0.22);
+    box-shadow:
+        0 -2px 10px rgba(63, 111, 181, 0.03),
+        0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+/* =========================================================
+   ✅ Credit Modals (거래내역/충전) - CLEAN MERGED
+   ✅ 요구사항: Portal로 body 밖에서 떠도 적용 + 내부 스크롤 + 스크롤바 색
+   - (모달 관련 선택자만 .uprofile-root 스코프 제거)
+========================================================= */
+
+/* Overlay / Modal */
+.user-profile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.52);
+
+    /* ✅ 중앙정렬은 유지하되, 작은 화면에서는 스크롤 가능하게 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* ✅ 핵심: 오버레이가 스크롤 담당 */
+    overflow-y: auto;
+    padding: 24px 16px;
+
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+/* 모달 박스 */
+.user-profile-modal-box {
+    background: #fff;
+    border-radius: 22px;
+    padding: 32px 28px;
+
+    /* ✅ 폭/높이: 뷰포트에 맞게 */
+    width: min(560px, 92vw);
+    max-height: calc(100vh - 48px);
+
+    /* ✅ 내용이 길면 모달 내부도 스크롤 가능 */
+    overflow: auto;
+
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+    border: 1.5px solid rgba(47, 78, 132, 0.22);
+}
+
+/* ✅ 화면 높이가 낮은 경우: 위쪽부터 뜨게 (잘림 방지 체감 큼) */
+@media (max-height: 720px) {
+    .user-profile-overlay {
+        align-items: flex-start;
+    }
+}
+
+/* 패키지 그리드도 모바일/좁은 폭에서 3칸→2칸 */
+@media (max-width: 520px) {
+    .user-profile-pkg-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.user-profile-modal-title {
+    margin: 0 0 8px;
+    font-size: 1.3rem;
+    font-weight: 900;
+
+    /* ✅ 더 진하게 */
+    color: rgba(15, 23, 42, 0.92);
+}
+
+.user-profile-modal-sub {
+    margin-bottom: 22px;
+    font-size: 0.95rem;
+
+    /* ✅ 더 진하게 + 굵게 */
+    color: rgba(55, 74, 110, 0.82);
+    font-weight: 800;
+}
+
+.user-profile-modal-strong {
+    /* ✅ 현재 잔액 텍스트보다 조금 더 진하게 */
+    color: rgba(51, 102, 204, 0.95);
+    font-weight: 900;
+}
+
+.user-profile-modal-close {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 8px;
+
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+
+    /* ✅ 톤업 + 보더 */
+    border: 1.5px solid rgba(47, 78, 132, 0.22);
+    color: rgba(45, 62, 92, 0.86);
+    background: rgba(241, 245, 249, 0.95);
+
+    transition:
+        background var(--up-ease),
+        border-color var(--up-ease),
+        color var(--up-ease),
+        transform var(--up-ease),
+        box-shadow var(--up-ease);
+}
+
+.user-profile-modal-close:hover {
+    border-color: rgba(47, 78, 132, 0.34);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+
+/* Packages */
+.user-profile-pkg-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.user-profile-pkg-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 16px 10px;
+    border-radius: 14px;
+    cursor: pointer;
+
+    /* ✅ 톤업 통합 */
+    border: 2px solid rgba(47, 78, 132, 0.20);
+    background: rgba(244, 247, 255, 0.98);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+
+    transition:
+        transform var(--up-ease),
+        box-shadow var(--up-ease),
+        border-color var(--up-ease);
+}
+
+.user-profile-pkg-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(47, 78, 132, 0.32);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+}
+
+.user-profile-pkg-credit {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: rgba(51, 102, 204, 0.96);
+}
+
+.user-profile-pkg-unit {
+    font-size: 0.7rem;
+
+    /* ✅ #9ab -> 더 진하게 */
+    color: rgba(86, 106, 138, 0.78);
+    font-weight: 800;
+}
+
+.user-profile-pkg-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 16px;
+    margin-top: 4px;
+
+    /* ✅ 더 진한 pill */
+    background: rgba(220, 234, 255, 0.98);
+    color: rgba(30, 62, 115, 0.92);
+    border: 1px solid rgba(63, 111, 181, 0.26);
+}
+
+.user-profile-modal-tip {
+    font-size: 0.8rem;
+    text-align: center;
+    margin-bottom: 12px;
+
+    /* ✅ 안내문 톤업 */
+    color: rgba(100, 116, 139, 0.78);
+    font-weight: 700;
+}
+
+/* History */
+.user-profile-modal-loading,
+.user-profile-modal-empty {
+    text-align: center;
+    padding: 40px;
+
+    /* ✅ 더 진하게 */
+    color: rgba(71, 85, 105, 0.82);
+    font-weight: 800;
+}
+
+.user-profile-hist-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 380px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.user-profile-hist-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 10px;
+
+    /* ✅ 보더/배경 톤업 */
+    background: rgba(248, 250, 252, 0.96);
+    border: 1.5px solid rgba(47, 78, 132, 0.18);
+}
+
+.user-profile-hist-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-profile-hist-desc {
+    font-size: 0.85rem;
+
+    /* ✅ 설명 더 진하고 굵게 */
+    color: rgba(30, 41, 59, 0.92);
+    font-weight: 800;
+}
+
+.user-profile-hist-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.user-profile-hist-sub {
+    font-size: 0.7rem;
+
+    /* ✅ 작은 글씨 더 진하게 */
+    color: rgba(71, 85, 105, 0.72);
+    font-weight: 800;
+}
+
+.user-profile-hist-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.user-profile-hist-badge.charge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid rgba(46, 125, 50, 0.22);
+}
+
+.user-profile-hist-badge.spend {
+    background: #ffeaea;
+    color: #c62828;
+    border: 1px solid rgba(198, 40, 40, 0.20);
+}
+
+.user-profile-hist-amount {
+    font-size: 0.95rem;
+    font-weight: 900;
+}
+
+.user-profile-hist-amount.charge {
+    color: #2e7d32;
+}
+
+.user-profile-hist-amount.spend {
+    color: #c62828;
+}
+
+/* ===== Modal scrollbars (only inside credit modals) ===== */
+
+/* WebKit (Chrome/Edge/Safari) */
+.user-profile-modal-box::-webkit-scrollbar,
+.user-profile-hist-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.user-profile-modal-box::-webkit-scrollbar-track,
+.user-profile-hist-list::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.06);
+    border-radius: 999px;
+}
+
+.user-profile-modal-box::-webkit-scrollbar-thumb,
+.user-profile-hist-list::-webkit-scrollbar-thumb {
+    background: rgba(47, 78, 132, 0.45);
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.65);
+}
+
+.user-profile-modal-box::-webkit-scrollbar-thumb:hover,
+.user-profile-hist-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(47, 78, 132, 0.65);
+}
+
+/* Firefox */
+.user-profile-modal-box,
+.user-profile-hist-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(47, 78, 132, 0.55) rgba(15, 23, 42, 0.06);
+}
+
+/* ===============================
+   ✅ Calendar (THIS WAS MISSING)
+   matches: user-profile-cal-...
+================================= */
+.uprofile-root .user-profile-cal-wrap {
+    margin-top: 10px;
+
+    background: rgba(255, 255, 255, 0.82);
+
+    border: 1px solid rgba(63, 111, 181, 0.28);
+    border-radius: 16px;
+    padding: 14px 14px 10px;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.06),
+        0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+/* 헤더 */
+.uprofile-root .user-profile-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.uprofile-root .user-profile-cal-title {
+    font-weight: 900;
+    color: rgba(45, 62, 92, 0.92);
+    font-size: 14px;
+}
+
+/* 이전/다음 */
+.uprofile-root .user-profile-cal-nav {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+
+    border: 1px solid rgba(63, 111, 181, 0.38);
+    background: rgba(238, 244, 255, 0.95);
+    color: var(--up-primary);
+
+    font-weight: 900;
+    cursor: pointer;
+
+    transition:
+        transform var(--up-ease),
+        background var(--up-ease),
+        border-color var(--up-ease),
+        box-shadow var(--up-ease);
+}
+
+.uprofile-root .user-profile-cal-nav:hover {
+    transform: translateY(-1px);
+    background: rgba(210, 230, 255, 0.95);
+    border-color: rgba(63, 111, 181, 0.52);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* ✅ 핵심: grid가 다른 CSS에 덮여도 무조건 7칸 그리드로 */
+.uprofile-root .user-profile-cal-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    gap: 8px !important;
+
+    align-items: stretch;
+}
+
+/* 요일 */
+.uprofile-root .user-profile-cal-weekday {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(71, 85, 105, 0.78);
+
+    padding: 4px 0;
+    width: 100%;
+}
+
+/* 빈칸도 그리드 칸 유지 */
+.uprofile-root .user-profile-cal-empty {
+    height: 36px;
+    width: 100%;
+}
+
+/* 날짜 셀 */
+.uprofile-root .user-profile-cal-cell {
+    height: 36px;
+    width: 100%;
+    min-width: 0;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(63, 111, 181, 0.30);
+
+    background: rgba(255, 255, 255, 0.96);
+    color: rgba(45, 62, 92, 0.94);
+
+    font-weight: 800;
+    cursor: pointer;
+
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform var(--up-ease),
+        box-shadow var(--up-ease),
+        background var(--up-ease),
+        border-color var(--up-ease),
+        color var(--up-ease);
+}
+
+.uprofile-root .user-profile-cal-cell:hover {
+    transform: translateY(-1px);
+    border-color: rgba(63, 111, 181, 0.44);
+
+    background: rgba(247, 250, 255, 0.96);
+
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+}
+
+/* 선택된 날짜 */
+.uprofile-root .user-profile-cal-cell.is-selected {
+    background: rgba(232, 240, 255, 0.92);
+
+    border-color: rgba(63, 111, 181, 0.58);
+    color: rgba(30, 62, 115, 0.98);
+
+    box-shadow: 0 6px 14px rgba(63, 111, 181, 0.10);
+}
+
+/* 지난 날짜 */
+.uprofile-root .user-profile-cal-cell.is-past {
+    opacity: 0.70;
+    color: rgba(55, 74, 110, 0.88);
+
+    border-color: rgba(63, 111, 181, 0.26);
+    background: rgba(248, 251, 255, 0.90);
+
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.uprofile-root .user-profile-cal-foot {
+    margin: 10px 2px 0;
+    font-size: 12px;
+    color: rgba(71, 85, 105, 0.84);
+    font-weight: 800;
+}
+
+/* ===============================
+   UserProfile EDIT MODE
+================================ */
+.uprofile-root .user-profile-edit-root {
+    margin-top: 20px;
+}
+
+.uprofile-root .user-profile-edit-header {
+    margin-bottom: 20px;
+}
+
+.uprofile-root .user-profile-edit-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.uprofile-root .user-profile-edit-hint {
+    font-size: 14px;
+    color: rgba(55, 74, 110, 0.80);
+}
+
+.uprofile-root .user-profile-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.uprofile-root .user-profile-span-all {
+    grid-column: 1 / -1;
+}
+
+.uprofile-root .user-profile-field-label {
+    font-size: 13px;
+    font-weight: 720;
+    color: rgba(56, 76, 112, 0.82);
+    margin-bottom: 6px;
+}
+
+.uprofile-root .user-profile-input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+
+    border: 1px solid rgba(63, 111, 181, 0.34);
+    color: rgba(45, 62, 92, 0.96);
+    font-size: 14px;
+
+    background: rgba(255, 255, 255, 0.965);
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.06),
+        0 1px 2px rgba(15, 23, 42, 0.04);
+
+    transition: border-color var(--up-ease), box-shadow var(--up-ease), background var(--up-ease);
+}
+
+.uprofile-root .user-profile-input::placeholder {
+    color: rgba(86, 106, 138, 0.86);
+}
+
+.uprofile-root .user-profile-input:focus {
+    outline: none;
+    border-color: rgba(63, 111, 181, 0.58);
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.08),
+        0 0 0 3px rgba(63, 111, 181, 0.10);
+    background: rgba(255, 255, 255, 0.985);
+}
+
+.uprofile-root .user-profile-textarea {
+    resize: vertical;
+}
+
+.uprofile-root .user-profile-avatar-preview {
+    width: 80px;
+    height: 80px;
+    margin-top: 8px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.uprofile-root .user-profile-cat-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.uprofile-root .user-profile-cat-on {
+    padding: 6px 12px;
+    border-radius: 20px;
+
+    border: 1px solid rgba(63, 111, 181, 0.62);
+    background: rgba(210, 230, 255, 0.95);
+    color: #244e86;
+
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* on(선택) 강화 */
+.uprofile-root .user-profile-cat-on {
+    border-color: rgba(63, 111, 181, 0.52);
+}
+
+.uprofile-root .user-profile-cat-off {
+    padding: 6px 12px;
+    border-radius: 20px;
+
+    border: 1px solid rgba(63, 111, 181, 0.32);
+    background: rgba(241, 245, 249, 0.92);
+    color: rgba(55, 74, 110, 0.82);
+
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.uprofile-root .user-profile-edit-footer {
+    margin-top: 24px;
+    display: flex;
+    gap: 10px;
+}
+
+.uprofile-root .user-profile-btn-save {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+
+    background: var(--up-primary);
+    color: #fff;
+
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Cancel button (통일 버전) */
+.uprofile-root .user-profile-btn-cancel {
+    padding: 10px 20px;
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(63, 111, 181, 0.35);
+    color: rgba(55, 74, 110, 0.88);
+
+    font-weight: 700;
+    cursor: pointer;
+
+    transition: background var(--up-ease), border-color var(--up-ease), color var(--up-ease), transform var(--up-ease);
+}
+
+.uprofile-root .user-profile-btn-cancel:hover {
+    background: rgba(210, 230, 255, 0.95);
+    border-color: rgba(63, 111, 181, 0.55);
+    color: #244e86;
+    transform: translateY(-1px);
+}
+
+/* Responsive for header/actions */
+@media (max-width: 850px) {
+    .uprofile-root .user-profile-view-header {
+        padding: 16px 14px;
+    }
+
+    .uprofile-root .user-profile-view-actions {
+        width: 100%;
+        align-items: flex-start;
+    }
 }

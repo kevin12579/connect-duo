@@ -33,21 +33,21 @@ export const initSocket = (token) => {
 export const getSocket = () => socket;
 
 /**
- * ✅ FIX BUG4: 새로고침(F5) 후 socket이 null인 경우 자동 복구
- *
- * ChatRoom, ChatList 컴포넌트에서는 getSocket() 대신 이 함수를 사용하세요.
- * 소켓이 없거나 끊겨있으면 sessionStorage의 accessToken으로 자동 재연결합니다.
+ * ✅ FIX: 소켓이 재연결 중(disconnected but active)이면 그대로 반환
+ * 완전히 null이거나 수동 disconnect된 경우에만 새로 생성
  */
 export const ensureSocket = () => {
-    if (socket && socket.connected) return socket;
+    // 소켓이 있으면 (연결 중이든, 재연결 대기 중이든) 그대로 반환
+    if (socket) return socket;
 
+    // 소켓 자체가 없을 때만 새로 생성
     const token = sessionStorage.getItem('accessToken');
     if (!token) {
         console.warn('[Socket] accessToken이 없습니다. 로그인이 필요합니다.');
         return null;
     }
 
-    console.log('[Socket] 소켓 없음 또는 끊김 → 재연결 시도');
+    console.log('[Socket] 소켓 없음 → 새로 생성');
     return initSocket(token);
 };
 

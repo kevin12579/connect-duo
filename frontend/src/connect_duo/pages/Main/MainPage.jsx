@@ -1,3 +1,7 @@
+// MainPage.js (FULL) - creditStyles 제거 + CSS className 적용 (main-credit-...)
+// ✅ 요청대로: "헤더 크레딧 span만" 숫자/글자 분리(span 추가)만 적용
+// ✅ 나머지 로직/구조/클래스명은 그대로 유지
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -93,9 +97,14 @@ export default function MainPage() {
                         const res = await getUserProfile(parsedBackup.id);
                         if (res.result === 'success') {
                             const userData = res.data.user;
-                            loginAuthUser({ ...userData, accessToken: newAt });
-                            setDbUser({ ...userData, avatarUrl: userData.profile_img });
-                            localStorage.setItem('userBackup', JSON.stringify(userData));
+                            // ✅ user_type은 로그인 시 저장된 값을 우선 보존 (getUserProfile이 없을 수 있음)
+                            const mergedUser = {
+                                ...userData,
+                                user_type: userData.user_type || parsedBackup.user_type,
+                            };
+                            loginAuthUser({ ...mergedUser, accessToken: newAt });
+                            setDbUser({ ...mergedUser, avatarUrl: mergedUser.profile_img });
+                            localStorage.setItem('userBackup', JSON.stringify(mergedUser));
                         }
                     } catch (profileErr) {
                         console.warn('[Auth] 최신 프로필 동기화 실패:', profileErr?.message);
@@ -113,8 +122,7 @@ export default function MainPage() {
         initAuth();
     }, [loginAuthUser, logout, setAuthLoading]);
 
-    // ✅ 2. [추가] 크레딧 로드 전용 useEffect
-    // authUser.id가 바뀌는 순간(로그인, 복구 등) 자동으로 크레딧을 가져옵니다.
+    // ✅ 2. 크레딧 로드 전용 useEffect
     useEffect(() => {
         const fetchCredit = async () => {
             const userId = authUser?.id || JSON.parse(localStorage.getItem('userBackup') || 'null')?.id;
@@ -130,7 +138,7 @@ export default function MainPage() {
             }
         };
         fetchCredit();
-    }, [authUser?.id]); // ID 감시
+    }, [authUser?.id]);
 
     useEffect(() => {
         if (!isChatOpen) setLockMainSearch(false);
@@ -158,6 +166,7 @@ export default function MainPage() {
     const handleChargeCredit = async (amount, description) => {
         const userId = authUser?.id || JSON.parse(localStorage.getItem('userBackup') || 'null')?.id;
         if (!userId) return;
+
         try {
             const res = await chargeCredit(userId, amount, description);
             if (res.result === 'success') {
@@ -206,8 +215,9 @@ export default function MainPage() {
     const renderProfile = () => {
         if (profileView === 'USER_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
         if (profileView === 'TAX_PROFILE') return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
-        if (profileView === 'TAX_DETAIL_VIEW')
+        if (profileView === 'TAX_DETAIL_VIEW') {
             return <TaxProfile viewerRole={profileNav?.viewerRole || 'USER'} nav={profileNav} />;
+        }
         return <UserProfile onOpenTaxProProfile={openTaxProFromUser} />;
     };
 
@@ -220,6 +230,7 @@ export default function MainPage() {
         if (selected === 'login') {
             if (authUser && displayUser) {
                 const userPhoto = displayUser.profile_img || displayUser.avatarUrl;
+
                 return (
                     <div className="welcome-container">
                         <div className="welcome-header">
@@ -244,6 +255,7 @@ export default function MainPage() {
                                     <span>{String(displayUser?.name || 'U').charAt(0)}</span>
                                 )}
                             </div>
+
                             <div className="welcome-text">
                                 <h2>
                                     반가워요,{' '}
@@ -256,16 +268,18 @@ export default function MainPage() {
                             </div>
                         </div>
 
-                        {/* 크레딧 배너 */}
-                        <div style={creditStyles.banner}>
-                            <div style={creditStyles.bannerLeft}>
-                                <span style={creditStyles.bannerIcon}>💳</span>
+                        {/* ✅ 크레딧 배너 (CSS class) */}
+                        <div className="main-credit-banner">
+                            <div className="main-credit-banner-left">
+                                <span className="main-credit-banner-icon">💳</span>
                                 <div>
-                                    <div style={creditStyles.bannerLabel}>내 크레딧</div>
-                                    <div style={creditStyles.bannerValue}>{userCredit.toLocaleString()} C</div>
+                                    <div className="main-credit-banner-label">내 크레딧</div>
+                                    <div className="main-credit-banner-value">
+                                        <span className="credit-num">{userCredit.toLocaleString()}</span> C
+                                    </div>
                                 </div>
                             </div>
-                            <button style={creditStyles.chargeBtn} onClick={() => setShowCreditModal(true)}>
+                            <button className="main-credit-banner-charge" onClick={() => setShowCreditModal(true)}>
                                 충전하기
                             </button>
                         </div>
@@ -303,7 +317,6 @@ export default function MainPage() {
                         loginAuthUser({ ...data });
                         setSelected('profile');
                         setProfileView(data.user_type === 'TAX_ACCOUNTANT' ? 'TAX_PROFILE' : 'USER_PROFILE');
-                        // 여기서 getCredit을 직접 호출하지 않아도 위쪽 useEffect가 authUser 변화를 감지해 처리합니다.
                     }}
                     setDbUser={setDbUser}
                     onGoSignup={() => setAuthView('signup')}
@@ -337,10 +350,16 @@ export default function MainPage() {
                             </div>
                         </div>
 
+                        {/* ✅ 헤더 크레딧 (CSS class) */}
                         {authUser && (
-                            <div style={creditStyles.headerCredit}>
-                                <span>💳 {userCredit.toLocaleString()} 크레딧</span>
-                                <button style={creditStyles.headerChargeBtn} onClick={() => setShowCreditModal(true)}>
+                            <div className="main-credit-header">
+                                {/* ✅ 여기만 수정: 숫자만 credit-num에 넣고, '크레딧'은 credit-word로 분리 */}
+                                <span className="main-credit-header-text">
+                                    💳 <span className="credit-num">{userCredit.toLocaleString()}</span>{' '}
+                                    <span className="credit-word">크레딧</span>
+                                </span>
+
+                                <button className="main-credit-header-btn" onClick={() => setShowCreditModal(true)}>
                                     + 충전
                                 </button>
                             </div>
@@ -434,30 +453,22 @@ export default function MainPage() {
                 <div className="mainpage-content-card">{renderContent()}</div>
             </div>
 
-            {/* 크레딧 충전 모달 */}
+            {/* ✅ 크레딧 충전 모달 (CSS class) */}
             {showCreditModal && (
-                <div style={creditStyles.overlay} onClick={() => setShowCreditModal(false)}>
-                    <div style={creditStyles.modal} onClick={(e) => e.stopPropagation()}>
-                        <h3 style={creditStyles.modalTitle}>💳 크레딧 충전</h3>
-                        <p style={creditStyles.modalSub}>
+                <div className="main-credit-overlay" onClick={() => setShowCreditModal(false)}>
+                    <div className="main-credit-modal" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="main-credit-modal-title">💳 크레딧 충전</h3>
+
+                        <p className="main-credit-modal-sub">
                             현재 잔액:{' '}
-                            <strong style={{ color: '#3d6fd9' }}>{userCredit.toLocaleString()} 크레딧</strong>
+                            <strong className="main-credit-modal-strong">{userCredit.toLocaleString()} 크레딧</strong>
                         </p>
-                        <div style={creditStyles.pkgGrid}>
+
+                        <div className="main-credit-pkg-grid">
                             {CREDIT_PACKAGES.map((pkg) => (
                                 <button
                                     key={pkg.price}
-                                    style={creditStyles.pkgBtn}
-                                    onMouseOver={(e) => {
-                                        e.currentTarget.style.background = '#e8eeff';
-                                        e.currentTarget.style.borderColor = '#5a8cf1';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.currentTarget.style.background = '#f4f7ff';
-                                        e.currentTarget.style.borderColor = '#e8eeff';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                    }}
+                                    className="main-credit-pkg-btn"
                                     onClick={() => {
                                         if (
                                             window.confirm(
@@ -468,14 +479,16 @@ export default function MainPage() {
                                         }
                                     }}
                                 >
-                                    <div style={creditStyles.pkgCredit}>{pkg.credit.toLocaleString()}</div>
-                                    <div style={creditStyles.pkgCreditLabel}>크레딧</div>
-                                    <div style={creditStyles.pkgPrice}>{pkg.label}</div>
+                                    <div className="main-credit-pkg-credit">{pkg.credit.toLocaleString()}</div>
+                                    <div className="main-credit-pkg-unit">크레딧</div>
+                                    <div className="main-credit-pkg-label">{pkg.label}</div>
                                 </button>
                             ))}
                         </div>
-                        <p style={creditStyles.notice}>💡 크레딧은 채팅 상담, 서비스 이용 등에 사용됩니다.</p>
-                        <button style={creditStyles.closeBtn} onClick={() => setShowCreditModal(false)}>
+
+                        <p className="main-credit-modal-tip">💡 크레딧은 채팅 상담, 서비스 이용 등에 사용됩니다.</p>
+
+                        <button className="main-credit-modal-close" onClick={() => setShowCreditModal(false)}>
                             닫기
                         </button>
                     </div>
@@ -484,106 +497,3 @@ export default function MainPage() {
         </div>
     );
 }
-
-const creditStyles = {
-    headerCredit: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        fontSize: '0.9rem',
-        fontWeight: 700,
-        color: '#3d6fd9',
-        marginBottom: 4,
-    },
-    headerChargeBtn: {
-        padding: '3px 12px',
-        borderRadius: 20,
-        border: '1.5px solid #5a8cf1',
-        background: '#fff',
-        color: '#5a8cf1',
-        fontWeight: 700,
-        cursor: 'pointer',
-        fontSize: '0.82rem',
-    },
-    banner: {
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: 'linear-gradient(135deg, #eef2ff 0%, #e0e9ff 100%)',
-        borderRadius: 18,
-        padding: '16px 22px',
-        border: '1.5px solid #c7d8ff',
-    },
-    bannerLeft: { display: 'flex', alignItems: 'center', gap: 14 },
-    bannerIcon: { fontSize: '2rem' },
-    bannerLabel: { fontSize: '0.82rem', color: '#7a92c0', fontWeight: 600 },
-    bannerValue: { fontSize: '1.5rem', fontWeight: 900, color: '#3d6fd9', letterSpacing: '-0.5px' },
-    chargeBtn: {
-        padding: '10px 22px',
-        borderRadius: 14,
-        border: 'none',
-        background: '#5a8cf1',
-        color: '#fff',
-        fontWeight: 800,
-        fontSize: '0.95rem',
-        cursor: 'pointer',
-    },
-    overlay: {
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        backdropFilter: 'blur(3px)',
-    },
-    modal: {
-        background: '#fff',
-        borderRadius: 26,
-        padding: '38px 36px',
-        width: 480,
-        maxWidth: '95vw',
-        boxShadow: '0 30px 80px rgba(0,0,0,0.22)',
-    },
-    modalTitle: { margin: '0 0 10px', fontSize: '1.5rem', fontWeight: 900, color: '#222' },
-    modalSub: { color: '#666', marginBottom: 26, fontSize: '1rem' },
-    pkgGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 },
-    pkgBtn: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 3,
-        padding: '18px 12px',
-        borderRadius: 16,
-        border: '2px solid #e8eeff',
-        background: '#f4f7ff',
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-    },
-    pkgCredit: { fontSize: '1.25rem', fontWeight: 900, color: '#3d6fd9' },
-    pkgCreditLabel: { fontSize: '0.72rem', color: '#9ab' },
-    pkgPrice: {
-        fontSize: '0.9rem',
-        fontWeight: 700,
-        color: '#222',
-        marginTop: 5,
-        background: '#e8f0fe',
-        padding: '3px 10px',
-        borderRadius: 20,
-    },
-    notice: { fontSize: '0.82rem', color: '#888', textAlign: 'center', marginBottom: 18 },
-    closeBtn: {
-        width: '100%',
-        padding: '14px',
-        borderRadius: 14,
-        border: 'none',
-        background: '#f0f0f0',
-        color: '#555',
-        fontWeight: 800,
-        fontSize: '1rem',
-        cursor: 'pointer',
-    },
-};
