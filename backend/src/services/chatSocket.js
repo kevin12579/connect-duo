@@ -101,5 +101,13 @@ module.exports = (io) => {
                 }
             }
         });
+
+        socket.on('timer_sync', ({ roomId, consultSec, billingSec }) => {
+            socket.to(String(roomId)).emit('timer_sync', { consultSec, billingSec });
+        });
+
+        socket.on('request_timer_sync', ({ roomId }) => {
+            socket.to(String(roomId)).emit('request_timer_sync', { roomId });
+        });
     });
 };
