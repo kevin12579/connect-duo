@@ -197,7 +197,8 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     }, [isMyTypeUser, ratePerBilling, rid, MY_ID, roomInfo, fetchUserCredit]);
 
-    // ✅ 타이머: USER가 마스터, 10초마다 세무사에게 sync emit
+    // ✅ 문제3: 세무사도 타이머 표시 (isMyTypeUser 조건 제거)
+    // ✅ 문제2: 5초마다 localStorage에 타이머 저장
     useEffect(() => {
         if (roomClosed || ratePerBilling <= 0) return;
         if (timerRef.current) clearInterval(timerRef.current);
@@ -211,8 +212,8 @@ export default function ChatRoom({ roomId, onBack }) {
             if (billingRef.current.consultSec % 5 === 0) {
                 saveTimer(billingRef.current.consultSec, billingRef.current.billingSec);
             }
-            // USER가 10초마다 세무사에게 타이머 동기화 emit
-            if (isMyTypeUser && billingRef.current.consultSec % 10 === 0) {
+            // USER가 3초마다 세무사에게 타이머 동기화 emit
+            if (isMyTypeUser && billingRef.current.consultSec % 3 === 0) {
                 const sock = ensureSocket();
                 if (sock)
                     sock.emit('timer_sync', {
@@ -224,7 +225,7 @@ export default function ChatRoom({ roomId, onBack }) {
             if (billingRef.current.billingSec <= 0) {
                 billingRef.current.billingSec = BILLING_INTERVAL;
                 setBillingSec(BILLING_INTERVAL);
-                if (isMyTypeUser) handleBilling();
+                if (isMyTypeUser) handleBilling(); // USER만 실제 결제 처리
             }
         }, 1000);
         return () => {
@@ -295,14 +296,26 @@ export default function ChatRoom({ roomId, onBack }) {
 
         // ✅ 타이머 동기화: 세무사가 USER로부터 수신
         const onTimerSync = ({ consultSec: cs, billingSec: bs }) => {
-            if (isMyTypeUser) return; // USER는 무시
+            if (isMyTypeUser) return;
             billingRef.current.consultSec = cs;
             billingRef.current.billingSec = bs;
             setConsultSec(cs);
             setBillingSec(bs);
         };
+        // ✅ USER: 세무사가 join 시 즉시 현재 타이머 전송 요청 수신
+        const onRequestTimerSync = ({ roomId: reqRid }) => {
+            if (!isMyTypeUser || String(reqRid) !== rid) return;
+            const sock = ensureSocket();
+            if (sock)
+                sock.emit('timer_sync', {
+                    roomId: rid,
+                    consultSec: billingRef.current.consultSec,
+                    billingSec: billingRef.current.billingSec,
+                });
+        };
 
         socket.on('timer_sync', onTimerSync);
+        socket.on('request_timer_sync', onRequestTimerSync);
         socket.on('receive_message', onReceiveMessage);
         socket.on('ROOM_CLOSED', onRoomClosed);
         socket.on('credit_shortage', onCreditShortage);
@@ -312,7 +325,13 @@ export default function ChatRoom({ roomId, onBack }) {
         socket.on('user_offline', onUserOffline);
 
         // ✅ 문제4 핵심: connected 상태 확인 후 join_room - 아직 연결 중이면 connect 이후 emit
-        const doJoin = () => socket.emit('join_room', rid);
+        const doJoin = () => {
+            socket.emit('join_room', rid);
+            // 세무사가 방 진입 시 USER에게 현재 타이머 즉시 요청
+            if (!isMyTypeUser) {
+                socket.emit('request_timer_sync', { roomId: rid });
+            }
+        };
         if (socket.connected) {
             doJoin();
         } else {
@@ -323,6 +342,7 @@ export default function ChatRoom({ roomId, onBack }) {
             socket.off('connect', doJoin);
             socket.emit('leave_room', rid);
             socket.off('timer_sync', onTimerSync);
+            socket.off('request_timer_sync', onRequestTimerSync);
             socket.off('receive_message', onReceiveMessage);
             socket.off('ROOM_CLOSED', onRoomClosed);
             socket.off('credit_shortage', onCreditShortage);
