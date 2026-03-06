@@ -725,7 +725,7 @@
 .uprofile-root .user-profile-info-label {
     font-size: 0.72rem;
     font-weight: 800;
-    color: rgba(71, 85, 105, 0.72);
+    color: rgba(71, 85, 105, 0.84);
     margin-bottom: 3px;
 }
 
@@ -740,26 +740,42 @@
     flex-wrap: wrap;
     gap: 6px;
     margin-top: 4px;
+    max-height: 60px;   /* 태그 2줄 높이 */
+    overflow-y: auto;
+    padding-right: 2px; /* 스크롤 여유 */
+}
+
+.uprofile-root .user-profile-tag-row::-webkit-scrollbar {
+    width: 6px;
+}
+
+.uprofile-root .user-profile-tag-row::-webkit-scrollbar-thumb {
+    background: rgba(63,111,181,0.48);
+    border-radius: 999px;
+}
+
+.uprofile-root .user-profile-tag-row::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .uprofile-root .user-profile-tag-blue {
     padding: 3px 10px;
     border-radius: 20px;
-    background: rgba(238, 242, 255, 0.95);
-    color: #3d6fd9;
+    background: rgba(231, 239, 253, 0.96);
+    color: #335f9f;
     font-size: 0.78rem;
     font-weight: 800;
-    border: 1px solid rgba(63, 111, 181, 0.20);
+    border: 1px solid rgba(63, 111, 181, 0.42);
 }
 
 .uprofile-root .user-profile-tag-green {
     padding: 3px 10px;
     border-radius: 20px;
-    background: rgba(232, 245, 233, 0.95);
-    color: #2e7d32;
+    background: rgba(230, 242, 234, 0.96);
+    color: #3d7253;
     font-size: 0.78rem;
     font-weight: 800;
-    border: 1px solid rgba(46, 125, 50, 0.22);
+    border: 1px solid rgba(76, 124, 92, 0.42);
 }
 
 .uprofile-root .user-profile-user-bio-display {

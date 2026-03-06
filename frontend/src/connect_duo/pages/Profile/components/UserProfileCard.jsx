@@ -86,13 +86,55 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
         }));
 
     const handleSave = () => {
-        onSave?.({ ...draft }); // ← UserProfile.jsx handleSave 호출
+        onSave?.({
+            ...draft,
+            experience_years: Number(draft.experience_years) || 0,
+            monthly_fee: Number(draft.monthly_fee) || 0,
+            chat_rate_per_10min: Number(draft.chat_rate_per_10min) || 0,
+        });
         setMode('view');
     };
 
     const handleCancel = () => {
         setDraft(buildDraft());
         setMode('view');
+    };
+
+    /* ── 숫자 input 전용 핸들러 ── */
+    const handleNumberFocus = (field) => {
+        setDraft((p) => ({
+            ...p,
+            [field]: Number(p[field]) === 0 ? '' : String(p[field]),
+        }));
+    };
+
+    const handleNumberChange = (field, rawValue) => {
+        // 빈값 허용
+        if (rawValue === '') {
+            setDraft((p) => ({ ...p, [field]: '' }));
+            return;
+        }
+
+        // 숫자만 허용
+        if (!/^\d+$/.test(rawValue)) return;
+
+        setDraft((p) => ({
+            ...p,
+            [field]: rawValue,
+        }));
+    };
+
+    const handleNumberBlur = (field) => {
+        setDraft((p) => {
+            const raw = p[field];
+
+            if (raw === '' || raw === null || raw === undefined) {
+                return { ...p, [field]: 0 };
+            }
+
+            const num = Math.max(0, Number(raw) || 0);
+            return { ...p, [field]: num };
+        });
     };
 
     /* ── 크레딧 내역 불러오기 ── */
@@ -123,7 +165,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
 
         return (
             <div className="user-profile-cal-wrap">
-                {/* 월 네비게이션 */}
                 <div className="user-profile-cal-header">
                     <button
                         type="button"
@@ -154,7 +195,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                     </button>
                 </div>
 
-                {/* 요일 헤더 + 날짜 */}
                 <div className="user-profile-cal-grid">
                     {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
                         <div key={d} className="user-profile-cal-weekday">
@@ -192,15 +232,10 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
 
     if (!user) return null;
 
-    /* ══════════════════════════════════════════════════════
-       VIEW MODE
-    ══════════════════════════════════════════════════════ */
     if (mode === 'view')
         return (
             <div className="user-profile-card-root">
-                {/* ── 헤더: 아바타 + 기본정보 + 액션 버튼 ── */}
                 <div className="user-profile-view-header">
-                    {/* 아바타 */}
                     <div className="user-profile-avatar-col">
                         {user.avatarUrl ? (
                             <img
@@ -216,7 +251,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                         )}
                     </div>
 
-                    {/* 이름·아이디·크레딧 */}
                     <div className="user-profile-view-info">
                         <div className="user-profile-name-row">
                             <span className="user-profile-name-text">{user.name}</span>
@@ -224,7 +258,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                         </div>
                         <div className="user-profile-username">@{user.username}</div>
 
-                        {/* 크레딧 바 */}
                         <div className="user-profile-credit-bar">
                             <span className="user-profile-credit-icon" aria-hidden="true">
                                 💳
@@ -246,7 +279,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                         </div>
                     </div>
 
-                    {/* 오른쪽 액션 버튼 */}
                     <div className="user-profile-view-actions">
                         <button className="user-profile-btn-edit" onClick={() => setMode('edit')}>
                             ✏️ 프로필 편집
@@ -257,7 +289,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                     </div>
                 </div>
 
-                {/* ── 세무사 상세 정보 그리드 ── */}
                 {isTax && (
                     <div className="user-profile-tax-grid">
                         <InfoBox icon="📝" label="한줄 소개" value={user.bio || user.bio_one_line || '미등록'} wide />
@@ -285,7 +316,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                         />
                         <InfoBox icon="🕐" label="상담 가능 시간" value={user.available_hours || '미등록'} />
 
-                        {/* 전문 분야 */}
                         <div className="user-profile-info-box wide">
                             <span className="user-profile-info-icon">🎯</span>
                             <div className="user-profile-info-body">
@@ -304,7 +334,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                             </div>
                         </div>
 
-                        {/* 상담 가능 일정 */}
                         <div className="user-profile-info-box wide">
                             <span className="user-profile-info-icon">📅</span>
                             <div className="user-profile-info-body">
@@ -325,10 +354,8 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                     </div>
                 )}
 
-                {/* 일반 유저 한줄 소개 */}
                 {!isTax && user.bio && <div className="user-profile-user-bio-display">{user.bio}</div>}
 
-                {/* ── 크레딧 충전 모달 ── */}
                 {showCreditModal && (
                     <Overlay onClose={() => setShowCreditModal(false)}>
                         <h3 className="user-profile-modal-title">💳 크레딧 충전</h3>
@@ -370,7 +397,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                     </Overlay>
                 )}
 
-                {/* ── 크레딧 거래 내역 모달 ── */}
                 {showHistoryModal && (
                     <Overlay onClose={() => setShowHistoryModal(false)}>
                         <h3 className="user-profile-modal-title">📋 크레딧 거래 내역</h3>
@@ -425,21 +451,14 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
             </div>
         );
 
-    /* ══════════════════════════════════════════════════════
-       EDIT MODE
-       ★ 저장 버튼은 폼 최하단에 항상 고정
-    ══════════════════════════════════════════════════════ */
     return (
         <div className="user-profile-edit-root">
-            {/* 편집 헤더 */}
             <div className="user-profile-edit-header">
                 <h3 className="user-profile-edit-title">✏️ 프로필 편집</h3>
                 <span className="user-profile-edit-hint">수정 후 하단의 [저장하기] 버튼을 눌러주세요</span>
             </div>
 
-            {/* 2-컬럼 편집 그리드 */}
             <div className="user-profile-edit-grid">
-                {/* 프로필 이미지 URL */}
                 <div className="user-profile-span-all">
                     <FL>프로필 이미지 URL</FL>
                     <input
@@ -460,7 +479,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                     )}
                 </div>
 
-                {/* 이름 */}
                 <div>
                     <FL>이름</FL>
                     <input
@@ -473,7 +491,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
 
                 {isTax ? (
                     <>
-                        {/* 한줄 소개 */}
                         <div>
                             <FL>한줄 소개</FL>
                             <input
@@ -484,7 +501,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                             />
                         </div>
 
-                        {/* 회사명 */}
                         <div>
                             <FL>회사명 (상호명)</FL>
                             <input
@@ -495,7 +511,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                             />
                         </div>
 
-                        {/* 사무실 주소 */}
                         <div>
                             <FL>사무실 주소</FL>
                             <input
@@ -506,7 +521,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                             />
                         </div>
 
-                        {/* 경력 */}
                         <div>
                             <FL>경력 (년)</FL>
                             <input
@@ -514,13 +528,12 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                                 type="number"
                                 min="0"
                                 value={draft.experience_years}
-                                onChange={(e) =>
-                                    setDraft((p) => ({ ...p, experience_years: parseInt(e.target.value) || 0 }))
-                                }
+                                onFocus={() => handleNumberFocus('experience_years')}
+                                onChange={(e) => handleNumberChange('experience_years', e.target.value)}
+                                onBlur={() => handleNumberBlur('experience_years')}
                             />
                         </div>
 
-                        {/* 기장료 */}
                         <div>
                             <FL>기장료 (원/월)</FL>
                             <input
@@ -528,12 +541,13 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                                 type="number"
                                 min="0"
                                 value={draft.monthly_fee}
-                                onChange={(e) => setDraft((p) => ({ ...p, monthly_fee: parseInt(e.target.value) || 0 }))}
+                                onFocus={() => handleNumberFocus('monthly_fee')}
+                                onChange={(e) => handleNumberChange('monthly_fee', e.target.value)}
+                                onBlur={() => handleNumberBlur('monthly_fee')}
                                 placeholder="예: 100000"
                             />
                         </div>
 
-                        {/* 10분 채팅 요금 */}
                         <div>
                             <FL>10분 채팅 요금 (원)</FL>
                             <input
@@ -541,14 +555,13 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                                 type="number"
                                 min="0"
                                 value={draft.chat_rate_per_10min}
-                                onChange={(e) =>
-                                    setDraft((p) => ({ ...p, chat_rate_per_10min: parseInt(e.target.value) || 0 }))
-                                }
+                                onFocus={() => handleNumberFocus('chat_rate_per_10min')}
+                                onChange={(e) => handleNumberChange('chat_rate_per_10min', e.target.value)}
+                                onBlur={() => handleNumberBlur('chat_rate_per_10min')}
                                 placeholder="예: 5000"
                             />
                         </div>
 
-                        {/* 상담 가능 시간 */}
                         <div>
                             <FL>상담 가능 시간</FL>
                             <input
@@ -559,7 +572,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                             />
                         </div>
 
-                        {/* 전문 분야 */}
                         <div className="user-profile-span-all">
                             <FL>전문 분야 (여러 개 선택 가능)</FL>
                             <div className="user-profile-cat-wrap">
@@ -576,14 +588,12 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                             </div>
                         </div>
 
-                        {/* 상담 일정 캘린더 */}
                         <div className="user-profile-span-all">
                             <FL>📅 상담 가능 일정 (날짜 클릭으로 선택 / 다시 클릭으로 해제)</FL>
                             {renderCalendar()}
                         </div>
                     </>
                 ) : (
-                    /* 일반 유저 */
                     <div>
                         <FL>한줄 소개</FL>
                         <textarea
@@ -597,7 +607,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                 )}
             </div>
 
-            {/* ★★★ 저장 / 취소 버튼 — 항상 폼 하단에 위치 ★★★ */}
             <div className="user-profile-edit-footer">
                 <button className="user-profile-btn-save" onClick={handleSave}>
                     💾 저장하기
@@ -610,7 +619,6 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
     );
 }
 
-/* ─── 서브 컴포넌트 ─── */
 function FL({ children }) {
     return <div className="user-profile-field-label">{children}</div>;
 }
