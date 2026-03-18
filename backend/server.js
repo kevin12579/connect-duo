@@ -52,6 +52,6 @@ app.use('/api/credit', creditRouter); // ★ 추가
 
 socketHandler(io);
 
-server.listen(port, address, () => {
+server.listen(address, () => {
     console.log(`Server running at ${address}`);
 });
