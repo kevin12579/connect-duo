@@ -2,8 +2,8 @@
 import axios from 'axios';
 import { checkTokenExpiration, refreshAccessToken } from '../utils/authUtils';
 import { initSocket, disconnectSocket } from './chatAxios';
-
-const BASE_URL = `http://localhost:7777/api/`;
+const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:7777';
+const BASE_URL = `${SOCKET_URL}/api/`;
 
 // [1] 인증 불필요
 export const axiosBase = axios.create({
