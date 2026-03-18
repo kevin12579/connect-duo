@@ -15,6 +15,7 @@ const chatRouter = require('./src/routes/chatRouter');
 const creditRouter = require('./src/routes/creditRouter'); // ★ 추가
 const socketHandler = require('./src/services/chatSocket');
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const address = process.env.ADDRESS || 'localhost';
 const port = process.env.PORT || 7777;
 const app = express();
@@ -22,7 +23,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: `http://${address}:3000`,
+        origin: FRONTEND_URL,
         credentials: true,
     },
 });
@@ -31,7 +32,7 @@ app.set('io', io);
 
 app.use(
     cors({
-        origin: `http://${address}:3000`,
+        origin: FRONTEND_URL,
         credentials: true,
     }),
 );
