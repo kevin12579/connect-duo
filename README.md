@@ -21,10 +21,14 @@
 # 1. 레포지토리 클론
 git clone https://github.com/kevin12579/connect-duo.git
 
-# 2. 의존성 설치
+# 2. 백엔드 실행
+cd backend
 npm install
+node server.js
 
-# 3. 실행하기
+# 3. 프론트엔드 실행 (새 터미널)
+cd frontend
+npm install
 npm start
 ```
 

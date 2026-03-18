@@ -1,4 +1,3 @@
-// src/pages/RankingPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getTaxProRanking, purchaseAd, cancelAd } from '../../api/axios';
@@ -8,6 +7,8 @@ import rankGold from '../../assets/gold-1st.png';
 import rankSilver from '../../assets/silver-2st.png';
 import rankBronze from '../../assets/bronze-3rd.png';
 import adPng from '../../assets/ad.png';
+import rightNext from '../../assets/right-next.png';
+import rightEnd from '../../assets/right-end.png';
 
 /* ─── 상수 ────────────────────────────────────── */
 const ALL_CATEGORIES = [
@@ -37,6 +38,8 @@ const AD_PLANS = [
   { days: 90, price: 80000, label: '90일', tag: '인기' },
 ];
 
+const NORMAL_PAGE_SIZE = 5;
+
 /* ─── 유틸 ─────────────────────────────────────── */
 const isAdActive = (item) =>
   !!(item.is_ad && item.ad_expires_at && new Date(item.ad_expires_at) > new Date());
@@ -54,6 +57,7 @@ export default function RankingPage({ onOpenTaxProProfile }) {
   const [sortKey, setSortKey] = useState('satisfaction_score');
   const [adModal, setAdModal] = useState(null); // null | 'purchase' | 'cancel'
   const [adLoading, setAdLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
   /* 로그인 유저 */
   const me = useMemo(() => {
@@ -81,20 +85,42 @@ export default function RankingPage({ onOpenTaxProProfile }) {
   };
   useEffect(fetchList, []);
 
-  /* 필터 + 정렬 + AD 상단 고정 */
-  const filtered = useMemo(() => {
-    const base = (Array.isArray(list) ? list : [])
+  /* 필터 + 정렬 */
+  const filteredBase = useMemo(() => {
+    return (Array.isArray(list) ? list : [])
       .filter(
         (item) =>
           selectedCategory === '전체' ||
           (Array.isArray(item.categories) && item.categories.includes(selectedCategory)),
       )
       .sort((a, b) => Number(b?.[sortKey] || 0) - Number(a?.[sortKey] || 0));
-
-    const adItems = base.filter(isAdActive);
-    const normalItems = base.filter((i) => !isAdActive(i));
-    return [...adItems, ...normalItems];
   }, [list, selectedCategory, sortKey]);
+
+  /* 광고 / 일반 분리 */
+  const adItems = useMemo(() => filteredBase.filter(isAdActive), [filteredBase]);
+  const normalItems = useMemo(() => filteredBase.filter((i) => !isAdActive(i)), [filteredBase]);
+
+  /* 일반 카드 페이징 */
+  const totalPages = Math.max(1, Math.ceil(normalItems.length / NORMAL_PAGE_SIZE));
+
+  const pagedNormalItems = useMemo(() => {
+    const start = (page - 1) * NORMAL_PAGE_SIZE;
+    return normalItems.slice(start, start + NORMAL_PAGE_SIZE);
+  }, [normalItems, page]);
+
+  const visibleItems = useMemo(() => {
+    return [...adItems, ...pagedNormalItems];
+  }, [adItems, pagedNormalItems]);
+
+  /* 필터/정렬 바뀌면 첫 페이지로 */
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategory, sortKey]);
+
+  /* 현재 페이지가 범위 벗어나면 보정 */
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
 
   /* 광고 구매 */
   const handlePurchase = async (days) => {
@@ -151,7 +177,6 @@ export default function RankingPage({ onOpenTaxProProfile }) {
 
   return (
     <div className="ranking-root">
-      {/* 헤더 */}
       <div className="ranking-header">
         <h2 className="ranking-title">🏆 세무사 랭킹</h2>
 
@@ -167,7 +192,6 @@ export default function RankingPage({ onOpenTaxProProfile }) {
         )}
       </div>
 
-      {/* 필터 */}
       <div className="ranking-filter">
         <div className="ranking-filter-label">전문 분야</div>
         <div className="ranking-filter-row">
@@ -183,7 +207,6 @@ export default function RankingPage({ onOpenTaxProProfile }) {
         </div>
       </div>
 
-      {/* 정렬 */}
       <div className="ranking-sort-row">
         {SORT_OPTIONS.map((opt) => (
           <button
@@ -194,50 +217,95 @@ export default function RankingPage({ onOpenTaxProProfile }) {
             {opt.label}순
           </button>
         ))}
-        <span className="ranking-result-count">총 {filtered.length}명</span>
+        <span className="ranking-result-count">총 {filteredBase.length}명</span>
       </div>
 
-      {/* 리스트 */}
-      {filtered.length === 0 ? (
+      {filteredBase.length === 0 ? (
         <div className="ranking-empty">해당 분야의 세무사가 없습니다.</div>
       ) : (
-        <div className="ranking-list">
-          {filtered.map((item) => {
-            const ad = isAdActive(item);
-            const isMe = isTaxPro && String(item.user_id) === String(me?.id);
+        <>
+          <div className="ranking-list">
+            {visibleItems.map((item) => {
+              const ad = isAdActive(item);
+              const isMe = isTaxPro && String(item.user_id) === String(me?.id);
+              const rank = ad ? null : normalItems.findIndex((i) => String(i.user_id) === String(item.user_id)) + 1;
 
-            // 순위는 AD 제외한 일반 목록에서 계산
-            const normalItems = filtered.filter((i) => !isAdActive(i));
-            const rank = ad ? null : normalItems.indexOf(item) + 1;
+              return ad ? (
+                <AdCard
+                  key={`ad-${item.user_id}`}
+                  item={item}
+                  isMe={isMe}
+                  onOpen={() => onOpenTaxProProfile?.(item.user_id)}
+                  onManage={() => setAdModal(myAdActive ? 'cancel' : 'purchase')}
+                  adIcon={adPng}
+                />
+              ) : (
+                <NormalCard
+                  key={`normal-${item.user_id}`}
+                  item={item}
+                  rank={rank}
+                  isMe={isMe}
+                  myAdActive={myAdActive}
+                  onOpen={() => onOpenTaxProProfile?.(item.user_id)}
+                  onAdUpsell={() => setAdModal('purchase')}
+                  badgeGold={rankGold}
+                  badgeSilver={rankSilver}
+                  badgeBronze={rankBronze}
+                />
+              );
+            })}
+          </div>
 
-            return ad ? (
-              <AdCard
-                key={item.user_id}
-                item={item}
-                isMe={isMe}
-                onOpen={() => onOpenTaxProProfile?.(item.user_id)}
-                onManage={() => setAdModal(myAdActive ? 'cancel' : 'purchase')}
-                adIcon={adPng}
-              />
-            ) : (
-              <NormalCard
-                key={item.user_id}
-                item={item}
-                rank={rank}
-                isMe={isMe}
-                myAdActive={myAdActive}
-                onOpen={() => onOpenTaxProProfile?.(item.user_id)}
-                onAdUpsell={() => setAdModal('purchase')}
-                badgeGold={rankGold}
-                badgeSilver={rankSilver}
-                badgeBronze={rankBronze}
-              />
-            );
-          })}
-        </div>
+          {normalItems.length > NORMAL_PAGE_SIZE && (
+            <div className="ranking-pagination">
+              <button
+                className="ranking-pg-ctrl-btn"
+                onClick={() => setPage(1)}
+                disabled={page === 1}
+                aria-label="first"
+                title="처음"
+              >
+                <img className="ranking-pg-icon ranking-pg-rotate" src={rightEnd} alt="" aria-hidden="true" />
+              </button>
+
+              <button
+                className="ranking-pg-ctrl-btn"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                aria-label="prev"
+                title="이전"
+              >
+                <img className="ranking-pg-icon ranking-pg-rotate" src={rightNext} alt="" aria-hidden="true" />
+              </button>
+
+              <div className="ranking-pg-num-info">
+                {page} / {totalPages}
+              </div>
+
+              <button
+                className="ranking-pg-ctrl-btn"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                aria-label="next"
+                title="다음"
+              >
+                <img className="ranking-pg-icon" src={rightNext} alt="" aria-hidden="true" />
+              </button>
+
+              <button
+                className="ranking-pg-ctrl-btn"
+                onClick={() => setPage(totalPages)}
+                disabled={page === totalPages}
+                aria-label="last"
+                title="마지막"
+              >
+                <img className="ranking-pg-icon" src={rightEnd} alt="" aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </>
       )}
 
-      {/* 광고 구매 모달 (PORTAL) */}
       {adModal === 'purchase' && (
         <AdPurchaseModal
           plans={AD_PLANS}
@@ -248,7 +316,6 @@ export default function RankingPage({ onOpenTaxProProfile }) {
         />
       )}
 
-      {/* 광고 관리/취소 모달 (PORTAL) */}
       {adModal === 'cancel' && (
         <AdCancelModal
           item={myItem}
@@ -262,9 +329,6 @@ export default function RankingPage({ onOpenTaxProProfile }) {
   );
 }
 
-/* =========================
-   AD 카드 (정의 누락 방지)
-========================= */
 function AdCard({ item, isMe, onOpen, onManage, adIcon }) {
   const hasFee = item.chat_rate_per_10min > 0 || item.monthly_fee > 0;
 
@@ -320,13 +384,13 @@ function AdCard({ item, isMe, onOpen, onManage, adIcon }) {
             <div className="ad-fee-box" onClick={(e) => e.stopPropagation()}>
               {item.chat_rate_per_10min > 0 && (
                 <div className="ad-fee-row">
-                  <span className="ad-fee-label">💬 10분 채팅 상담</span>
+                  <span className="ad-fee-label">💰 10분 채팅 상담</span>
                   <span className="ad-fee-val">{item.chat_rate_per_10min.toLocaleString()}원</span>
                 </div>
               )}
               {item.monthly_fee > 0 && (
                 <div className="ad-fee-row">
-                  <span className="ad-fee-label">📋 기장료</span>
+                  <span className="ad-fee-label">🧾 기장료</span>
                   <span className="ad-fee-val">{item.monthly_fee.toLocaleString()}원/월</span>
                 </div>
               )}
@@ -341,7 +405,7 @@ function AdCard({ item, isMe, onOpen, onManage, adIcon }) {
                 onManage();
               }}
             >
-              ⚙️ 광고 관리
+              📢 광고 관리
             </button>
           )}
         </div>
@@ -369,9 +433,6 @@ function AdCard({ item, isMe, onOpen, onManage, adIcon }) {
   );
 }
 
-/* =========================
-   일반 카드
-========================= */
 function NormalCard({
   item,
   rank,
@@ -385,9 +446,11 @@ function NormalCard({
 }) {
   const badgeSrc = rank === 1 ? badgeGold : rank === 2 ? badgeSilver : rank === 3 ? badgeBronze : null;
 
-  // 이건 네 CSS에 “레일 방식”이 이미 있어서, className 기반으로만 출력
   return (
-    <div className={`ranking-card ${rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : ''} ${isMe ? 'is-me' : ''}`} onClick={onOpen}>
+    <div
+      className={`ranking-card ${rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : ''} ${isMe ? 'is-me' : ''}`}
+      onClick={onOpen}
+    >
       <div className="rank-rail">
         {badgeSrc ? <img className="rank-badge-img" src={badgeSrc} alt={`${rank}등`} /> : <div className="rank-number">{rank}</div>}
       </div>
@@ -408,7 +471,7 @@ function NormalCard({
         </div>
 
         {item.office_address && <div className="card-sub">📍 {item.office_address}</div>}
-        {item.experience_years > 0 && <div className="card-sub">🗂 경력 {item.experience_years}년</div>}
+        {item.experience_years > 0 && <div className="card-sub">🎓 경력 {item.experience_years}년</div>}
 
         <div className="card-bio">{item.bio_one_line || '소개가 없습니다.'}</div>
 
@@ -457,9 +520,6 @@ function NormalCard({
   );
 }
 
-/* =========================
-   광고 구매 모달 (Portal)
-========================= */
 function AdPurchaseModal({ plans, loading, onBuy, onClose, adIcon }) {
   const [selected, setSelected] = useState(plans[1]);
 
@@ -520,9 +580,6 @@ function AdPurchaseModal({ plans, loading, onBuy, onClose, adIcon }) {
   );
 }
 
-/* =========================
-   광고 취소/관리 모달 (Portal)
-========================= */
 function AdCancelModal({ item, loading, onCancel, onExtend, onClose }) {
   const daysLeft = item?.ad_expires_at
     ? Math.max(0, Math.ceil((new Date(item.ad_expires_at) - new Date()) / 86400000))
@@ -539,7 +596,7 @@ function AdCancelModal({ item, loading, onCancel, onExtend, onClose }) {
             <strong>{fmtDate(item?.ad_expires_at)}</strong>
           </div>
           <div className="ad-cancel-row">
-            <span>⏱ 남은 기간</span>
+            <span>🕒 남은 기간</span>
             <strong className={`days-left ${daysLeft <= 3 ? 'danger' : 'ok'}`}>{daysLeft}일</strong>
           </div>
         </div>

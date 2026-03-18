@@ -1,4 +1,3 @@
-// src/components/chat/ChatRoom.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import {
@@ -34,6 +33,7 @@ import txtFileIcon from '../../assets/txt-icon.png';
 import leftArrowIcon from '../../assets/left-arrow.png';
 import upIcon from '../../assets/up.png';
 import downIcon from '../../assets/down.png';
+import profileIcon from '../../assets/ai-profile.png';
 import { formatResponseSpeed, responseSpeedClass } from '../../utils/formatResponseSpeed';
 
 function dayKeyFromTime(t) {
@@ -41,12 +41,14 @@ function dayKeyFromTime(t) {
     if (Number.isNaN(d.getTime())) return null;
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
 function formatKoreanDayHeader(t) {
     const d = new Date(t);
     if (Number.isNaN(d.getTime())) return '';
     const WEEK = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     return `${d.getFullYear()}년 ${String(d.getMonth() + 1).padStart(2, '0')}월 ${String(d.getDate()).padStart(2, '0')}일 ${WEEK[d.getDay()]}`;
 }
+
 function formatTimer(sec) {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -82,10 +84,8 @@ export default function ChatRoom({ roomId, onBack }) {
     const [billingSec, setBillingSec] = useState(BILLING_INTERVAL);
     const [billingAlert, setBillingAlert] = useState('');
     const [infoOpen, setInfoOpen] = useState(false);
-    // ✅ 세무사 자신의 요금 (SQL이 partner 기준이라 별도 fetch 필요)
     const [taxOwnRate, setTaxOwnRate] = useState(0);
 
-    // ✅ Zustand store에서 유저 정보 읽기 (loginAuthUser에서 { id, user_type, ... } 저장)
     const authUser = useAuthStore((s) => s.authUser);
     const MY_ID = authUser?.id ?? null;
     const isMyTypeUser = (authUser?.user_type ?? 'USER') === 'USER';
@@ -95,11 +95,12 @@ export default function ChatRoom({ roomId, onBack }) {
         () => onlineUsers.has(String(MY_ID)) && isAgentOnline,
         [onlineUsers, MY_ID, isAgentOnline],
     );
-    // ✅ USER: 상대(세무사) 요금 / TAX_ACCOUNTANT: 자신의 요금 (partner는 일반인이라 0)
+
     const ratePerBilling = useMemo(() => {
         if (isMyTypeUser) return roomInfo?.partner_rate_per_10min || 0;
         return taxOwnRate;
     }, [isMyTypeUser, roomInfo, taxOwnRate]);
+
     const partnerCategories = useMemo(() => {
         try {
             const c = roomInfo?.partner_categories;
@@ -124,7 +125,6 @@ export default function ChatRoom({ roomId, onBack }) {
         }, 500);
     }, [rid]);
 
-    // ✅ 문제2: 타이머 저장/복원
     const saveTimer = useCallback(
         (cSec, bSec) => {
             try {
@@ -148,15 +148,12 @@ export default function ChatRoom({ roomId, onBack }) {
         } catch {}
     }, [rid]);
 
-    // ✅ 문제3: 세무사도 크레딧 조회
     const fetchUserCredit = useCallback(async () => {
         if (!MY_ID) return;
         try {
             const res = await axiosAuth.get(`/credit/balance/${MY_ID}`);
             setUserCredit(res.data?.credit ?? 0);
-        } catch {
-            /* ignore */
-        }
+        } catch {}
     }, [MY_ID]);
 
     const handleBilling = useCallback(async () => {
@@ -164,9 +161,9 @@ export default function ChatRoom({ roomId, onBack }) {
         try {
             const balRes = await axiosAuth.get(`/credit/balance/${MY_ID}`);
             const currentCredit = balRes.data?.credit ?? 0;
+
             if (currentCredit < ratePerBilling) {
                 setBillingAlert('⚠️ 크레딧 부족으로 상담이 종료됩니다.');
-                // ✅ 문제3: 세무사에게 크레딧 부족 종료 알림
                 const sock = ensureSocket();
                 if (sock) sock.emit('credit_shortage', { roomId: rid });
                 try {
@@ -176,11 +173,13 @@ export default function ChatRoom({ roomId, onBack }) {
                 if (timerRef.current) clearInterval(timerRef.current);
                 return;
             }
+
             await axiosAuth.post('/credit/deduct', {
                 user_id: MY_ID,
                 amount: ratePerBilling,
                 description: `채팅 상담 10분 요금 (방 #${rid})`,
             });
+
             const taxUserId = roomInfo?.tax_id;
             if (taxUserId) {
                 await axiosAuth.post('/credit/charge', {
@@ -189,6 +188,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     description: `채팅 수익 (방 #${rid}, 수수료 10%)`,
                 });
             }
+
             await fetchUserCredit();
             setBillingAlert(`💳 ${ratePerBilling.toLocaleString()} 크레딧 결제 완료`);
             setTimeout(() => setBillingAlert(''), 3500);
@@ -197,94 +197,103 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     }, [isMyTypeUser, ratePerBilling, rid, MY_ID, roomInfo, fetchUserCredit]);
 
-    // ✅ 문제3: 세무사도 타이머 표시 (isMyTypeUser 조건 제거)
-    // ✅ 문제2: 5초마다 localStorage에 타이머 저장
     useEffect(() => {
         if (roomClosed || ratePerBilling <= 0) return;
         if (timerRef.current) clearInterval(timerRef.current);
+
         timerRef.current = setInterval(() => {
             if (!bothOnline) return;
+
             billingRef.current.consultSec += 1;
             billingRef.current.billingSec -= 1;
             setConsultSec(billingRef.current.consultSec);
             setBillingSec(billingRef.current.billingSec);
-            // 5초마다 localStorage 저장
+
             if (billingRef.current.consultSec % 5 === 0) {
                 saveTimer(billingRef.current.consultSec, billingRef.current.billingSec);
             }
-            // USER가 3초마다 세무사에게 타이머 동기화 emit
+
             if (isMyTypeUser && billingRef.current.consultSec % 3 === 0) {
                 const sock = ensureSocket();
-                if (sock)
+                if (sock) {
                     sock.emit('timer_sync', {
                         roomId: rid,
                         consultSec: billingRef.current.consultSec,
                         billingSec: billingRef.current.billingSec,
                     });
+                }
             }
+
             if (billingRef.current.billingSec <= 0) {
                 billingRef.current.billingSec = BILLING_INTERVAL;
                 setBillingSec(BILLING_INTERVAL);
-                if (isMyTypeUser) handleBilling(); // USER만 실제 결제 처리
+                if (isMyTypeUser) handleBilling();
             }
         }, 1000);
+
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
     }, [bothOnline, roomClosed, ratePerBilling, isMyTypeUser, handleBilling, saveTimer, rid]);
 
-    // ✅ 문제4: 소켓 이벤트 및 join_room 타이밍
     useEffect(() => {
         if (!rid) return;
         const socket = ensureSocket();
         if (!socket) return;
 
-        // 방 진입마다 온라인 상태 초기화 (room_users로 재수신)
         setOnlineUsers(new Set());
 
         const onReceiveMessage = (rawMsg) => {
             const uiMsg = mapRowToUiMessage(rawMsg, MY_ID, absolutizeFileUrl);
             if (!uiMsg) return;
+
             setMessages((prev) => {
                 if (prev.some((m) => String(m.id) === String(uiMsg.id))) return prev;
+
                 if (uiMsg.from === 'me') {
                     const tempIdx = prev.findIndex((m) => typeof m.id === 'string' && m.id.startsWith('temp-'));
                     if (tempIdx !== -1) {
                         const next = [...prev];
                         const tempId = next[tempIdx]?.id;
                         next[tempIdx] = uiMsg;
-                        if (tempId)
+                        if (tempId) {
                             setSendFail((sf) => {
                                 if (!sf?.[tempId]) return sf;
                                 const n = { ...sf };
                                 delete n[tempId];
                                 return n;
                             });
+                        }
                         return next;
                     }
                     return [...prev, uiMsg];
                 }
+
                 debouncedMarkRead();
                 return [...prev, uiMsg];
             });
+
             setTimeout(scrollToBottom, 0);
             if (uiMsg.from !== 'me') debouncedMarkRead();
         };
+
         const onRoomClosed = () => {
             setRoomClosed(true);
             if (timerRef.current) clearInterval(timerRef.current);
         };
-        // ✅ 문제3: 세무사 크레딧 부족 종료 알림 수신
+
         const onCreditShortage = () => {
             setBillingAlert('⚠️ 상대방 크레딧 부족으로 상담이 종료됩니다.');
             setRoomClosed(true);
             if (timerRef.current) clearInterval(timerRef.current);
         };
+
         const onReadUpdated = ({ userId }) => {
-            if (String(userId) !== String(MY_ID))
+            if (String(userId) !== String(MY_ID)) {
                 setMessages((prev) => prev.map((m) => (m.from === 'me' ? { ...m, isRead: true } : m)));
+            }
         };
-        // ✅ 문제4: 방 접속자 목록 (이 채팅방에 join한 사람만)
+
         const onCurrentUsers = ({ users }) => setOnlineUsers(new Set((users || []).map((id) => String(id))));
         const onUserOnline = ({ userId }) => setOnlineUsers((p) => new Set([...p, String(userId)]));
         const onUserOffline = ({ userId }) =>
@@ -294,7 +303,6 @@ export default function ChatRoom({ roomId, onBack }) {
                 return n;
             });
 
-        // ✅ 타이머 동기화: 세무사가 USER로부터 수신
         const onTimerSync = ({ consultSec: cs, billingSec: bs }) => {
             if (isMyTypeUser) return;
             billingRef.current.consultSec = cs;
@@ -302,16 +310,17 @@ export default function ChatRoom({ roomId, onBack }) {
             setConsultSec(cs);
             setBillingSec(bs);
         };
-        // ✅ USER: 세무사가 join 시 즉시 현재 타이머 전송 요청 수신
+
         const onRequestTimerSync = ({ roomId: reqRid }) => {
             if (!isMyTypeUser || String(reqRid) !== rid) return;
             const sock = ensureSocket();
-            if (sock)
+            if (sock) {
                 sock.emit('timer_sync', {
                     roomId: rid,
                     consultSec: billingRef.current.consultSec,
                     billingSec: billingRef.current.billingSec,
                 });
+            }
         };
 
         socket.on('timer_sync', onTimerSync);
@@ -324,14 +333,13 @@ export default function ChatRoom({ roomId, onBack }) {
         socket.on('user_online', onUserOnline);
         socket.on('user_offline', onUserOffline);
 
-        // ✅ 문제4 핵심: connected 상태 확인 후 join_room - 아직 연결 중이면 connect 이후 emit
         const doJoin = () => {
             socket.emit('join_room', rid);
-            // 세무사가 방 진입 시 USER에게 현재 타이머 즉시 요청
             if (!isMyTypeUser) {
                 socket.emit('request_timer_sync', { roomId: rid });
             }
         };
+
         if (socket.connected) {
             doJoin();
         } else {
@@ -355,7 +363,9 @@ export default function ChatRoom({ roomId, onBack }) {
     }, [rid, MY_ID, isMyTypeUser, scrollToBottom, debouncedMarkRead]);
 
     const lastMyMsgId = useMemo(() => {
-        for (let i = messages.length - 1; i >= 0; i--) if (messages[i].from === 'me') return messages[i].id;
+        for (let i = messages.length - 1; i >= 0; i--) {
+            if (messages[i].from === 'me') return messages[i].id;
+        }
         return null;
     }, [messages]);
 
@@ -373,13 +383,12 @@ export default function ChatRoom({ roomId, onBack }) {
         }
     }, [rid]);
 
-    // ✅ 세무사 자신의 chat_rate_per_10min 조회
     useEffect(() => {
         if (isMyTypeUser || !MY_ID) return;
+
         (async () => {
             try {
                 const res = await axiosAuth.post('/profile/taxpro', { id: MY_ID });
-                // 응답 구조: res.data.data.taxPro.chat_rate_per_10min
                 const rate = res.data?.data?.taxPro?.chat_rate_per_10min ?? 0;
                 setTaxOwnRate(Number(rate) || 0);
             } catch (e) {
@@ -394,11 +403,13 @@ export default function ChatRoom({ roomId, onBack }) {
             setLoading(true);
             await fetchRoomStatus();
             await fetchUserCredit();
-            restoreTimer(); // ✅ 문제2: 나갔다 들어와도 타이머 복원
+            restoreTimer();
+
             const res = await listMessages(rid);
             const arr = extractMessagesSafely(res, (r) => r?.messages || r?.data || r || []);
             const mapped = arr.map((m) => mapRowToUiMessage(m, MY_ID, absolutizeFileUrl));
             setMessages(mapped);
+
             if (mapped.length > 0) debouncedMarkRead();
         } catch (e) {
             console.error('메시지 불러오기 실패:', e);
@@ -418,25 +429,38 @@ export default function ChatRoom({ roomId, onBack }) {
         const draft = getDraft(rid);
         if (draft) setInput(draft);
         loadMessages();
-    }, [rid]); // eslint-disable-line
+    }, [rid, loadMessages]);
 
     useEffect(() => {
         if (rid) saveDraft(rid, input);
     }, [rid, input]);
 
-    const markSendFail = useCallback((msgId) => setSendFail((p) => ({ ...(p || {}), [msgId]: true })), []);
+    const markSendFail = useCallback((msgId) => {
+        setSendFail((p) => ({ ...(p || {}), [msgId]: true }));
+    }, []);
 
     const sendMessage = async (overrideText) => {
         if (roomClosed) return;
         const text = (overrideText ?? input).trim();
         if (!text || !rid) return;
+
         setInput('');
         const tempId = `temp-${Date.now()}`;
+
         setMessages((prev) => [
             ...prev,
-            { id: tempId, from: 'me', type: 'TEXT', text, time: new Date().toISOString(), isRead: false },
+            {
+                id: tempId,
+                from: 'me',
+                type: 'TEXT',
+                text,
+                time: new Date().toISOString(),
+                isRead: false,
+            },
         ]);
+
         setTimeout(scrollToBottom, 0);
+
         try {
             const res = await apiSendMessage(rid, text);
             const serverMsg = res?.data;
@@ -478,7 +502,10 @@ export default function ChatRoom({ roomId, onBack }) {
                 return n;
             });
         } catch (e) {
-            setDlState((p) => ({ ...p, [m.id]: e?.code === 410 || e?.message === 'EXPIRED' ? 'expired' : 'failed' }));
+            setDlState((p) => ({
+                ...p,
+                [m.id]: e?.code === 410 || e?.message === 'EXPIRED' ? 'expired' : 'failed',
+            }));
         }
     };
 
@@ -526,23 +553,27 @@ export default function ChatRoom({ roomId, onBack }) {
         const re = new RegExp(escapeRegExp(q), 'ig');
         const parts = String(text || '').split(re);
         if (parts.length <= 1) return text;
+
         const matches = String(text || '').match(re) || [];
         const out = [];
+
         for (let i = 0; i < parts.length; i++) {
             out.push(<span key={`p-${i}`}>{parts[i]}</span>);
-            if (i < matches.length)
+            if (i < matches.length) {
                 out.push(
                     <mark key={`m-${i}`} className="cr-hl">
                         {matches[i]}
                     </mark>,
                 );
+            }
         }
+
         return out;
     };
 
     const headerTitle = useMemo(() => roomInfo?.partner_name || `세무챗 (방 ${rid || '-'})`, [rid, roomInfo]);
 
-    if (!rid)
+    if (!rid) {
         return (
             <div className="cr-page">
                 <div className="cr-wrap" style={{ padding: 16 }}>
@@ -553,11 +584,11 @@ export default function ChatRoom({ roomId, onBack }) {
                 </div>
             </div>
         );
+    }
 
     return (
         <div className="cr-page">
             <div className="cr-wrap">
-                {/* ════ 헤더 ════ */}
                 <div className="cr-header">
                     {!searchOpen ? (
                         <>
@@ -575,11 +606,15 @@ export default function ChatRoom({ roomId, onBack }) {
                                     {headerTitle}
                                     {roomClosed && <span className="cr-closedBadge">종료</span>}
                                 </div>
+
                                 <div className="cr-header-meta">
                                     <div className={`cr-status-tag ${isAgentOnline ? 'is-online' : ''}`}>
                                         <span className="cr-status-dot" />
-                                        <span className="cr-status-text">{isAgentOnline ? '접속 중' : '오프라인'}</span>
+                                        <span className={`cr-taxStatVal ${isAgentOnline ? 'is-online-text' : ''}`}>
+                                            {isAgentOnline ? '접속 중' : '오프라인'}
+                                        </span>
                                     </div>
+
                                     {isMyTypeUser && roomInfo?.partner_response_speed !== undefined && (
                                         <div
                                             className={`cr-status-tag cr-response-speed ${responseSpeedClass(roomInfo.partner_response_speed)}`}
@@ -590,17 +625,18 @@ export default function ChatRoom({ roomId, onBack }) {
                                             </span>
                                         </div>
                                     )}
-                                    {/* ✅ 문제1: USER만 요금/무료 태그 표시 */}
+
                                     {isMyTypeUser && ratePerBilling > 0 && (
                                         <div className="cr-status-tag cr-rate-tag">
                                             <span className="cr-status-text">
-                                                💳 {ratePerBilling.toLocaleString()}cr/10분
+                                                💰 {ratePerBilling.toLocaleString()}cr/10분
                                             </span>
                                         </div>
                                     )}
+
                                     {isMyTypeUser && ratePerBilling === 0 && (
                                         <div className="cr-status-tag cr-free-tag">
-                                            <span className="cr-status-text">✅ 무료 상담</span>
+                                            <span className="cr-status-text">💬 무료 상담</span>
                                         </div>
                                     )}
                                 </div>
@@ -614,9 +650,10 @@ export default function ChatRoom({ roomId, onBack }) {
                                         title="세무사 정보"
                                         onClick={() => setInfoOpen((v) => !v)}
                                     >
-                                        👤
+                                        <img className="cr-hIconImg" src={profileIcon} alt="세무사 정보" />
                                     </button>
                                 )}
+
                                 <button
                                     type="button"
                                     className="cr-hIcon"
@@ -628,6 +665,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                 >
                                     🔎
                                 </button>
+
                                 <button
                                     type="button"
                                     className={`cr-hIcon cr-menuIcon ${menuOpen ? 'isOn' : ''}`}
@@ -663,6 +701,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                     ✕
                                 </button>
                             </div>
+
                             {query.trim() && (
                                 <div className="cr-searchMeta">
                                     <span className="cr-hitCount">
@@ -670,6 +709,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                             ? `${Math.min(activeHitIdx + 1, hits.length)}/${hits.length}`
                                             : '0/0'}
                                     </span>
+
                                     <div className="cr-searchNav">
                                         <button
                                             type="button"
@@ -679,6 +719,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                         >
                                             <img className="cr-navIcon" src={upIcon} alt="up" />
                                         </button>
+
                                         <button
                                             type="button"
                                             className="cr-navBtn"
@@ -694,7 +735,6 @@ export default function ChatRoom({ roomId, onBack }) {
                     )}
                 </div>
 
-                {/* ════ 세무사 정보 패널 ════ */}
                 {infoOpen && isMyTypeUser && roomInfo && (
                     <div className="cr-taxPanel">
                         <div className="cr-taxPanel-inner">
@@ -708,12 +748,14 @@ export default function ChatRoom({ roomId, onBack }) {
                                 ) : (
                                     <div className="cr-taxAvatarFallback">{(roomInfo.partner_name || '?')[0]}</div>
                                 )}
+
                                 <div className="cr-taxInfo">
                                     <div className="cr-taxName">{roomInfo.partner_name}</div>
                                     {roomInfo.partner_company && (
                                         <div className="cr-taxCompany">{roomInfo.partner_company}</div>
                                     )}
                                     {roomInfo.partner_bio && <div className="cr-taxBio">{roomInfo.partner_bio}</div>}
+
                                     {partnerCategories.length > 0 && (
                                         <div className="cr-taxCats">
                                             {partnerCategories.slice(0, 4).map((c) => (
@@ -725,23 +767,26 @@ export default function ChatRoom({ roomId, onBack }) {
                                     )}
                                 </div>
                             </div>
+
                             <div className="cr-taxPanel-right">
                                 {roomInfo.partner_experience_years > 0 && (
                                     <div className="cr-taxStat">
-                                        <span className="cr-taxStatIcon">🏅</span>
+                                        <span className="cr-taxStatIcon">🎓</span>
                                         <span className="cr-taxStatLabel">경력</span>
                                         <span className="cr-taxStatVal">{roomInfo.partner_experience_years}년</span>
                                     </div>
                                 )}
+
                                 {roomInfo.partner_monthly_fee > 0 && (
                                     <div className="cr-taxStat">
-                                        <span className="cr-taxStatIcon">📋</span>
+                                        <span className="cr-taxStatIcon">🧾</span>
                                         <span className="cr-taxStatLabel">기장료</span>
                                         <span className="cr-taxStatVal">
                                             {roomInfo.partner_monthly_fee.toLocaleString()}원~
                                         </span>
                                     </div>
                                 )}
+
                                 <div className="cr-taxStat">
                                     <span className="cr-taxStatIcon">💳</span>
                                     <span className="cr-taxStatLabel">채팅 요금</span>
@@ -749,8 +794,9 @@ export default function ChatRoom({ roomId, onBack }) {
                                         {ratePerBilling === 0 ? '무료' : `${ratePerBilling.toLocaleString()}cr/10분`}
                                     </span>
                                 </div>
+
                                 <div className="cr-taxStat">
-                                    <span className="cr-taxStatIcon">{isAgentOnline ? '🟢' : '⚫'}</span>
+                                    <span className={`cr-taxStateDot ${isAgentOnline ? 'is-online' : 'is-offline'}`} />
                                     <span className="cr-taxStatLabel">현재 상태</span>
                                     <span className={`cr-taxStatVal ${isAgentOnline ? 'is-online-text' : ''}`}>
                                         {isAgentOnline ? '접속 중' : '오프라인'}
@@ -761,16 +807,16 @@ export default function ChatRoom({ roomId, onBack }) {
                     </div>
                 )}
 
-                {/* ════ 결제/입금 타이머 바 (USER + 세무사 모두) ════ */}
                 {!roomClosed && ratePerBilling > 0 && (
                     <div className="cr-billingBar">
                         <div className="cr-billingLeft">
                             <div className="cr-billingItem">
-                                <span className="cr-billingLabel">⏱ 상담 시간</span>
+                                <span className="cr-billingLabel">🕘 상담 시간</span>
                                 <span className="cr-billingVal">{formatTimer(consultSec)}</span>
                             </div>
+
                             <div className="cr-billingDivider" />
-                            {/* ✅ 문제3: USER는 "다음 결제", 세무사는 "다음 입금" */}
+
                             <div className="cr-billingItem">
                                 <span className="cr-billingLabel">
                                     {isMyTypeUser ? '💳 다음 결제' : '💰 다음 입금'}
@@ -781,7 +827,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                     {formatTimer(billingSec)}
                                 </span>
                             </div>
-                            {/* ✅ 세무사: 다음 입금 예정액 */}
+
                             {!isMyTypeUser && (
                                 <>
                                     <div className="cr-billingDivider" />
@@ -793,8 +839,10 @@ export default function ChatRoom({ roomId, onBack }) {
                                     </div>
                                 </>
                             )}
+
                             {!bothOnline && <span className="cr-billingPause">⏸ 오프라인 — 타이머 정지</span>}
                         </div>
+
                         <div className="cr-billingRight">
                             <span className="cr-creditLabel">보유 크레딧</span>
                             <span
@@ -806,7 +854,6 @@ export default function ChatRoom({ roomId, onBack }) {
                     </div>
                 )}
 
-                {/* 무료 상담 크레딧 표시 */}
                 {!roomClosed && ratePerBilling === 0 && isMyTypeUser && userCredit !== null && (
                     <div className="cr-creditOnlyBar">
                         <span className="cr-creditLabel">보유 크레딧</span>
@@ -814,10 +861,8 @@ export default function ChatRoom({ roomId, onBack }) {
                     </div>
                 )}
 
-                {/* 결제 토스트 */}
                 {billingAlert && <div className="cr-billingAlert">{billingAlert}</div>}
 
-                {/* ════ 채팅 본문 ════ */}
                 <div
                     ref={listRef}
                     className="cr-chat"
@@ -827,9 +872,11 @@ export default function ChatRoom({ roomId, onBack }) {
                     }}
                 >
                     {loading && <div className="cr-loading">메시지 불러오는 중…</div>}
+
                     {!loading &&
                         (() => {
                             let lastDayKey = null;
+
                             return messages.map((m) => {
                                 const isMe = m.from === 'me';
                                 const type = String(m.type).toUpperCase();
@@ -839,7 +886,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                 const showDay = dk && dk !== lastDayKey;
                                 if (showDay) lastDayKey = dk;
 
-                                if (isSystem)
+                                if (isSystem) {
                                     return (
                                         <React.Fragment key={m.id}>
                                             {showDay && (
@@ -850,6 +897,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                             </div>
                                         </React.Fragment>
                                     );
+                                }
 
                                 const dl = dlState[m.id] || null;
                                 const openUrl = m.fileUrl
@@ -857,8 +905,10 @@ export default function ChatRoom({ roomId, onBack }) {
                                         ? getTxtViewerUrl(m.fileUrl)
                                         : m.fileUrl
                                     : null;
-                                let sideLabel = null,
-                                    sideKind = null;
+
+                                let sideLabel = null;
+                                let sideKind = null;
+
                                 if (dl === 'failed') {
                                     sideLabel = '다운로드 실패';
                                     sideKind = 'err';
@@ -878,6 +928,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                 return (
                                     <React.Fragment key={m.id}>
                                         {showDay && <div className="cr-dayPill">{formatKoreanDayHeader(m.time)}</div>}
+
                                         <div
                                             id={`msg-${m.id}`}
                                             className={`cr-row ${isMe ? 'cr-rowMe' : 'cr-rowOther'}`}
@@ -890,6 +941,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                         {sideLabel}
                                                     </div>
                                                 )}
+
                                                 <div className={`cr-bubble ${isMe ? 'cr-bubbleMe' : 'cr-bubbleOther'}`}>
                                                     {type === 'IMAGE' && m.fileUrl && (
                                                         <div className="cr-imgWrap">
@@ -908,6 +960,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                     >
                                                                         {dl === 'loading' ? '다운로드중…' : '다운로드'}
                                                                     </button>
+
                                                                     {openUrl && (
                                                                         <a
                                                                             className="cr-openBtn"
@@ -919,6 +972,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                         </a>
                                                                     )}
                                                                 </div>
+
                                                                 <div className="cr-fileSub">
                                                                     <div className="cr-fileSubRow">
                                                                         <span className="cr-fileLabel">용량:</span>
@@ -926,6 +980,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                             {formatBytes(m.fileSize)}
                                                                         </span>
                                                                     </div>
+
                                                                     <div className="cr-fileSubRow">
                                                                         <span className="cr-fileLabel">유효기간:</span>
                                                                         <span className="cr-fileValue">
@@ -946,13 +1001,14 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                     alt="txt"
                                                                 />
                                                             )}
+
                                                             <div className="cr-fileTopRow">
                                                                 <div className="cr-fileBadge">
                                                                     {isTxtLike(m) ? 'TXT' : 'FILE'}
                                                                 </div>
                                                                 <div
                                                                     className="cr-fileTitle"
-                                                                    title={m?.fileName || '파일'}
+                                                                    title={displayFileTitle(m) || '파일'}
                                                                 >
                                                                     {renderHighlightedText(
                                                                         displayFileTitle(m) || '파일',
@@ -960,6 +1016,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                 </div>
                                                                 <div className="cr-fileRightSlot" />
                                                             </div>
+
                                                             <div className="cr-fileActions">
                                                                 <button
                                                                     type="button"
@@ -969,6 +1026,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                 >
                                                                     {dl === 'loading' ? '다운로드중…' : '다운로드'}
                                                                 </button>
+
                                                                 {openUrl && (
                                                                     <a
                                                                         className="cr-openBtn"
@@ -980,6 +1038,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                     </a>
                                                                 )}
                                                             </div>
+
                                                             <div className="cr-fileSub">
                                                                 <div className="cr-fileSubRow">
                                                                     <span className="cr-fileLabel">용량:</span>
@@ -987,6 +1046,7 @@ export default function ChatRoom({ roomId, onBack }) {
                                                                         {formatBytes(m.fileSize)}
                                                                     </span>
                                                                 </div>
+
                                                                 <div className="cr-fileSubRow">
                                                                     <span className="cr-fileLabel">유효기간:</span>
                                                                     <span className="cr-fileValue">
@@ -1004,7 +1064,9 @@ export default function ChatRoom({ roomId, onBack }) {
                                                     <div className={`cr-time ${isMe ? 'cr-timeMe' : 'cr-timeOther'}`}>
                                                         {timeText}
                                                         {isLastMy && (
-                                                            <span className="cr-readStatus">
+                                                            <span
+                                                                className={`cr-readStatus ${m.isRead ? 'is-read' : 'is-unread'}`}
+                                                            >
                                                                 {m.isRead ? '읽음' : '안읽음'}
                                                             </span>
                                                         )}
@@ -1029,6 +1091,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     }}
                     disabled={roomClosed}
                 />
+
                 <input
                     ref={imgInputRef}
                     type="file"
@@ -1050,6 +1113,7 @@ export default function ChatRoom({ roomId, onBack }) {
                             </span>
                             <span className="cr-attachText">텍스트 업로드</span>
                         </button>
+
                         <button type="button" className="cr-attachItem" onClick={() => imgInputRef.current?.click()}>
                             <span className="cr-attachIcon">
                                 <img className="cr-attachImg" src={pictureIcon} alt="사진 업로드" />
@@ -1068,6 +1132,7 @@ export default function ChatRoom({ roomId, onBack }) {
                     >
                         +
                     </button>
+
                     <textarea
                         value={input}
                         onChange={(e) => !roomClosed && setInput(e.target.value)}
@@ -1079,6 +1144,7 @@ export default function ChatRoom({ roomId, onBack }) {
                         disabled={roomClosed}
                         readOnly={roomClosed}
                     />
+
                     <button type="button" onClick={() => sendMessage()} className="cr-send" disabled={roomClosed}>
                         전송
                     </button>

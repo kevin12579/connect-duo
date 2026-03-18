@@ -15,6 +15,51 @@ import UserProfileCard from './components/UserProfileCard';
 import MyCommentsCard from './components/MyCommentsCard';
 import ConsultationRequestList from './components/ConsultationRequestList';
 
+const NOTI_STORAGE_KEY = 'consult_status_notifications_v1';
+
+function pushConsultStatusNotification({ requesterId, taxProName, status }) {
+    if (!requesterId) return;
+
+    try {
+        const raw = localStorage.getItem(NOTI_STORAGE_KEY);
+        const prev = raw ? JSON.parse(raw) : [];
+        const safePrev = Array.isArray(prev) ? prev : [];
+
+        const next = [
+            {
+                id: `noti-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                requesterId,
+                taxProName,
+                status,
+                actedAt: new Date().toISOString(),
+                read: false,
+            },
+            ...safePrev,
+        ];
+
+        localStorage.setItem(NOTI_STORAGE_KEY, JSON.stringify(next));
+    } catch (e) {
+        console.error('상담 결과 알림 저장 실패:', e);
+    }
+}
+
+function getRequesterIdFromRequest(request) {
+    return (
+        request?.user_id ||
+        request?.userId ||
+        request?.requester_id ||
+        request?.requesterId ||
+        request?.from_user_id ||
+        request?.fromUserId ||
+        request?.request_user_id ||
+        request?.client_id ||
+        request?.member_id ||
+        request?.user?.id ||
+        request?.requester?.id ||
+        null
+    );
+}
+
 export default function UserProfile({ onOpenTaxProProfile }) {
     const { logout } = useAuthStore();
     const [user, setUser] = useState(null);
@@ -25,6 +70,7 @@ export default function UserProfile({ onOpenTaxProProfile }) {
     const fetchProfileData = async () => {
         setLoading(true);
         const storedUser = JSON.parse(localStorage.getItem('userBackup') || 'null');
+
         if (!storedUser || !storedUser.id) {
             setLoading(false);
             return;
@@ -32,10 +78,10 @@ export default function UserProfile({ onOpenTaxProProfile }) {
 
         try {
             const response = await getUserProfile(storedUser.id);
+
             if (response.result === 'success') {
                 const userData = response.data.user;
 
-                // 크레딧 최신 잔액 조회
                 let credit = userData.credit || 0;
                 try {
                     const creditRes = await getCredit(userData.id);
@@ -50,7 +96,6 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                     bio: userData.bio_one_line || '',
                     userType: userData.user_type,
                     credit,
-                    // 세무사 확장 필드
                     company_name: userData.company_name || '',
                     office_address: userData.office_address || '',
                     experience_years: userData.experience_years || 0,
@@ -60,7 +105,8 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                     categories: Array.isArray(userData.categories) ? userData.categories : [],
                     consult_schedule: Array.isArray(userData.consult_schedule) ? userData.consult_schedule : [],
                 });
-                setMyComments(response.data.comments);
+
+                setMyComments(Array.isArray(response.data.comments) ? response.data.comments : []);
 
                 if (userData.user_type === 'TAX_ACCOUNTANT') {
                     const res = await getTaxProProfile(userData.id, userData.id);
@@ -97,26 +143,48 @@ export default function UserProfile({ onOpenTaxProProfile }) {
 
     const handleAccept = async (requestId) => {
         if (!window.confirm('상담을 수락하시겠습니까?')) return;
+
         try {
+            const targetRequest = requests.find((r) => r.id === requestId);
+            const requesterId = getRequesterIdFromRequest(targetRequest);
+
             const res = await acceptConsult(requestId);
             if (res.result === 'success') {
+                pushConsultStatusNotification({
+                    requesterId,
+                    taxProName: user?.name || '세무사',
+                    status: 'ACCEPTED',
+                });
+
                 alert('상담이 수락되었습니다. 채팅 메뉴를 확인해주세요.');
                 setRequests((prev) => prev.filter((r) => r.id !== requestId));
             }
         } catch (e) {
+            console.error('수락 처리 중 오류:', e);
             alert('수락 처리 중 오류 발생');
         }
     };
 
     const handleReject = async (requestId) => {
         if (!window.confirm('상담을 거절하시겠습니까?')) return;
+
         try {
+            const targetRequest = requests.find((r) => r.id === requestId);
+            const requesterId = getRequesterIdFromRequest(targetRequest);
+
             const res = await rejectConsult(requestId);
             if (res.result === 'success') {
+                pushConsultStatusNotification({
+                    requesterId,
+                    taxProName: user?.name || '세무사',
+                    status: 'REJECTED',
+                });
+
                 alert('상담 요청을 거절했습니다.');
                 setRequests((prev) => prev.filter((r) => r.id !== requestId));
             }
         } catch (e) {
+            console.error('거절 처리 중 오류:', e);
             alert('거절 처리 중 오류 발생');
         }
     };
@@ -136,6 +204,7 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                 categories: updated.categories,
                 consult_schedule: updated.consult_schedule,
             });
+
             if (res.result === 'success') {
                 alert('성공적으로 수정되었습니다.');
                 fetchProfileData();
@@ -166,6 +235,7 @@ export default function UserProfile({ onOpenTaxProProfile }) {
     return (
         <div className="uprofile-root">
             <h2 className="uprofile-title">내 계정 설정</h2>
+
             <div className="uprofile-card">
                 {user.userType === 'TAX_ACCOUNTANT' && (
                     <button
@@ -176,6 +246,7 @@ export default function UserProfile({ onOpenTaxProProfile }) {
                         내 세무사 프로필 공개 페이지 확인
                     </button>
                 )}
+
                 <UserProfileCard
                     user={user}
                     onSave={handleSave}
@@ -186,12 +257,17 @@ export default function UserProfile({ onOpenTaxProProfile }) {
 
             {user.userType === 'TAX_ACCOUNTANT' && (
                 <div className="uprofile-card">
-                    <ConsultationRequestList requests={requests} onAccept={handleAccept} onReject={handleReject} />
+                    <ConsultationRequestList
+                        requests={requests}
+                        onAccept={handleAccept}
+                        onReject={handleReject}
+                        pageSize={2}
+                    />
                 </div>
             )}
 
             <div className="uprofile-card">
-                <MyCommentsCard user={user} items={myComments} onOpenTaxProProfile={onOpenTaxProProfile} />
+                <MyCommentsCard user={user} items={myComments} onOpenTaxProProfile={onOpenTaxProProfile} pageSize={2} />
             </div>
         </div>
     );

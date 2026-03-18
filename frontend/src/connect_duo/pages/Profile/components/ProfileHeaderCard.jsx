@@ -12,7 +12,7 @@ function safeArr(v) {
 
 /* ─── 구분자 | ───────────────────────── */
 function Sep() {
-    return <span style={{ color: '#d1d5db', fontWeight: 400, margin: '0 8px' }}>|</span>;
+    return <span className="taxpro-sep">|</span>;
 }
 
 export default function ProfileHeaderCard({
@@ -47,14 +47,23 @@ export default function ProfileHeaderCard({
         setPhotoEdit(false);
         setInfoEdit(false);
         if (!taxPro) return;
-        setDraft({ name: taxPro.name || '', oneLine: taxPro.oneLine || '', avatarUrl: taxPro.avatarUrl || '' });
+        setDraft({
+            name: taxPro.name || '',
+            oneLine: taxPro.oneLine || '',
+            avatarUrl: taxPro.avatarUrl || '',
+        });
     };
 
     const commitSave = () => {
         if (!isEditing) return;
         setPhotoEdit(false);
         setInfoEdit(false);
-        onSaveProfile?.({ id: taxPro.id, name: draft.name, oneLine: draft.oneLine, avatarUrl: draft.avatarUrl });
+        onSaveProfile?.({
+            id: taxPro.id,
+            name: draft.name,
+            oneLine: draft.oneLine,
+            avatarUrl: draft.avatarUrl,
+        });
     };
 
     useEffect(() => {
@@ -144,13 +153,13 @@ export default function ProfileHeaderCard({
                 <div className="taxpro-detail-row">
                     {taxPro.experience_years > 0 && (
                         <span className="taxpro-detail-item">
-                            <span className="taxpro-meta-icon">🗂</span>
+                            <span className="taxpro-meta-icon">🎓</span>
                             경력 {taxPro.experience_years}년 이상
                         </span>
                     )}
                     {taxPro.available_hours && (
                         <span className="taxpro-detail-item">
-                            <span className="taxpro-meta-icon">🕐</span>
+                            <span className="taxpro-meta-icon">⏰</span>
                             {taxPro.available_hours}
                         </span>
                     )}
@@ -167,7 +176,7 @@ export default function ProfileHeaderCard({
                     <div className="taxpro-fee-table">
                         {taxPro.chat_rate_per_10min > 0 && (
                             <div className="taxpro-fee-row">
-                                <span className="taxpro-fee-label">💬 10분 채팅 상담</span>
+                                <span className="taxpro-fee-label">💰 10분 채팅 상담</span>
                                 <span className="taxpro-fee-value">
                                     {taxPro.chat_rate_per_10min.toLocaleString()}원
                                 </span>
@@ -175,7 +184,7 @@ export default function ProfileHeaderCard({
                         )}
                         {taxPro.monthly_fee > 0 && (
                             <div className="taxpro-fee-row">
-                                <span className="taxpro-fee-label">📋 기장료</span>
+                                <span className="taxpro-fee-label">🧾 기장료</span>
                                 <span className="taxpro-fee-value">{taxPro.monthly_fee.toLocaleString()}원/월</span>
                             </div>
                         )}

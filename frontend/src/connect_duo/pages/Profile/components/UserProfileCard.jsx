@@ -265,9 +265,7 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
 
                             <div className="user-profile-credit-meta">
                                 <div className="user-profile-credit-label">내 크레딧</div>
-                                <div className="user-profile-credit-value">
-                                    {(user.credit || 0).toLocaleString()} C
-                                </div>
+                                <div className="user-profile-credit-value">{(user.credit || 0).toLocaleString()} C</div>
                             </div>
 
                             <button className="user-profile-btn-charge" onClick={() => setShowCreditModal(true)}>
@@ -296,17 +294,17 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                         <InfoBox icon="🏢" label="회사명" value={user.company_name || '미등록'} />
                         <InfoBox icon="📍" label="사무실 주소" value={user.office_address || '미등록'} />
                         <InfoBox
-                            icon="⏱"
+                            icon="🎓"
                             label="경력"
                             value={user.experience_years > 0 ? `${user.experience_years}년` : '미등록'}
                         />
                         <InfoBox
-                            icon="📋"
+                            icon="🧾"
                             label="기장료"
                             value={user.monthly_fee > 0 ? `${user.monthly_fee.toLocaleString()}원/월` : '미등록'}
                         />
                         <InfoBox
-                            icon="💬"
+                            icon="💰"
                             label="10분 채팅 요금"
                             value={
                                 user.chat_rate_per_10min > 0
@@ -314,7 +312,7 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                                     : '미등록'
                             }
                         />
-                        <InfoBox icon="🕐" label="상담 가능 시간" value={user.available_hours || '미등록'} />
+                        <InfoBox icon="⏰" label="상담 가능 시간" value={user.available_hours || '미등록'} />
 
                         <div className="user-profile-info-box wide">
                             <span className="user-profile-info-icon">🎯</span>
@@ -421,7 +419,9 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                                     return (
                                         <div key={item.id || idx} className="user-profile-hist-item">
                                             <div className="user-profile-hist-left">
-                                                <span className={typeClass}>{item.type === 'CHARGE' ? '충전' : '차감'}</span>
+                                                <span className={typeClass}>
+                                                    {item.type === 'CHARGE' ? '충전' : '차감'}
+                                                </span>
                                                 <span className="user-profile-hist-desc">{item.description}</span>
                                             </div>
 
@@ -579,7 +579,11 @@ export default function UserProfileCard({ user, onSave, onDeleteAccount, onCharg
                                     <button
                                         key={cat}
                                         type="button"
-                                        className={draft.categories.includes(cat) ? 'user-profile-cat-on' : 'user-profile-cat-off'}
+                                        className={
+                                            draft.categories.includes(cat)
+                                                ? 'user-profile-cat-on'
+                                                : 'user-profile-cat-off'
+                                        }
                                         onClick={() => toggleCategory(cat)}
                                     >
                                         {cat}

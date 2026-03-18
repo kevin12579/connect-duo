@@ -4,9 +4,13 @@ import React, { useMemo, useState, useEffect } from 'react';
 import rightNext from '../../../assets/right-next.png';
 import rightEnd from '../../../assets/right-end.png';
 
-export default function ConsultationRequestList({ requests, onAccept, onReject, pageSize = 3 }) {
+export default function ConsultationRequestList({ requests, onAccept, onReject, pageSize = 2 }) {
     const [page, setPage] = useState(1);
-    const safeRequests = Array.isArray(requests) ? requests : [];
+
+    const safeRequests = useMemo(() => {
+        return Array.isArray(requests) ? requests : [];
+    }, [requests]);
+
     const totalPages = Math.max(1, Math.ceil(safeRequests.length / pageSize));
 
     const sliced = useMemo(() => {
@@ -31,17 +35,20 @@ export default function ConsultationRequestList({ requests, onAccept, onReject, 
                     sliced.map((r) => (
                         <div key={r.id} className="item-row">
                             <div className="item-side-info">{new Date(r.created_at).toLocaleDateString()}</div>
+
                             <div className="item-main-info">
                                 {r.avatarUrl ? (
                                     <img src={r.avatarUrl} className="item-avatar" alt="user" />
                                 ) : (
                                     <div className="item-avatar fallback-avatar">{r.nickname?.charAt(0) || 'U'}</div>
                                 )}
+
                                 <div className="item-text-wrap">
                                     <span className="item-primary-text">{r.nickname} 님</span>
                                     <span className="item-secondary-text">새로운 상담 요청이 도착했습니다.</span>
                                 </div>
                             </div>
+
                             <div className="item-actions">
                                 <button className="action-btn btn-accept" onClick={() => onAccept(r.id)}>
                                     수락
@@ -55,11 +62,18 @@ export default function ConsultationRequestList({ requests, onAccept, onReject, 
                 )}
             </div>
 
-            {safeRequests.length > pageSize && (
+            {safeRequests.length > 0 && (
                 <div className="custom-pagination">
-                    <button className="pg-ctrl-btn" onClick={() => setPage(1)} disabled={page === 1} aria-label="first" title="처음">
+                    <button
+                        className="pg-ctrl-btn"
+                        onClick={() => setPage(1)}
+                        disabled={page === 1}
+                        aria-label="first"
+                        title="처음"
+                    >
                         <img className="pg-icon pg-rotate" src={rightEnd} alt="" aria-hidden="true" />
                     </button>
+
                     <button
                         className="pg-ctrl-btn"
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -83,6 +97,7 @@ export default function ConsultationRequestList({ requests, onAccept, onReject, 
                     >
                         <img className="pg-icon" src={rightNext} alt="" aria-hidden="true" />
                     </button>
+
                     <button
                         className="pg-ctrl-btn"
                         onClick={() => setPage(totalPages)}

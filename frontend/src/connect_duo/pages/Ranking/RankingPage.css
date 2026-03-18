@@ -64,7 +64,7 @@
 .ranking-root .ranking-filter-label {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #555;
+    color: #374151;
     margin-bottom: 8px;
 }
 
@@ -205,7 +205,7 @@
 }
 
 .ranking-root .ranking-card.rank-2 .rank-badge-img {
-    filter: brightness(1) contrast(0.8) saturate(1.1);
+    filter: brightness(1) contrast(0.8) saturate(1.1) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
 }
 
 /* 4등부터 숫자 */
@@ -402,8 +402,8 @@
 /* 분야 */
 .ranking-root .ranking-card.rank-3 .cat-tag {
     color: #9a5f43;
-  border: 1px solid #d49b82;
-  background: #fffefe;
+    border: 1px solid #d49b82;
+    background: #fffefe;
 }
 
 /* 회사 태그 */
@@ -430,9 +430,9 @@
 
 /* 분야 */
 .ranking-root .ranking-card:not(.rank-1):not(.rank-2):not(.rank-3) .cat-tag {
-  color: #4d6fa8;
-  border: 1px solid #8aace0;
-  background: #fcfdff ;
+    color: #4d6fa8;
+    border: 1px solid #8aace0;
+    background: #fcfdff;
 }
 
 /* 회사 태그 */
@@ -599,9 +599,9 @@
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background: #22c55e;
+    background: #3bbf8a; /* 고급 민트-에메랄드 */
     border: 2.5px solid #fff;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 8px rgba(59, 191, 138, 0.45);
 }
 
 /* info */
@@ -716,14 +716,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(
-    180deg,
-    #e9e6de 0%,
-    #e3ded3 55%,
-    #d6d0c3 100%
-    );
-    border:none;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+    background: linear-gradient(180deg, #e9e6de 0%, #e3ded3 55%, #d6d0c3 100%);
+    border: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
     border-radius: 12px;
     padding: 8px 14px;
     min-width: 74px;
@@ -752,7 +747,7 @@
     border: 1.6px solid rgba(33, 53, 93, 0.55);
     background: linear-gradient(135deg, #f2d791, #e3bb63);
     color: #4f2e05;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     font-weight: 700;
     font-size: 0.8rem;
     cursor: pointer;
@@ -856,7 +851,7 @@
 
 .ranking-root .ad-upsell-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .ranking-root .ad-upsell-btn:active {
@@ -923,11 +918,10 @@
     box-shadow: 0 8px 18px rgba(63, 120, 213, 0.22);
 }
 
-.ranking-root 
-.ranking-card:not(.rank-1):not(.rank-2):not(.rank-3):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(17, 24, 39, 0.08);
-  border-color: #2f5fc5;
+.ranking-root .ranking-card:not(.rank-1):not(.rank-2):not(.rank-3):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(17, 24, 39, 0.08);
+    border-color: #2f5fc5;
 }
 
 /* 모달 헤더 아이콘 이미지 */
@@ -1194,6 +1188,137 @@
     color: #166534;
 }
 
+/* =========================
+   Ranking Pagination
+========================= */
+
+.ranking-root .ranking-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.ranking-root .ranking-pg-num-info {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #5a6b80;
+    background: rgba(63, 111, 181, 0.08);
+    border: 1px solid rgba(63, 111, 181, 0.29);
+}
+
+.ranking-root .ranking-pg-num-info::first-letter {
+    color: #356ec9;
+    font-weight: 900;
+}
+
+.ranking-root .ranking-pg-ctrl-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(47, 78, 132, 0.32) !important;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.ranking-root .ranking-pg-ctrl-btn:first-child,
+.ranking-root .ranking-pg-ctrl-btn:last-child {
+    border-color: rgba(34, 60, 104, 0.42) !important;
+}
+
+.ranking-root .ranking-pg-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    filter: brightness(0) saturate(100%) invert(23%) sepia(21%) saturate(1300%) hue-rotate(185deg) brightness(92%)
+        contrast(94%);
+    opacity: 0.95;
+    transition:
+        filter 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.ranking-root .ranking-pg-rotate {
+    transform: rotate(180deg);
+}
+
+.ranking-root .ranking-pg-ctrl-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
+.ranking-root .ranking-pg-ctrl-btn:not(:disabled):hover .ranking-pg-icon {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+.ranking-root .ranking-pagination .ranking-pg-ctrl-btn:first-child:not(:disabled):hover,
+.ranking-root .ranking-pagination .ranking-pg-ctrl-btn:nth-child(2):not(:disabled):hover {
+    background: #3f7fd6;
+    border-color: #3f7fd6 !important;
+}
+
+.ranking-root .ranking-pagination .ranking-pg-num-info + .ranking-pg-ctrl-btn:not(:disabled):hover {
+    background: #3f6fb5;
+    border-color: #3f6fb5 !important;
+}
+
+.ranking-root .ranking-pagination .ranking-pg-ctrl-btn:last-child:not(:disabled):hover {
+    background: #2d5592;
+    border-color: #2d5592 !important;
+}
+
+.ranking-root .ranking-pg-ctrl-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(47, 78, 132, 0.12) !important;
+}
+
+.ranking-root .ranking-pg-ctrl-btn:disabled .ranking-pg-icon {
+    opacity: 0.35;
+    filter: none;
+}
+
+@media (max-width: 480px) {
+    .ranking-root .ranking-pagination {
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .ranking-root .ranking-pg-ctrl-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .ranking-root .ranking-pg-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .ranking-root .ranking-pg-num-info {
+        padding: 5px 11px;
+        font-size: 0.8rem;
+    }
+}
+
 @media (max-width: 520px) {
     .ad-benefit-grid {
         grid-template-columns: 1fr;
@@ -1201,5 +1326,168 @@
 
     .plan-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   Ranking text wrap / tag wrap fix
+   - 한글 단어 단위 줄바꿈
+   - 태그는 쪼개지지 않게
+========================================= */
+
+/* 텍스트성 영역: 단어 단위로 줄바꿈 */
+.ranking-root .ranking-title,
+.ranking-root .ranking-filter-label,
+.ranking-root .ranking-empty,
+.ranking-root .ranking-result-count,
+.ranking-root .card-name,
+.ranking-root .card-sub,
+.ranking-root .card-bio,
+.ranking-root .stat-label,
+.ranking-root .ad-name,
+.ranking-root .ad-meta,
+.ranking-root .ad-bio,
+.ranking-root .ad-sponsored,
+.ranking-root .ad-fee-label,
+.ranking-root .ad-fee-val,
+.ranking-root .ad-stat-label,
+.ranking-root .ad-stat-val {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+}
+
+/* 이름줄: 좁아지면 다음 줄로 자연스럽게 */
+.ranking-root .card-name-row,
+.ranking-root .ad-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+/* 태그류: 글자 단위로 절대 안 쪼개짐 */
+.ranking-root .card-company,
+.ranking-root .card-me,
+.ranking-root .cat-tag,
+.ranking-root .filter-chip,
+.ranking-root .sort-btn,
+.ranking-root .ad-role-badge,
+.ranking-root .ad-exp-badge,
+.ranking-root .ad-cat-chip,
+.ranking-root .ad-top-btn,
+.ranking-root .ad-manage-btn,
+.ranking-root .ad-upsell-btn {
+    white-space: nowrap;
+    word-break: keep-all;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+/* 회사 태그가 너무 작게 찢어지지 않게 */
+.ranking-root .card-company {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+}
+
+/* 카테고리 줄은 자연스럽게 여러 줄 허용 */
+.ranking-root .card-cats,
+.ranking-root .ad-cat-row,
+.ranking-root .ranking-filter-row,
+.ranking-root .ranking-sort-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* bio는 한 줄 말줄임보다 자연스럽게 보이게 하고 싶으면 사용 */
+.ranking-root .card-bio {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+/* 주소/경력도 글자 단위 쪼개짐 방지 */
+.ranking-root .card-sub,
+.ranking-root .ad-meta,
+.ranking-root .ad-bio {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+/* AD 상단 버튼 문구도 안 찢어지게 */
+.ranking-root .ad-top-btn,
+.ranking-root .ad-top-btn span {
+    white-space: nowrap;
+    word-break: keep-all;
+}
+
+/* 순위 카드 안 정보영역이 너무 좁아져도 레이아웃 유지 */
+.ranking-root .card-info,
+.ranking-root .ad-info {
+    min-width: 0;
+}
+
+/* 통계 라벨도 어색하게 안 쪼개지게 */
+.ranking-root .stat,
+.ranking-root .ad-stat-pill {
+    min-width: 0;
+}
+
+@media (max-width: 480px) {
+    /* 랭킹 제목 */
+    .ranking-root .ranking-title {
+        font-size: 1.7rem;
+        line-height: 1.15;
+        letter-spacing: -0.7px;
+    }
+
+    /* 광고 관리 모달 */
+    .ad-modal--sm {
+        width: min(400px, calc(100vw - 28px));
+        padding: 36px 16px 18px;
+    }
+
+    .ad-modal-title {
+        font-size: 1.02rem;
+    }
+
+    .ad-cancel-info {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .ad-cancel-row {
+        font-size: 0.95rem;
+        gap: 10px;
+    }
+
+    .ad-modal-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr 84px;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+    .btn-ad-extend,
+    .btn-ad-cancel-ad,
+    .btn-ad-close {
+        width: 100%;
+        min-width: 0;
+        padding: 10px 8px;
+        font-size: 0.82rem;
+        line-height: 1.25;
+        border-radius: 12px;
+        word-break: keep-all;
+        white-space: normal;
+    }
+
+    .btn-ad-close {
+        font-size: 0.9rem;
+        white-space: nowrap;
     }
 }

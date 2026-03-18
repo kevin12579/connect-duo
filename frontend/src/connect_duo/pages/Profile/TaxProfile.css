@@ -99,13 +99,7 @@
     -webkit-backdrop-filter: blur(8px);
 }
 
-@media (max-width: 920px) {
-    .profile-root .taxpro-header {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 20px;
-    }
-}
+
 
 /* avatar area */
 .profile-root .taxpro-avatar {
@@ -164,11 +158,7 @@
     gap: 10px;
 }
 
-@media (max-width: 920px) {
-    .profile-root .taxpro-oneLine-row {
-        justify-content: center;
-    }
-}
+
 
 .profile-root .taxpro-oneLine {
     font-size: 16px;
@@ -227,7 +217,7 @@
 
 .profile-root .taxpro-btn {
     width: 100%;
-    max-width: 220px;
+    max-width: 180px;
     padding: 14px 14px;
     border-radius: 14px;
     border: 1px solid rgba(63, 111, 181, 0.25);
@@ -441,11 +431,7 @@
     box-shadow: var(--tp-shadow-soft);
 }
 
-@media (max-width: 720px) {
-    .profile-root .comment-item {
-        grid-template-columns: 1fr;
-    }
-}
+
 
 .profile-root .comment-left {
     display: flex;
@@ -484,7 +470,7 @@
 
 .profile-root .comment-date {
     font-size: 12px;
-    color: var(--tp-text-400);
+    color: var(--tp-text-500);
     font-weight: 700;
 }
 
@@ -712,6 +698,10 @@
     gap: 10px;
 }
 
+.comment-empty{
+    color: #6b7f97;
+}
+
 /* =========================================================
    stats + donut (2 columns)
 ========================================================= */
@@ -721,11 +711,7 @@
     gap: 22px;
 }
 
-@media (max-width: 900px) {
-    .profile-root .profile-row-2 {
-        grid-template-columns: 1fr;
-    }
-}
+
 
 .profile-root .profile-stats,
 .profile-root .profile-score {
@@ -787,13 +773,7 @@
     align-items: center;
 }
 
-@media (max-width: 900px) {
-    .profile-root .donut-wrap {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        text-align: center;
-    }
-}
+
 
 .profile-root .donut-bg {
     stroke: rgba(0, 0, 0, 0.08);
@@ -892,11 +872,7 @@
     align-items: start;
 }
 
-@media (max-width: 900px) {
-    .profile-root .actions-grid {
-        grid-template-columns: 1fr;
-    }
-}
+
 
 .profile-root .actions-title {
     font-size: 16px;
@@ -1157,23 +1133,7 @@
 .profile-root .comment-pagination .pg-btn:last-child {
     border-color: rgba(34, 60, 104, 0.42) !important;
 }
-/* =========================================================
-   Responsive extras
-========================================================= */
-@media (max-width: 980px) {
-    .profile-root .donut-wrap {
-        grid-template-columns: 1fr;
-    }
-    .profile-root .comment-bubble {
-        min-width: 0;
-        max-width: 100%;
-    }
 
-    /* 모바일에서 textarea 너무 길면 부담이라 살짝만 줄임(원하면 삭제 가능) */
-    .profile-root .comment-input {
-        min-height: 140px;
-    }
-}
 
 /* =========================================================
    ProfileHeaderCard — 확장 필드 (회사/주소/카테고리/경력/요금)
@@ -1190,14 +1150,13 @@
 /* "세무사" 뱃지 */
 .profile-root .taxpro-role-badge {
     display: inline-block;
-    font-size: 13px;
+    font-size: 0.75rem;
     font-weight: 700;
+    background: rgba(238, 244, 255, 0.95);
     color: var(--tp-primary);
-    background: rgba(63, 111, 181, 0.1);
-    border: 1px solid rgba(63, 111, 181, 0.28);
-    border-radius: 8px;
     padding: 3px 10px;
-    letter-spacing: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(63, 111, 181, 0.38);
     white-space: nowrap;
 }
 
@@ -1235,29 +1194,30 @@
 .profile-root .taxpro-categories {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
+    gap: 8px;
     margin-top: 2px;
+    max-width: 720px;
 }
 
 .profile-root .taxpro-cat-chip {
     display: inline-block;
     font-size: 13px;
-    font-weight: 700;
-    color: var(--tp-text-700);
-    background: rgba(255, 255, 255, 0.92);
-    border: 1.5px solid rgba(63, 111, 181, 0.22);
+    font-weight: 740;
+    line-height: 1.1;
+    color: #496c9d;
+    background: #f4f8fe;
+    border: 1.5px solid rgba(118, 156, 212, 0.5);
     border-radius: 20px;
-    padding: 4px 13px;
+    padding: 5px 13px;
     white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
-    transition:
-        border-color 0.15s,
-        background 0.15s;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.035);
+    transition: none;
 }
 
 .profile-root .taxpro-cat-chip:hover {
-    border-color: rgba(63, 111, 181, 0.55);
-    background: rgba(238, 244, 255, 0.95);
+    color: #496c9d;
+    background: #f4f8fe;
+    border-color: rgba(118, 156, 212, 0.5);
 }
 
 /* 경력 · 시간 · 일정 가로 행 */
@@ -1287,17 +1247,21 @@
     color: #166534;
 }
 
+
 /* 요금 테이블 */
 .profile-root .taxpro-fee-table {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-top: 4px;
-    padding: 12px 16px;
-    background: rgba(248, 250, 252, 0.9);
-    border: 1px solid rgba(63, 111, 181, 0.14);
-    border-radius: 14px;
-    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+    margin-top: 6px;
+    padding: 13px 16px;
+
+    /* 덜 바이올렛 */
+    background: linear-gradient(180deg, #f5f6ff 0%, #eef2ff 100%);
+    border: 1.5px solid rgba(138, 154, 220, 0.55);
+
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
 }
 
 .profile-root .taxpro-fee-row {
@@ -1309,29 +1273,582 @@
 
 .profile-root .taxpro-fee-label {
     font-size: 14px;
-    font-weight: 700;
-    color: var(--tp-text-600);
+    font-weight: 780;
+    color: #566482; /* 약간 또렷 */
     white-space: nowrap;
 }
 
 .profile-root .taxpro-fee-value {
     font-size: 15px;
     font-weight: 900;
-    color: var(--tp-primary);
+
+    /* 블루에 살짝 보라 */
+    color: #5563d6;
+
     white-space: nowrap;
 }
 
-/* 반응형 */
-@media (max-width: 920px) {
-    .profile-root .taxpro-name-row,
-    .profile-root .taxpro-meta-row,
-    .profile-root .taxpro-categories,
-    .profile-root .taxpro-detail-row {
-        justify-content: center;
-    }
-    .profile-root .taxpro-fee-table {
-        max-width: 320px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+
+/* =========================================================
+   ProfileHeaderCard 톤 보정
+   - JSX inline 제거 + 색감 수정
+========================================================= */
+
+/* semu | 신사역 사이 구분자 */
+.profile-root .taxpro-sep {
+    color: #c7d2df;
+    font-weight: 500;
+    margin: 0 8px;
+}
+
+/* 회사명 / 주소 : 기존보다 아주 살짝 더 푸른계 */
+.profile-root .taxpro-meta-row {
+    color: #4f6385;
+    font-weight: 650;
+}
+
+.profile-root .taxpro-company {
+    font-weight: 750;
+    color: #3f5f90;
+}
+
+.profile-root .taxpro-addr {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #4a668f;
+}
+
+/* 분야 칩 : 더 푸른 보더/글씨 + 더 옅은 푸른 안색 */
+.profile-root .taxpro-cat-chip {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 750;
+    color: #496791;
+    background: #f4f8fe;
+    border: 1.5px solid rgba(116, 153, 208, 0.5);
+    border-radius: 20px;
+    padding: 4px 13px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    transition: none;
+}
+
+/* hover 필요 없다 했으니 사실상 고정 */
+.profile-root .taxpro-cat-chip:hover {
+    color: #496791;
+    background: #f4f8fe;
+    border-color: rgba(116, 153, 208, 0.5);
+}
+
+/* 디테일 행 기본 글씨 */
+.profile-root .taxpro-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 750;
+    color: #4a5568;
+}
+
+/* 상담 가능 n일 : 더 자연스러운 초록 */
+.profile-root .taxpro-schedule-badge {
+    background: #e6f3ea;
+    border: 1px solid rgba(105, 168, 123, 0.45);
+    border-radius: 20px;
+    padding: 4px 11px;
+    color: #2f7a46;
+    font-weight: 800;
+}
+
+/* =========================================
+   TaxProfile Mobile Responsive
+   기준: 360 ~ 480px
+========================================= */
+@media (max-width: 480px) {
+
+.profile-root {
+    width: min(100%, 94%);
+    padding: 20px 0 30px;
+}
+
+.profile-root .profile-title {
+    font-size: 1.7rem;
+    margin: 0 0 16px;
+    letter-spacing: -0.7px;
+}
+
+.profile-root .profile-card,
+.profile-root .profile-top {
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 20px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* =========================
+   상단 프로필 카드
+========================= */
+
+.profile-root .taxpro-header {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 14px;
+    text-align: center;
+    border-radius: 18px;
+}
+
+.profile-root .taxpro-avatar-circle {
+    width: 148px;
+    height: 148px;
+}
+
+.profile-root .taxpro-info {
+    gap: 8px;
+}
+
+.profile-root .taxpro-name-row,
+.profile-root .taxpro-oneLine-row,
+.profile-root .taxpro-meta-row,
+.profile-root .taxpro-categories,
+.profile-root .taxpro-detail-row {
+    justify-content: center;
+}
+
+.profile-root .taxpro-name {
+    font-size: 1.1rem;
+    line-height: 1.25;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .taxpro-role-badge {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+}
+
+.profile-root .taxpro-meta-row {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    gap: 4px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .taxpro-oneLine-row {
+    width: 100%;
+    text-align: center;
+}
+
+.profile-root .taxpro-oneLine {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .taxpro-cat-chip {
+    font-size: 0.76rem;
+    padding: 4px 10px;
+}
+
+.profile-root .taxpro-detail-row {
+    gap: 10px;
+}
+
+.profile-root .taxpro-detail-item {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .taxpro-schedule-badge {
+    padding: 4px 9px;
+    font-size: 0.78rem;
+}
+
+.profile-root .taxpro-fee-table {
+    max-width: 100%;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    gap: 4px;
+}
+
+.profile-root .taxpro-fee-row {
+    gap: 10px;
+}
+
+.profile-root .taxpro-fee-label {
+    font-size: 0.8rem;
+}
+
+.profile-root .taxpro-fee-value {
+    font-size: 0.92rem;
+}
+
+.profile-root .taxpro-btn {
+    max-width: 100%;
+    font-size: 0.95rem;
+    padding: 12px 14px;
+    border-radius: 14px;
+}
+
+/* =========================
+   댓글 접힘/펼침 영역
+========================= */
+
+.profile-root .comment-collapsed {
+    padding: 14px;
+    gap: 10px;
+}
+
+.profile-root .comment-mini {
+    gap: 10px;
+    min-width: 0;
+}
+
+.profile-root .comment-mini-meta {
+    width: 64px;
+    gap: 6px;
+}
+
+.profile-root .comment-mini-avatar {
+    width: 42px;
+    height: 42px;
+}
+
+.profile-root .comment-mini-name {
+    font-size: 0.72rem;
+    line-height: 1.2;
+    word-break: keep-all;
+}
+
+.profile-root .comment-bubble {
+    padding: 11px 12px;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .comment-toggle {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.profile-root .comment-expanded {
+    padding: 14px;
+}
+
+.profile-root .comment-expanded-head {
+    margin-bottom: 10px;
+}
+
+.profile-root .comment-expanded-title {
+    font-size: 1rem;
+    line-height: 1.3;
+    word-break: keep-all;
+}
+
+.profile-root .comment-list,
+.profile-root .my-comments-list {
+    gap: 10px;
+}
+
+.profile-root .comment-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
+}
+
+.profile-root .comment-left {
+    gap: 8px;
+}
+
+.profile-root .comment-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.profile-root .comment-nick {
+    font-size: 0.92rem;
+    line-height: 1.3;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .comment-topline {
+    gap: 8px;
+    margin-bottom: 6px;
+    align-items: flex-start;
+}
+
+.profile-root .comment-date {
+    font-size: 0.74rem;
+    line-height: 1.4;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .comment-content {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.profile-root .comment-item.mine .comment-content {
+    padding: 10px 12px;
+    border-radius: 12px;
+}
+
+.profile-root .my-comments-box {
+    padding: 12px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+}
+
+.profile-root .my-comments-head {
+    margin-bottom: 8px;
+}
+
+.profile-root .my-comments-title {
+    font-size: 0.96rem;
+    line-height: 1.3;
+    word-break: keep-all;
+}
+
+.profile-root .my-toggle {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+}
+
+.profile-root .comment-delete {
+    width: 26px;
+    height: 26px;
+    font-size: 0.95rem;
+}
+
+.profile-root .comment-empty {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    word-break: keep-all;
+}
+
+/* 페이지네이션 */
+
+.profile-root .comment-pagination {
+    gap: 6px;
+    padding-top: 2px;
+}
+
+.profile-root .pg-btn {
+    width: 30px;
+    height: 30px;
+}
+
+.profile-root .pg-btn .pg-icon {
+    width: 12px;
+    height: 12px;
+}
+
+.profile-root .comment-pagination .pg-info {
+    padding: 5px 12px !important;
+    font-size: 0.8rem !important;
+}
+
+/* =========================
+   통계 카드
+========================= */
+
+.profile-root .profile-row-2 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.profile-root .stats-card {
+    gap: 10px;
+}
+
+.profile-root .stats-row {
+    padding: 10px 12px;
+    border-radius: 14px;
+    gap: 10px;
+}
+
+.profile-root .stats-label {
+    font-size: 0.9rem;
+    line-height: 1.35;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .stats-value {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.profile-root .stats-value.chip {
+    padding: 5px 9px;
+    font-size: 0.74rem;
+}
+
+/* =========================
+   도넛 카드
+========================= */
+
+.profile-root .score-card .score-title {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    word-break: keep-all;
+}
+
+.profile-root .donut-wrap {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    justify-items: center;
+    text-align: center;
+}
+
+.profile-root .donut-wrap svg {
+    width: 220px;
+    height: 220px;
+    max-width: 100%;
+}
+
+.profile-root .donut-legend {
+    width: 100%;
+    gap: 8px;
+}
+
+.profile-root .legend-row {
+    grid-template-columns: 12px 1fr auto;
+    gap: 8px;
+    padding: 9px 11px;
+    border-radius: 12px;
+}
+
+.profile-root .legend-label {
+    font-size: 0.9rem;
+    line-height: 1.35;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .legend-val {
+    font-size: 0.88rem;
+    flex-shrink: 0;
+}
+
+/* =========================
+   액션 카드
+========================= */
+
+.profile-root .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.profile-root .actions-title {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    word-break: keep-all;
+}
+
+.profile-root .like-area {
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.profile-root .like-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+}
+
+.profile-root .like-emoji {
+    font-size: 18px;
+}
+
+.profile-root .like-help {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .rating-box {
+    padding: 10px 12px;
+    border-radius: 14px;
+}
+
+.profile-root .star-row {
+    gap: 4px;
+}
+
+.profile-root .star-btn {
+    font-size: 18px;
+}
+
+.profile-root .actions-btn-row {
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: center;
+}
+
+.profile-root .btn-primary,
+.profile-root .btn-danger {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    border-radius: 12px;
+}
+
+.profile-root .comment-writer-head {
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.profile-root .writer-avatar {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.profile-root .writer-name {
+    font-size: 0.95rem;
+    word-break: keep-all;
+}
+
+.profile-root .comment-input {
+    min-height: 130px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+.profile-root .lock-msg {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    word-break: keep-all;
+}
+
 }

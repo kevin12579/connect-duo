@@ -226,9 +226,9 @@ export default function ChatList({ onOpenRoom }) {
                         {/* 요금: USER만 표시 */}
                         {isMyTypeUser &&
                             (c.partnerRate > 0 ? (
-                                <span className="cl-chip cl-chip-rate">💳 {c.partnerRate.toLocaleString()}cr/10분</span>
+                                <span className="cl-chip cl-chip-rate">💰 {c.partnerRate.toLocaleString()}cr/10분</span>
                             ) : (
-                                <span className="cl-chip cl-chip-free">✅ 무료 상담</span>
+                                <span className="cl-chip cl-chip-free">💬 무료 상담</span>
                             ))}
                         {/* 경력 */}
                         {c.partnerExperience > 0 && (
@@ -248,7 +248,8 @@ export default function ChatList({ onOpenRoom }) {
                         ))}
                         {/* 온라인 상태 */}
                         <span className={`cl-chip ${c.isPartnerOnline ? 'cl-chip-online' : 'cl-chip-offline'}`}>
-                            {c.isPartnerOnline ? '🟢 접속 중' : '⚫ 오프라인'}
+                            <span className={`cl-chip-status-dot ${c.isPartnerOnline ? 'is-online' : 'is-offline'}`} />
+                            <span className="cl-chip-status-text">{c.isPartnerOnline ? '접속 중' : '오프라인'}</span>
                         </span>
                     </div>
                 </div>
@@ -269,7 +270,7 @@ export default function ChatList({ onOpenRoom }) {
 
     return (
         <div className="cl-page">
-            <div className="cl-panel">
+            <div className={`cl-panel ${allCards.length >= 5 ? 'is-scrollable' : ''}`}>
                 {loading ? (
                     <div className="cl-loading">불러오는 중...</div>
                 ) : allCards.length === 0 ? (
