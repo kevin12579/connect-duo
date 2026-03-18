@@ -1,8 +1,10 @@
 // api/publicAxios.js (공용 API용)
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7777';
+
 const axiosInstance = axios.create({
-    baseURL: `http://localhost:7777/api`,
+    baseURL: `${API_BASE_URL}/api`,
     headers: {
         'Content-Type': 'application/json',
     },

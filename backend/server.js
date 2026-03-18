@@ -15,13 +15,14 @@ const chatRouter = require('./src/routes/chatRouter');
 const creditRouter = require('./src/routes/creditRouter'); // ★ 추가
 const socketHandler = require('./src/services/chatSocket');
 
+const address = process.env.ADDRESS || 'localhost';
 const port = process.env.PORT || 7777;
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: `http://${address}:3000`,
         credentials: true,
     },
 });
@@ -30,7 +31,7 @@ app.set('io', io);
 
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: `http://${address}:3000`,
         credentials: true,
     }),
 );
@@ -50,6 +51,6 @@ app.use('/api/credit', creditRouter); // ★ 추가
 
 socketHandler(io);
 
-server.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+server.listen(port, address, () => {
+    console.log(`Server running at http://${address}:${port}`);
 });

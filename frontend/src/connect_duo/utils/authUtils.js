@@ -1,6 +1,8 @@
 // authUtils.js
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7777';
+
 export const checkTokenExpiration = (token) => {
     try {
         //header.payload.signature
@@ -24,7 +26,7 @@ export const refreshAccessToken = async () => {
     }
     //리프레시 토큰을 보내 서버에서 검증받은 후 새 억세스토큰을 받자
     try {
-        const response = await axios.post(`http://localhost:7777/api/accounts/refresh`, { refreshToken });
+        const response = await axios.post(`${API_BASE_URL}/api/accounts/refresh`, { refreshToken });
         const newAccessToken = await response.data?.accessToken;
         return newAccessToken;
     } catch (error) {
