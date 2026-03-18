@@ -21,7 +21,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://192.168.0.8:3000',
+        origin: 'http://localhost:3000',
         credentials: true,
     },
 });
@@ -30,7 +30,7 @@ app.set('io', io);
 
 app.use(
     cors({
-        origin: 'http://192.168.0.8:3000',
+        origin: 'http://localhost:3000',
         credentials: true,
     }),
 );
@@ -51,5 +51,5 @@ app.use('/api/credit', creditRouter); // ★ 추가
 socketHandler(io);
 
 server.listen(port, () => {
-    console.log(`Server running at http://192.168.0.8:${port}`);
+    console.log(`Server running at http://localhost:${port}`);
 });
