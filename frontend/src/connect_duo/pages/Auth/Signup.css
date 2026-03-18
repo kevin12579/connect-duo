@@ -249,15 +249,91 @@
 }
 
 @media (max-width: 520px) {
+    .signup-page .loginform {
+        padding: 14px;
+    }
+
     .signup-page .loginbox {
         width: 94vw;
-        padding: 40px 18px 28px;
+        padding: 30px 14px 22px;
+        border-radius: 18px;
     }
+
+    .signup-page .logintitle {
+        width: 170px;
+        margin-bottom: 14px;
+    }
+
+    .signup-page .role-selector {
+        width: 78%;
+        margin-bottom: 18px;
+        padding: 4px;
+    }
+
+    .signup-page .role-selector button {
+        padding: 10px 8px;
+        font-size: 0.95rem;
+    }
+
     .signup-page .input-group {
-        padding: 26px 16px 20px;
+        padding: 20px 14px 16px;
+        gap: 16px;
+        border-radius: 16px;
+        margin-bottom: 14px;
     }
+
+    .signup-page .with-btn {
+        gap: 8px;
+    }
+
+    .signup-page .loginid input,
+    .signup-page .loginpw input {
+        height: 54px;
+        padding: 18px 18px 5px 18px;
+        font-size: 1rem;
+    }
+
+    .signup-page .loginid label,
+    .signup-page .loginpw label {
+        left: 18px;
+        font-size: 0.95rem;
+    }
+
+    .signup-page .loginid input:focus + label,
+    .signup-page .loginpw input:focus + label,
+    .signup-page .loginid input:not(:placeholder-shown) + label,
+    .signup-page .loginpw input:not(:placeholder-shown) + label {
+        top: 10px;
+        font-size: 11px;
+    }
+
+    .signup-page .inner-btn {
+        width: 92px;
+        height: 54px;
+        font-size: 12px;
+    }
+
     .signup-page .loginbutton {
-        width: 82%;
-        height: 56px;
+        width: 78%;
+        height: 54px;
+        font-size: 1rem;
+        margin-top: 6px;
+    }
+
+    .signup-page .loginkeep {
+        margin-top: 14px;
+        gap: 10px;
+        font-size: 0.92rem;
+    }
+
+    .signup-page .loginkeep input[type='checkbox'] {
+        transform: scale(1.15);
+    }
+
+    .signup-page .err-msg,
+    .signup-page .success-msg {
+        font-size: 12.5px;
+        margin-top: 6px;
+        margin-left: 14px;
     }
 }

@@ -261,7 +261,7 @@
     justify-content: center;
 
     font-size: 18px;
-    border: 1px solid rgba(63, 111, 181, 0.30);
+    border: 1px solid rgba(63, 111, 181, 0.3);
 
     cursor: pointer;
 
@@ -348,11 +348,13 @@
     pointer-events: none;
     user-select: none;
 
-    filter: brightness(0) saturate(100%) invert(23%) sepia(21%) saturate(1300%)
-        hue-rotate(185deg) brightness(92%) contrast(94%);
+    filter: brightness(0) saturate(100%) invert(23%) sepia(21%) saturate(1300%) hue-rotate(185deg) brightness(92%)
+        contrast(94%);
     opacity: 0.95;
 
-    transition: filter var(--up-ease), opacity var(--up-ease);
+    transition:
+        filter var(--up-ease),
+        opacity var(--up-ease);
 }
 
 .uprofile-root .pg-ctrl-btn .pg-rotate {
@@ -361,7 +363,7 @@
 
 .uprofile-root .pg-ctrl-btn:not(:disabled):hover {
     transform: translateY(-1px);
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
 }
 
 .uprofile-root .pg-ctrl-btn:not(:disabled):hover .pg-icon {
@@ -421,26 +423,6 @@
 .uprofile-root .custom-pagination .pg-ctrl-btn:nth-child(2),
 .uprofile-root .custom-pagination .pg-num-info + .pg-ctrl-btn {
     border-color: rgba(47, 78, 132, 0.36) !important;
-}
-
-/* -------------------------
-   Responsive (List)
-------------------------- */
-@media (max-width: 768px) {
-    .uprofile-root .item-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .uprofile-root .item-side-info {
-        width: 100%;
-    }
-
-    .uprofile-root .item-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
 }
 
 /* fallback avatar (리스트 등에서 쓰는 경우) */
@@ -540,7 +522,7 @@
     color: var(--up-primary);
     padding: 3px 10px;
     border-radius: 8px;
-    border: 1px solid rgba(63, 111, 181, 0.22);
+    border: 1px solid rgba(63, 111, 181, 0.38);
 }
 
 .uprofile-root .user-profile-username {
@@ -639,7 +621,7 @@
     background: rgba(231, 242, 255, 0.88);
     color: #2f5f9f;
 
-    border: 1px solid rgba(63, 111, 181, 0.30);
+    border: 1px solid rgba(63, 111, 181, 0.3);
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
 
     font-weight: 800;
@@ -658,7 +640,7 @@
 .uprofile-root .user-profile-btn-edit:hover {
     background: rgba(210, 230, 255, 0.95);
     color: #244e86;
-    border-color: rgba(63, 111, 181, 0.40);
+    border-color: rgba(63, 111, 181, 0.4);
     transform: translateY(-1px);
     box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
 }
@@ -674,7 +656,9 @@
     padding: 8px 6px;
     cursor: pointer;
 
-    transition: color var(--up-ease), text-decoration-color var(--up-ease);
+    transition:
+        color var(--up-ease),
+        text-decoration-color var(--up-ease);
 }
 
 .uprofile-root .user-profile-btn-withdraw:hover {
@@ -740,7 +724,7 @@
     flex-wrap: wrap;
     gap: 6px;
     margin-top: 4px;
-    max-height: 60px;   /* 태그 2줄 높이 */
+    max-height: 60px; /* 태그 2줄 높이 */
     overflow-y: auto;
     padding-right: 2px; /* 스크롤 여유 */
 }
@@ -750,7 +734,7 @@
 }
 
 .uprofile-root .user-profile-tag-row::-webkit-scrollbar-thumb {
-    background: rgba(63,111,181,0.48);
+    background: rgba(63, 111, 181, 0.48);
     border-radius: 999px;
 }
 
@@ -837,20 +821,6 @@
     border: 1.5px solid rgba(47, 78, 132, 0.22);
 }
 
-/* ✅ 화면 높이가 낮은 경우: 위쪽부터 뜨게 (잘림 방지 체감 큼) */
-@media (max-height: 720px) {
-    .user-profile-overlay {
-        align-items: flex-start;
-    }
-}
-
-/* 패키지 그리드도 모바일/좁은 폭에서 3칸→2칸 */
-@media (max-width: 520px) {
-    .user-profile-pkg-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 .user-profile-modal-title {
     margin: 0 0 8px;
     font-size: 1.3rem;
@@ -922,7 +892,7 @@
     cursor: pointer;
 
     /* ✅ 톤업 통합 */
-    border: 2px solid rgba(47, 78, 132, 0.20);
+    border: 2px solid rgba(47, 78, 132, 0.2);
     background: rgba(244, 247, 255, 0.98);
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
 
@@ -935,7 +905,7 @@
 .user-profile-pkg-btn:hover {
     transform: translateY(-2px);
     border-color: rgba(47, 78, 132, 0.32);
-    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.1);
 }
 
 .user-profile-pkg-credit {
@@ -1052,7 +1022,7 @@
 .user-profile-hist-badge.spend {
     background: #ffeaea;
     color: #c62828;
-    border: 1px solid rgba(198, 40, 40, 0.20);
+    border: 1px solid rgba(198, 40, 40, 0.2);
 }
 
 .user-profile-hist-amount {
@@ -1195,7 +1165,7 @@
 
     border-radius: 12px;
 
-    border: 1px solid rgba(63, 111, 181, 0.30);
+    border: 1px solid rgba(63, 111, 181, 0.3);
 
     background: rgba(255, 255, 255, 0.96);
     color: rgba(45, 62, 92, 0.94);
@@ -1229,16 +1199,16 @@
     border-color: rgba(63, 111, 181, 0.58);
     color: rgba(30, 62, 115, 0.98);
 
-    box-shadow: 0 6px 14px rgba(63, 111, 181, 0.10);
+    box-shadow: 0 6px 14px rgba(63, 111, 181, 0.1);
 }
 
 /* 지난 날짜 */
 .uprofile-root .user-profile-cal-cell.is-past {
-    opacity: 0.70;
+    opacity: 0.7;
     color: rgba(55, 74, 110, 0.88);
 
     border-color: rgba(63, 111, 181, 0.26);
-    background: rgba(248, 251, 255, 0.90);
+    background: rgba(248, 251, 255, 0.9);
 
     cursor: not-allowed;
     box-shadow: none;
@@ -1271,7 +1241,7 @@
 
 .uprofile-root .user-profile-edit-hint {
     font-size: 14px;
-    color: rgba(55, 74, 110, 0.80);
+    color: rgba(55, 74, 110, 0.8);
 }
 
 .uprofile-root .user-profile-edit-grid {
@@ -1306,7 +1276,10 @@
         0 2px 6px rgba(15, 23, 42, 0.06),
         0 1px 2px rgba(15, 23, 42, 0.04);
 
-    transition: border-color var(--up-ease), box-shadow var(--up-ease), background var(--up-ease);
+    transition:
+        border-color var(--up-ease),
+        box-shadow var(--up-ease),
+        background var(--up-ease);
 }
 
 .uprofile-root .user-profile-input::placeholder {
@@ -1318,7 +1291,7 @@
     border-color: rgba(63, 111, 181, 0.58);
     box-shadow:
         0 4px 12px rgba(15, 23, 42, 0.08),
-        0 0 0 3px rgba(63, 111, 181, 0.10);
+        0 0 0 3px rgba(63, 111, 181, 0.1);
     background: rgba(255, 255, 255, 0.985);
 }
 
@@ -1401,7 +1374,11 @@
     font-weight: 700;
     cursor: pointer;
 
-    transition: background var(--up-ease), border-color var(--up-ease), color var(--up-ease), transform var(--up-ease);
+    transition:
+        background var(--up-ease),
+        border-color var(--up-ease),
+        color var(--up-ease),
+        transform var(--up-ease);
 }
 
 .uprofile-root .user-profile-btn-cancel:hover {
@@ -1411,14 +1388,725 @@
     transform: translateY(-1px);
 }
 
-/* Responsive for header/actions */
-@media (max-width: 850px) {
-    .uprofile-root .user-profile-view-header {
-        padding: 16px 14px;
+/* =========================================
+   UserProfile Mobile Responsive
+   기준: 360 ~ 480px
+   - 전체 통합 정리본
+   - 프로필 / 리스트 / 편집 / 캘린더 / 크레딧 모달 포함
+========================================= */
+@media (max-width: 480px) {
+    .uprofile-root {
+        width: min(100%, 94%);
+        padding: 20px 0 30px;
     }
 
+    .uprofile-root .uprofile-title {
+        font-size: 1.7rem;
+        line-height: 1.15;
+        margin-bottom: 14px;
+        letter-spacing: -0.7px;
+    }
+
+    .uprofile-root .uprofile-card {
+        padding: 14px;
+        margin-bottom: 16px;
+        border-radius: 20px;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    /* 상단 긴 버튼 */
+    .uprofile-root .mytaxpro-btn {
+        padding: 10px 12px;
+        font-size: 0.92rem;
+        border-radius: 14px;
+        margin-bottom: 12px;
+    }
+
+    /* =========================
+       상단 프로필 헤더
+    ========================= */
+    .uprofile-root .user-profile-view-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .uprofile-root .user-profile-avatar-col {
+        display: flex;
+        justify-content: center;
+    }
+
+    .uprofile-root .user-profile-avatar-img,
+    .uprofile-root .user-profile-avatar-fallback {
+        width: 92px;
+        height: 92px;
+    }
+
+    .uprofile-root .user-profile-avatar-fallback {
+        font-size: 2rem;
+    }
+
+    .uprofile-root .user-profile-view-info {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .uprofile-root .user-profile-name-row {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 2px;
+        text-align: center;
+    }
+
+    .uprofile-root .user-profile-name-text {
+        font-size: 1.15rem;
+        line-height: 1.25;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .user-profile-role-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    .uprofile-root .user-profile-username {
+        text-align: center;
+        font-size: 0.82rem;
+        margin-bottom: 10px;
+    }
+
+    /* 크레딧 바 */
+    .uprofile-root .user-profile-credit-bar {
+        gap: 6px;
+        padding: 8px 9px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .uprofile-root .user-profile-credit-icon {
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    .uprofile-root .user-profile-credit-meta {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .uprofile-root .user-profile-credit-label {
+        font-size: 0.62rem;
+        line-height: 1.1;
+        margin-bottom: 1px;
+    }
+
+    .uprofile-root .user-profile-credit-value {
+        font-size: 0.82rem;
+        line-height: 1.1;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .user-profile-btn-charge,
+    .uprofile-root .user-profile-btn-history {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+        border-radius: 15px;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* 액션 버튼 */
     .uprofile-root .user-profile-view-actions {
         width: 100%;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 8px;
     }
+
+    .uprofile-root .user-profile-btn-edit {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        padding: 11px 14px;
+        font-size: 0.9rem;
+        border-radius: 14px;
+    }
+
+    .uprofile-root .user-profile-btn-withdraw {
+        width: 100%;
+        text-align: center;
+        margin-top: 0;
+        padding: 6px 0 0;
+        font-size: 0.88rem;
+    }
+
+    /* =========================
+       소개/정보 박스
+    ========================= */
+    .uprofile-root .user-profile-user-bio-display {
+        margin-top: 12px;
+        padding: 14px 14px;
+        font-size: 0.95rem;
+        border-radius: 16px;
+        line-height: 1.55;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .user-profile-tax-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .uprofile-root .user-profile-info-box,
+    .uprofile-root .user-profile-info-box.wide {
+        grid-column: auto;
+        padding: 12px 13px;
+        border-radius: 16px;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .uprofile-root .user-profile-info-icon {
+        font-size: 1rem;
+    }
+
+    .uprofile-root .user-profile-info-label {
+        font-size: 0.78rem;
+        margin-bottom: 2px;
+    }
+
+    .uprofile-root .user-profile-info-value {
+        font-size: 0.9rem;
+        line-height: 1.45;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .user-profile-tag-row {
+        gap: 6px;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .uprofile-root .user-profile-tag-blue,
+    .uprofile-root .user-profile-tag-green {
+        font-size: 0.74rem;
+        padding: 4px 9px;
+    }
+
+    /* =========================
+       리스트 공통
+    ========================= */
+    .uprofile-root .list-title {
+        font-size: 1rem;
+        margin-bottom: 12px;
+        gap: 8px;
+        line-height: 1.35;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .list-wrapper {
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .uprofile-root .item-row {
+        display: grid;
+        grid-template-columns: 58px 40px minmax(0, 1fr);
+        gap: 10px 10px;
+        align-items: center;
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .uprofile-root .item-side-info {
+        grid-column: 1;
+        grid-row: 1;
+        width: auto;
+        min-width: 0;
+        font-size: 0.74rem;
+        line-height: 1.35;
+        text-align: left;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .item-main-info {
+        grid-column: 2 / 4;
+        grid-row: 1;
+        width: auto;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 8px;
+        align-items: center;
+    }
+
+    .uprofile-root .item-avatar {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+    }
+
+    .uprofile-root .item-text-wrap {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .uprofile-root .item-primary-text {
+        font-size: 0.95rem;
+        line-height: 1.28;
+        margin-bottom: 2px;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .item-secondary-text {
+        font-size: 0.78rem;
+        line-height: 1.42;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .item-actions {
+        grid-column: 2 / 4;
+        grid-row: 2;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .uprofile-root .action-btn {
+        padding: 8px 12px;
+        font-size: 0.84rem;
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+
+    .uprofile-root .btn-circle {
+        width: 34px;
+        height: 34px;
+        font-size: 0.92rem;
+        flex-shrink: 0;
+    }
+
+    .uprofile-root .no-data-msg {
+        padding: 24px 0;
+        font-size: 0.9rem;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    /* 페이지네이션 */
+    .uprofile-root .custom-pagination {
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .uprofile-root .pg-ctrl-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .uprofile-root .pg-ctrl-btn .pg-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .uprofile-root .pg-num-info {
+        padding: 5px 11px;
+        font-size: 0.8rem;
+    }
+
+    /* =========================
+       편집 모드
+    ========================= */
+    .uprofile-root .user-profile-edit-root {
+        margin-top: 14px;
+    }
+
+    .uprofile-root .user-profile-edit-header {
+        margin-bottom: 14px;
+    }
+
+    .uprofile-root .user-profile-edit-title {
+        font-size: 1.7rem;
+        line-height: 1.2;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+        margin-bottom: 6px;
+    }
+
+    .uprofile-root .user-profile-edit-hint {
+        font-size: 0.9rem;
+        line-height: 1.45;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .uprofile-root .user-profile-edit-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .uprofile-root .user-profile-span-all {
+        grid-column: auto;
+    }
+
+    .uprofile-root .user-profile-field-label {
+        font-size: 0.84rem;
+        margin-bottom: 5px;
+    }
+
+    .uprofile-root .user-profile-input {
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+    }
+
+    .uprofile-root .user-profile-avatar-preview {
+        width: 68px;
+        height: 68px;
+    }
+
+    .uprofile-root .user-profile-cat-wrap {
+        gap: 7px;
+    }
+
+    .uprofile-root .user-profile-cat-on,
+    .uprofile-root .user-profile-cat-off {
+        font-size: 0.82rem;
+        padding: 6px 10px;
+        line-height: 1.25;
+    }
+
+    /* 캘린더 */
+    .uprofile-root .user-profile-cal-wrap {
+        padding: 12px 10px 10px;
+        border-radius: 16px;
+    }
+
+    .uprofile-root .user-profile-cal-header {
+        margin-bottom: 8px;
+    }
+
+    .uprofile-root .user-profile-cal-title {
+        font-size: 0.92rem;
+    }
+
+    .uprofile-root .user-profile-cal-nav {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        font-size: 0.95rem;
+    }
+
+    .uprofile-root .user-profile-cal-grid {
+        gap: 6px !important;
+    }
+
+    .uprofile-root .user-profile-cal-weekday {
+        font-size: 0.72rem;
+        padding: 2px 0;
+    }
+
+    .uprofile-root .user-profile-cal-empty {
+        height: 32px;
+    }
+
+    .uprofile-root .user-profile-cal-cell {
+        height: 32px;
+        border-radius: 10px;
+        font-size: 0.82rem;
+    }
+
+    .uprofile-root .user-profile-cal-foot {
+        margin-top: 8px;
+        font-size: 0.76rem;
+    }
+
+    .uprofile-root .user-profile-edit-footer {
+        margin-top: 18px;
+        gap: 8px;
+        flex-direction: row;
+    }
+
+    .uprofile-root .user-profile-btn-save,
+    .uprofile-root .user-profile-btn-cancel {
+        flex: 1;
+        padding: 12px 10px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    /* =========================================
+       크레딧 모달 반응형 보정
+    ========================================= */
+    .user-profile-overlay {
+        align-items: flex-start;
+        padding: 20px 12px;
+    }
+
+    .user-profile-modal-box {
+        width: 100%;
+        max-width: 94vw;
+        max-height: calc(100vh - 40px);
+        padding: 20px 14px 16px;
+        border-radius: 18px;
+        overflow-x: hidden;
+    }
+
+    .user-profile-modal-title {
+        font-size: 1.05rem;
+        line-height: 1.3;
+        margin-bottom: 6px;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .user-profile-modal-sub {
+        font-size: 0.86rem;
+        line-height: 1.45;
+        margin-bottom: 14px;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .user-profile-modal-close {
+        padding: 11px 12px;
+        font-size: 0.92rem;
+        border-radius: 12px;
+        margin-top: 6px;
+    }
+
+    /* 충전 패키지 */
+    .user-profile-pkg-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .user-profile-pkg-btn {
+        min-width: 0;
+        padding: 14px 8px;
+        border-radius: 14px;
+    }
+
+    .user-profile-pkg-credit {
+        font-size: 0.92rem;
+        line-height: 1.15;
+        text-align: center;
+        word-break: keep-all;
+    }
+
+    .user-profile-pkg-unit {
+        font-size: 0.66rem;
+        line-height: 1.1;
+    }
+
+    .user-profile-pkg-label {
+        font-size: 0.74rem;
+        padding: 3px 8px;
+        margin-top: 3px;
+        line-height: 1.1;
+        white-space: nowrap;
+    }
+
+    .user-profile-modal-tip {
+        font-size: 0.78rem;
+        line-height: 1.5;
+        margin-bottom: 10px;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    /* 거래내역 리스트 */
+    .user-profile-hist-list {
+        max-height: 46vh;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-right: 2px;
+    }
+
+    .user-profile-hist-item {
+        display: grid;
+        grid-template-columns: 50px minmax(0, 1fr) auto;
+        gap: 8px 10px;
+        align-items: center;
+        padding: 12px 12px;
+        border-radius: 14px;
+    }
+
+    .user-profile-hist-left {
+        display: contents;
+    }
+
+    .user-profile-hist-badge {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start;
+        align-self: start;
+        font-size: 0.72rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+        white-space: nowrap;
+    }
+
+    .user-profile-hist-desc {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .user-profile-hist-right {
+        grid-column: 3;
+        grid-row: 1 / span 2;
+        min-width: 74px;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    .user-profile-hist-amount {
+        font-size: 0.88rem;
+        line-height: 1.1;
+        white-space: nowrap;
+    }
+
+    .user-profile-hist-sub {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: start;
+        font-size: 0.74rem;
+        line-height: 1.4;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    /* 공통 줄바꿈 보정 */
+    .uprofile-root .item-text-wrap,
+    .uprofile-root .item-primary-text,
+    .uprofile-root .item-secondary-text,
+    .uprofile-root .user-profile-info-value,
+    .uprofile-root .user-profile-user-bio-display,
+    .uprofile-root .list-title,
+    .uprofile-root .user-profile-edit-title,
+    .uprofile-root .user-profile-edit-hint {
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+}
+
+/* =========================================
+   UserProfile Extra Small Mobile
+   기준: ~390px
+========================================= */
+@media (max-width: 390px) {
+    .user-profile-modal-box {
+        padding: 18px 12px 14px;
+        border-radius: 16px;
+    }
+
+    .user-profile-pkg-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .user-profile-pkg-btn {
+        padding: 12px 6px;
+    }
+
+    .user-profile-pkg-credit {
+        font-size: 0.86rem;
+    }
+
+    .user-profile-pkg-unit {
+        font-size: 0.62rem;
+    }
+
+    .user-profile-pkg-label {
+        font-size: 0.7rem;
+        padding: 3px 7px;
+    }
+
+    .user-profile-hist-item {
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 8px 8px;
+    }
+
+    .user-profile-hist-right {
+        grid-column: 2;
+        grid-row: 3;
+        align-items: flex-start;
+        min-width: 0;
+        margin-top: 2px;
+    }
+
+    .user-profile-hist-amount {
+        font-size: 0.86rem;
+    }
+
+    .user-profile-hist-sub {
+        grid-column: 2;
+        grid-row: 2;
+    }
+}
+
+/* =========================================
+   Credit Modal text-safe base
+   - 데스크톱/모바일 공통 안전장치
+========================================= */
+.user-profile-pkg-btn,
+.user-profile-hist-item,
+.user-profile-hist-desc,
+.user-profile-hist-sub,
+.user-profile-modal-title,
+.user-profile-modal-sub {
+    min-width: 0;
+}
+
+.user-profile-hist-desc,
+.user-profile-hist-sub,
+.user-profile-modal-title,
+.user-profile-modal-sub {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    white-space: normal;
 }

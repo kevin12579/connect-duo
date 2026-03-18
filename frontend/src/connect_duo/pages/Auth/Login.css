@@ -222,3 +222,53 @@
     display: block !important;
     margin: 0 auto !important;
 }
+
+/* =========================================
+   Login Mobile Responsive
+========================================= */
+@media (max-width: 480px) {
+
+    .login-page .lp-wrap{
+        padding: 20px 14px 28px;
+    }
+
+    /* 로고 조금 키움 */
+    .login-page .lp-logo{
+        width:180px;
+        margin-bottom:16px;
+    }
+
+    /* 카드 크기 조금 키움 */
+    .login-page .lp-card{
+        width:100%;
+        padding:32px 22px 28px;
+        border-radius:20px;
+    }
+
+    .login-page .lp-fields{
+        gap:18px;
+        margin-bottom:20px;
+    }
+
+    /* 입력창 조금 키움 */
+    .login-page input.lp-input{
+        height:60px;
+        font-size:1rem;
+        padding:20px 20px 8px 20px;
+    }
+
+    .login-page .lp-label{
+        font-size:0.95rem;
+    }
+
+    /* 버튼 조금 키움 */
+    .login-page button.lp-btn{
+        height:60px;
+        font-size:1.05rem;
+    }
+
+    .login-page .lp-linkRow{
+        font-size:1rem;
+        margin-top:16px;
+    }
+}

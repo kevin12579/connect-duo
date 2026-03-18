@@ -43,18 +43,16 @@ body {
     width: min(1700px, 96%);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 260px 1fr; /* ✅ 로고 칸 조금만 넓힘 */
+    grid-template-columns: 260px 1fr;
     align-items: center;
     padding: 34px 0;
-
-    padding-left: 20px; /* ✅ 전체를 살짝 오른쪽 느낌 */
+    padding-left: 20px;
 }
 
 .mainpage-logo {
-    width: 360px; /* (원하면 380~420도 OK) */
-    justify-self: start; /* ✅ grid에서 왼쪽 정렬 */
-    margin-left: -55px; /* 혹시 남아있으면 제거 */
-
+    width: 360px;
+    justify-self: start;
+    margin-left: -55px;
     object-fit: contain;
     cursor: pointer;
 }
@@ -64,6 +62,7 @@ body {
     flex-direction: column;
     justify-content: center;
     gap: 16px;
+    position: relative;
 }
 
 .mainpage-title-row {
@@ -116,14 +115,10 @@ body {
 
 /* 채팅창이 열렸을 때 검색창 스타일 (일체형 + 회색 비활성 느낌) */
 .search-wrapper.is-open .mainpage-search-input {
-    /* 모양 */
     border-radius: 26px 26px 0 0;
-
-    /* 색감 */
-    background: #e3e8ef; /* 배경보다 한 단계 진한 회색 */
-    border: 1.8px solid #9aa7b8; /* 또렷한 회색 테두리 */
-    color: #2f3a4a; /* 가독성 유지되는 진한 글씨 */
-
+    background: #e3e8ef;
+    border: 1.8px solid #9aa7b8;
+    color: #2f3a4a;
     box-shadow: none;
 }
 
@@ -158,7 +153,7 @@ body {
 
 /* ✅ 열림(회색 입력창 상태): 토글만 살짝 더 진하게 */
 .search-wrapper.is-open .expand-arrow {
-    color: #1f78ff; /* 4da3ff보다 한 단계 진한 스카이블루 */
+    color: #1f78ff;
 }
 
 .search-expand-content {
@@ -200,20 +195,16 @@ body {
     justify-content: center;
     cursor: pointer;
     color: #333;
-
-    /* ✅ 위쪽 아주 약한 하이라이트 + 아래 그림자 */
     box-shadow:
         0 -6px 14px rgba(255, 255, 255, 0.6),
-        /* 위쪽 빛 느낌 */ 0 14px 28px rgba(0, 0, 0, 0.08),
-        /* 아래 기본 그림자 */ 0 4px 10px rgba(0, 0, 0, 0.04);
-
+        0 14px 28px rgba(0, 0, 0, 0.08),
+        0 4px 10px rgba(0, 0, 0, 0.04);
     transition: all 0.2s ease;
 }
 
 .mainpage-category-btn:hover {
     background: #e6eaff;
     transform: translateY(-3px) scale(1.02);
-
     box-shadow:
         0 -8px 18px rgba(255, 255, 255, 0.7),
         0 20px 40px rgba(0, 0, 0, 0.1),
@@ -224,8 +215,6 @@ body {
 .mainpage-category-btn.selected {
     background: #a3bffa;
     color: #fff;
-
-    /* ✅ 기본 버튼과 동일 레벨 그림자 */
     box-shadow:
         0 -6px 14px rgba(255, 255, 255, 0.25),
         0 14px 28px rgba(0, 0, 0, 0.08),
@@ -374,7 +363,7 @@ body {
 .btn-icon {
     width: 22px;
     height: 22px;
-    filter: invert(1); /* 검은 배경 버튼 아이콘 흰색으로 */
+    filter: invert(1);
 }
 
 /* 로딩/비어있음 상태 */
@@ -397,42 +386,6 @@ body {
     transform: translateX(-6px);
 }
 
-/* ==========================================================================
-   5. 반응형 디자인 (Responsive)
-   ========================================================================== */
-@media (max-width: 1100px) {
-    .mainpage-top-inner {
-        grid-template-columns: 1fr;
-        padding: 30px 20px;
-        text-align: center;
-        gap: 20px;
-    }
-    .mainpage-logo {
-        margin: 0 auto;
-    }
-    .mainpage-category-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-}
-
-@media (max-width: 600px) {
-    .mainpage-title {
-        font-size: 1.5rem;
-    }
-    .mainpage-category-btn {
-        width: 160px;
-        height: 160px;
-    }
-    .mainpage-content-card {
-        padding: 40px 20px;
-        min-height: 400px;
-    }
-    .welcome-actions {
-        flex-direction: column;
-    }
-}
-
 /* ===============================
    MainPage Credit UI (CSS Only)
    - UserProfile 모달 톤/감성 이식 버전
@@ -444,7 +397,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: 12px;
-
     font-size: 0.9rem;
     font-weight: 800;
     color: rgba(61, 111, 217, 0.95);
@@ -454,15 +406,12 @@ body {
 .main-credit-header-btn {
     padding: 3px 12px;
     border-radius: 20px;
-
     border: 1.5px solid rgba(63, 111, 181, 0.53);
     background: rgba(255, 255, 255, 0.96);
     color: rgba(63, 111, 181, 0.92);
-
     font-weight: 800;
     cursor: pointer;
     font-size: 0.82rem;
-
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease,
@@ -485,11 +434,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     background: linear-gradient(135deg, #eef2ff 0%, #e0e9ff 100%);
     border-radius: 18px;
     padding: 16px 22px;
-
     border: 1.5px solid rgba(63, 111, 181, 0.28);
 }
 
@@ -520,14 +467,11 @@ body {
     padding: 10px 22px;
     border-radius: 14px;
     border: none;
-
     background: rgba(63, 111, 181, 0.95);
     color: #fff;
-
     font-weight: 900;
     font-size: 0.95rem;
     cursor: pointer;
-
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease,
@@ -545,11 +489,9 @@ body {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.52);
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     z-index: 9999;
     backdrop-filter: blur(4px);
 }
@@ -558,12 +500,10 @@ body {
     background: #fff;
     border-radius: 22px;
     padding: 32px 28px;
-
     width: 460px;
     max-width: 95vw;
     max-height: 85vh;
     overflow-y: auto;
-
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
     border: 1.5px solid rgba(47, 78, 132, 0.22);
 }
@@ -578,7 +518,6 @@ body {
 .main-credit-modal-sub {
     margin-bottom: 22px;
     font-size: 0.95rem;
-
     color: rgba(55, 74, 110, 0.82);
     font-weight: 800;
 }
@@ -601,16 +540,12 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 3px;
-
     padding: 16px 10px;
     border-radius: 14px;
-
     cursor: pointer;
-
     border: 2px solid rgba(47, 78, 132, 0.2);
     background: rgba(244, 247, 255, 0.98);
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease,
@@ -640,11 +575,9 @@ body {
 .main-credit-pkg-label {
     font-size: 0.85rem;
     font-weight: 800;
-
     padding: 2px 8px;
     border-radius: 16px;
     margin-top: 4px;
-
     background: rgba(220, 234, 255, 0.98);
     color: rgba(30, 62, 115, 0.92);
     border: 1px solid rgba(63, 111, 181, 0.26);
@@ -655,7 +588,6 @@ body {
     font-size: 0.8rem;
     text-align: center;
     margin-bottom: 12px;
-
     color: rgba(100, 116, 139, 0.78);
     font-weight: 700;
 }
@@ -666,15 +598,12 @@ body {
     padding: 12px;
     border-radius: 12px;
     margin-top: 8px;
-
     font-weight: 900;
     font-size: 0.95rem;
     cursor: pointer;
-
     border: 1.5px solid rgba(47, 78, 132, 0.22);
     color: rgba(45, 62, 92, 0.86);
     background: rgba(241, 245, 249, 0.95);
-
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease,
@@ -688,13 +617,6 @@ body {
     box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
-/* 반응형: 패키지 2열로 */
-@media (max-width: 520px) {
-    .main-credit-pkg-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 /* 숫자만 강조 */
 .credit-num {
     color: #2f6fe4;
@@ -705,4 +627,553 @@ body {
 .credit-word {
     color: #3e5b86;
     font-weight: 800;
+}
+
+/* =========================
+   알림 아이콘 / 알림 모달
+========================= */
+
+.main-alert-btn {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    border: none;
+    background: #d4e2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(60, 90, 140, 0.08);
+    transition: all 0.18s ease;
+    z-index: 5;
+}
+
+.main-alert-btn:hover {
+    transform: translateY(-1px);
+    background: #c2d5f0;
+}
+
+.main-alert-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+
+.main-alert-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #e55353;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #f8fbff;
+    box-shadow: none;
+}
+
+.main-alert-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.52);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+    padding: 20px;
+}
+
+.main-alert-modal {
+    width: 560px;
+    max-width: 95vw;
+    max-height: 80vh;
+    background: #fff;
+    border-radius: 22px;
+    padding: 28px 24px 20px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+    border: 1.5px solid rgba(47, 78, 132, 0.22);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.main-alert-modal-title {
+    font-size: 1.28rem;
+    font-weight: 900;
+    color: rgba(15, 23, 42, 0.92);
+    margin: 0;
+}
+
+.main-alert-modal-guide {
+    font-size: 0.88rem;
+    color: rgba(100, 116, 139, 0.82);
+    font-weight: 700;
+}
+
+.main-alert-list {
+    max-height: 48vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 4px;
+}
+
+.main-alert-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.main-alert-list::-webkit-scrollbar-thumb {
+    background: rgba(110, 140, 190, 0.87);
+    border-radius: 999px;
+}
+
+.main-alert-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(90, 120, 175, 0.95);
+}
+
+.main-alert-empty {
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c8ea9;
+    font-size: 1rem;
+    font-weight: 800;
+    background: #f8fbff;
+    border: 1.5px dashed #c8d8f0;
+    border-radius: 18px;
+}
+
+.main-alert-item {
+    position: relative;
+    padding: 16px 52px 16px 16px;
+    border-radius: 18px;
+    background: #edf3ff;
+    border: 1.5px solid #c3d2ec;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+}
+
+.main-alert-nameRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.main-alert-name {
+    font-size: 1.08rem;
+    font-weight: 900;
+    color: #2d3f5c;
+}
+
+.main-alert-date {
+    font-size: 0.86rem;
+    color: #6f7f98;
+    font-weight: 800;
+}
+
+.main-alert-text {
+    font-size: 0.96rem;
+    color: #5f708c;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.main-alert-remove {
+    position: absolute;
+    top: 11px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #6f84a6;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+}
+
+.main-alert-remove:hover {
+    background: #fff0f0;
+    color: #d74a4a;
+}
+
+.main-alert-close {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 2px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border: 1.5px solid rgba(47, 78, 132, 0.22);
+    color: rgba(45, 62, 92, 0.86);
+    background: rgba(241, 245, 249, 0.95);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.main-alert-close:hover {
+    transform: translateY(-1px);
+    border-color: rgba(47, 78, 132, 0.34);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.alert-accept {
+    color: #2a63c6;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+}
+
+.alert-reject {
+    color: #c94a4a;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+}
+
+/* ==========================================================================
+   5. 반응형 디자인 (Responsive)
+   ========================================================================== */
+@media (max-width: 1000px) {
+    .mainpage-top-inner {
+        grid-template-columns: 1fr;
+        padding: 30px 20px;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .mainpage-logo {
+        margin: 0 auto;
+    }
+
+    .mainpage-category-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .main-alert-btn {
+        top: 0;
+        right: 0;
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+    }
+
+    .main-alert-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mainpage-root {
+        gap: 18px;
+    }
+
+    .mainpage-inner {
+        width: min(100%, 94%);
+        gap: 22px;
+    }
+
+    .mainpage-top-card {
+        box-shadow: none;
+        border-radius: 0 0 18px 18px;
+    }
+
+    .mainpage-top-inner {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 18px 14px 20px;
+        gap: 12px;
+        text-align: center;
+        padding-left: 14px;
+    }
+
+    .mainpage-top-left {
+        display: flex;
+        justify-content: center;
+    }
+
+    .mainpage-logo {
+        width: 170px;
+        margin: 0 auto;
+    }
+
+    .mainpage-top-center {
+        gap: 10px;
+    }
+
+    .mainpage-title-row {
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 38px;
+    }
+
+    .mainpage-chatbot-icon {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+    }
+
+    .mainpage-title {
+        font-size: 1.05rem;
+        line-height: 1.35;
+        letter-spacing: -0.5px;
+        word-break: keep-all;
+    }
+
+    .main-alert-btn {
+        top: -2px;
+        right: 2px;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .main-alert-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .main-alert-badge {
+        min-width: 18px;
+        height: 18px;
+        font-size: 10px;
+        top: -4px;
+        right: -4px;
+        padding: 0 4px;
+    }
+
+    .main-credit-header {
+        gap: 8px;
+        font-size: 0.78rem;
+        flex-wrap: wrap;
+        margin-bottom: 2px;
+    }
+
+    .main-credit-header-text {
+        font-size: 0.9rem;
+    }
+
+    .main-credit-header-btn {
+        padding: 4px 10px;
+        font-size: 0.74rem;
+        border-radius: 16px;
+    }
+
+    .search-wrapper {
+        width: 100%;
+    }
+
+    .mainpage-search-input {
+        height: 52px;
+        padding: 0 46px 0 18px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        border-radius: 26px;
+    }
+
+    .mainpage-search-input::placeholder {
+        font-size: 0.92rem;
+    }
+
+    .search-wrapper.is-open .mainpage-search-input {
+        border-radius: 18px 18px 0 0;
+    }
+
+    .expand-arrow {
+        right: 14px;
+        font-size: 1.1rem;
+    }
+
+    .mainpage-category-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 12px;
+    }
+
+    .mainpage-category-btn {
+        width: 138px;
+        height: 138px;
+    }
+
+    .mainpage-category-icon {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 8px;
+    }
+
+    .mainpage-category-label {
+        font-size: 0.98rem;
+    }
+
+    .mainpage-content-card {
+        min-height: 280px;
+        padding: 18px 14px 22px;
+        border-radius: 20px;
+    }
+
+    .welcome-container {
+        gap: 20px;
+        max-width: 100%;
+    }
+
+    .welcome-avatar {
+        width: 82px;
+        height: 82px;
+        font-size: 2rem;
+    }
+
+    .welcome-text h2 {
+        font-size: 1.9rem;
+        line-height: 1.28;
+        word-break: keep-all;
+    }
+
+    .welcome-text p {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .main-credit-banner {
+        padding: 12px 14px;
+        border-radius: 16px;
+        gap: 10px;
+    }
+
+    .main-credit-banner-left {
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .main-credit-banner-icon {
+        font-size: 1.45rem;
+    }
+
+    .main-credit-banner-label {
+        font-size: 0.72rem;
+    }
+
+    .main-credit-banner-value {
+        font-size: 1.05rem;
+        line-height: 1.1;
+    }
+
+    .main-credit-banner-charge {
+        padding: 8px 14px;
+        font-size: 0.82rem;
+        border-radius: 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .welcome-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .welcome-btn {
+        height: 52px;
+        font-size: 1rem;
+        border-radius: 14px;
+    }
+
+    .btn-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .main-alert-modal {
+        width: 100%;
+        max-width: 94vw;
+        padding: 20px 16px 16px;
+        border-radius: 18px;
+        gap: 10px;
+    }
+
+    .main-alert-modal-title {
+        font-size: 1.06rem;
+    }
+
+    .main-alert-modal-guide {
+        font-size: 0.78rem;
+    }
+
+    .main-alert-item {
+        padding: 14px 42px 14px 14px;
+        border-radius: 14px;
+    }
+
+    .main-alert-name {
+        font-size: 0.95rem;
+    }
+
+    .main-alert-date,
+    .main-alert-text {
+        font-size: 0.8rem;
+    }
+
+    .main-alert-remove {
+        width: 28px;
+        height: 28px;
+        font-size: 1.35rem;
+        top: 8px;
+        right: 8px;
+    }
+
+    .main-credit-modal {
+        width: 100%;
+        max-width: 94vw;
+        padding: 22px 16px 18px;
+        border-radius: 18px;
+    }
+
+    .main-credit-modal-title {
+        font-size: 1.05rem;
+    }
+
+    .main-credit-modal-sub {
+        font-size: 0.86rem;
+        margin-bottom: 16px;
+    }
+
+    .main-credit-pkg-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .main-credit-pkg-btn {
+        padding: 13px 8px;
+        border-radius: 12px;
+    }
+
+    .main-credit-pkg-credit {
+        font-size: 0.98rem;
+    }
+
+    .main-credit-pkg-unit {
+        font-size: 0.62rem;
+    }
+
+    .main-credit-pkg-label {
+        font-size: 0.74rem;
+    }
 }

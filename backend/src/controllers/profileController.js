@@ -306,9 +306,10 @@ exports.taxpro = async (req, res) => {
         let requests = [];
         if (String(viewerId) === String(taxProUserId)) {
             const [reqList] = await pool.query(
-                `SELECT cr.id, u.name AS nickname, cr.created_at, u.profile_img AS avatarUrl
-                 FROM ConsultRequests cr JOIN Users u ON cr.user_id = u.id
-                 WHERE cr.tax_user_id = ? AND cr.status = 'PENDING'`,
+                `SELECT cr.id, cr.user_id, u.name AS nickname, cr.created_at, u.profile_img AS avatarUrl
+                FROM ConsultRequests cr
+                JOIN Users u ON cr.user_id = u.id
+                WHERE cr.tax_user_id = ? AND cr.status = 'PENDING'`,
                 [taxProUserId],
             );
             requests = reqList;

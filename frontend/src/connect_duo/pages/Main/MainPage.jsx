@@ -1,9 +1,6 @@
-// MainPage.js (FULL) - creditStyles 제거 + CSS className 적용 (main-credit-...)
-// ✅ 요청대로: "헤더 크레딧 span만" 숫자/글자 분리(span 추가)만 적용
-// ✅ 나머지 로직/구조/클래스명은 그대로 유지
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+// MainPage.js
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { refreshAccessToken } from '../../utils/authUtils';
 import './MainPage.css';
@@ -21,6 +18,8 @@ import loginIcon from '../../assets/login.png';
 import profileIcon from '../../assets/profile.png';
 import rankingIcon from '../../assets/rank.png';
 import consultIcon from '../../assets/consult.png';
+import mailIcon from '../../assets/mail.png';
+
 import ChatList from '../Chat/ChatList';
 import ChatRoom from '../Chat/ChatRoom';
 
@@ -41,6 +40,40 @@ const CREDIT_PACKAGES = [
     { label: '50만원', price: 500000, credit: 500000 },
 ];
 
+const NOTI_STORAGE_KEY = 'consult_status_notifications_v1';
+const NOTI_EXPIRE_DAYS = 100;
+
+function formatNotiDate(dateString) {
+    const d = new Date(dateString);
+    if (Number.isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+}
+
+function isExpiredNotification(item) {
+    if (!item?.actedAt) return false;
+    const acted = new Date(item.actedAt).getTime();
+    if (Number.isNaN(acted)) return false;
+    const expireMs = NOTI_EXPIRE_DAYS * 24 * 60 * 60 * 1000;
+    return Date.now() - acted > expireMs;
+}
+
+function loadAllNotifications() {
+    try {
+        const raw = localStorage.getItem(NOTI_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((item) => !isExpiredNotification(item));
+    } catch {
+        return [];
+    }
+}
+
+function saveAllNotifications(list) {
+    try {
+        localStorage.setItem(NOTI_STORAGE_KEY, JSON.stringify(list));
+    } catch {}
+}
+
 export default function MainPage() {
     const { authUser, loginAuthUser, logout, isAuthLoading, setAuthLoading } = useAuthStore();
     const [dbUser, setDbUser] = useState(null);
@@ -60,7 +93,64 @@ export default function MainPage() {
     const [userCredit, setUserCredit] = useState(0);
     const [showCreditModal, setShowCreditModal] = useState(false);
 
-    // ✅ 1. 인증 초기화 (토큰 복구 및 유저 정보 로드)
+    const [showAlertModal, setShowAlertModal] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+
+    const currentUserId = authUser?.id || JSON.parse(localStorage.getItem('userBackup') || 'null')?.id || null;
+
+    const refreshNotifications = useCallback(() => {
+        const all = loadAllNotifications();
+        saveAllNotifications(all);
+
+        if (!currentUserId) {
+            setNotifications([]);
+            return;
+        }
+
+        const mine = all
+            .filter((item) => String(item?.requesterId) === String(currentUserId))
+            .sort((a, b) => new Date(b.actedAt) - new Date(a.actedAt));
+
+        setNotifications(mine);
+    }, [currentUserId]);
+
+    const unreadCount = useMemo(() => notifications.filter((item) => !item.read).length, [notifications]);
+
+    const handleOpenAlertModal = () => {
+        setShowAlertModal(true);
+
+        const all = loadAllNotifications();
+        const updated = all.map((item) =>
+            String(item?.requesterId) === String(currentUserId) ? { ...item, read: true } : item,
+        );
+        saveAllNotifications(updated);
+        refreshNotifications();
+    };
+
+    const handleRemoveNotification = (id) => {
+        const all = loadAllNotifications();
+        const updated = all.filter((item) => item.id !== id);
+        saveAllNotifications(updated);
+        refreshNotifications();
+    };
+
+    useEffect(() => {
+        refreshNotifications();
+
+        const onFocus = () => refreshNotifications();
+        const onStorage = (e) => {
+            if (!e.key || e.key === NOTI_STORAGE_KEY) refreshNotifications();
+        };
+
+        window.addEventListener('focus', onFocus);
+        window.addEventListener('storage', onStorage);
+
+        return () => {
+            window.removeEventListener('focus', onFocus);
+            window.removeEventListener('storage', onStorage);
+        };
+    }, [refreshNotifications]);
+
     useEffect(() => {
         const initAuth = async () => {
             setAuthLoading(true);
@@ -85,19 +175,16 @@ export default function MainPage() {
                 const parsedBackup = userBackup ? JSON.parse(userBackup) : {};
 
                 if (parsedBackup.id) {
-                    // 백업 데이터로 즉시 상태 복원
                     loginAuthUser({ ...parsedBackup, accessToken: newAt });
                     setDbUser({
                         ...parsedBackup,
                         avatarUrl: parsedBackup.profile_img || parsedBackup.avatarUrl || '',
                     });
 
-                    // DB에서 최신 정보 동기화
                     try {
                         const res = await getUserProfile(parsedBackup.id);
                         if (res.result === 'success') {
                             const userData = res.data.user;
-                            // ✅ user_type은 로그인 시 저장된 값을 우선 보존 (getUserProfile이 없을 수 있음)
                             const mergedUser = {
                                 ...userData,
                                 user_type: userData.user_type || parsedBackup.user_type,
@@ -122,7 +209,6 @@ export default function MainPage() {
         initAuth();
     }, [loginAuthUser, logout, setAuthLoading]);
 
-    // ✅ 2. 크레딧 로드 전용 useEffect
     useEffect(() => {
         const fetchCredit = async () => {
             const userId = authUser?.id || JSON.parse(localStorage.getItem('userBackup') || 'null')?.id;
@@ -268,7 +354,6 @@ export default function MainPage() {
                             </div>
                         </div>
 
-                        {/* ✅ 크레딧 배너 (CSS class) */}
                         <div className="main-credit-banner">
                             <div className="main-credit-banner-left">
                                 <span className="main-credit-banner-icon">💳</span>
@@ -341,6 +426,18 @@ export default function MainPage() {
                     </div>
 
                     <div className="mainpage-top-center">
+                        {authUser && (
+                            <button
+                                type="button"
+                                className="main-alert-btn"
+                                onClick={handleOpenAlertModal}
+                                aria-label="알림 보기"
+                            >
+                                <img src={mailIcon} alt="메일 알림" className="main-alert-icon" />
+                                {unreadCount > 0 && <span className="main-alert-badge">{unreadCount}</span>}
+                            </button>
+                        )}
+
                         <div className="mainpage-title-row">
                             <img src={chatbotIcon} alt="챗봇" className="mainpage-chatbot-icon" />
                             <div className="mainpage-title">
@@ -350,10 +447,8 @@ export default function MainPage() {
                             </div>
                         </div>
 
-                        {/* ✅ 헤더 크레딧 (CSS class) */}
                         {authUser && (
                             <div className="main-credit-header">
-                                {/* ✅ 여기만 수정: 숫자만 credit-num에 넣고, '크레딧'은 credit-word로 분리 */}
                                 <span className="main-credit-header-text">
                                     💳 <span className="credit-num">{userCredit.toLocaleString()}</span>{' '}
                                     <span className="credit-word">크레딧</span>
@@ -453,47 +548,101 @@ export default function MainPage() {
                 <div className="mainpage-content-card">{renderContent()}</div>
             </div>
 
-            {/* ✅ 크레딧 충전 모달 (CSS class) */}
-            {showCreditModal && (
-                <div className="main-credit-overlay" onClick={() => setShowCreditModal(false)}>
-                    <div className="main-credit-modal" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="main-credit-modal-title">💳 크레딧 충전</h3>
+            {showAlertModal &&
+                createPortal(
+                    <div className="main-alert-overlay" onClick={() => setShowAlertModal(false)}>
+                        <div className="main-alert-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="main-alert-modal-title">상담 결과 알림</div>
+                            <div className="main-alert-modal-guide">100일 지나면 자동으로 알림이 사라집니다.</div>
 
-                        <p className="main-credit-modal-sub">
-                            현재 잔액:{' '}
-                            <strong className="main-credit-modal-strong">{userCredit.toLocaleString()} 크레딧</strong>
-                        </p>
+                            <div className="main-alert-list">
+                                {notifications.length === 0 ? (
+                                    <div className="main-alert-empty">알림이 없습니다</div>
+                                ) : (
+                                    notifications.map((item) => (
+                                        <div key={item.id} className="main-alert-item">
+                                            <div className="main-alert-nameRow">
+                                                <span className="main-alert-name">{item.taxProName}</span>
+                                                <span className="main-alert-date">{formatNotiDate(item.actedAt)}</span>
+                                            </div>
 
-                        <div className="main-credit-pkg-grid">
-                            {CREDIT_PACKAGES.map((pkg) => (
-                                <button
-                                    key={pkg.price}
-                                    className="main-credit-pkg-btn"
-                                    onClick={() => {
-                                        if (
-                                            window.confirm(
-                                                `${pkg.label} 결제 시 ${pkg.credit.toLocaleString()} 크레딧이 충전됩니다.\n진행하시겠습니까?`,
-                                            )
-                                        ) {
-                                            handleChargeCredit(pkg.credit, `${pkg.label} 크레딧 패키지 구매`);
-                                        }
-                                    }}
-                                >
-                                    <div className="main-credit-pkg-credit">{pkg.credit.toLocaleString()}</div>
-                                    <div className="main-credit-pkg-unit">크레딧</div>
-                                    <div className="main-credit-pkg-label">{pkg.label}</div>
-                                </button>
-                            ))}
+                                            <div className="main-alert-text">
+                                                {item.taxProName}님이 상담을{' '}
+                                                <span
+                                                    className={
+                                                        item.status === 'ACCEPTED' ? 'alert-accept' : 'alert-reject'
+                                                    }
+                                                >
+                                                    {item.status === 'ACCEPTED' ? '수락' : '거절'}
+                                                </span>
+                                                하셨습니다.
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                className="main-alert-remove"
+                                                onClick={() => handleRemoveNotification(item.id)}
+                                                aria-label="알림 삭제"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            <button className="main-alert-close" onClick={() => setShowAlertModal(false)}>
+                                닫기
+                            </button>
                         </div>
+                    </div>,
+                    document.body,
+                )}
 
-                        <p className="main-credit-modal-tip">💡 크레딧은 채팅 상담, 서비스 이용 등에 사용됩니다.</p>
+            {showCreditModal &&
+                createPortal(
+                    <div className="main-credit-overlay" onClick={() => setShowCreditModal(false)}>
+                        <div className="main-credit-modal" onClick={(e) => e.stopPropagation()}>
+                            <h3 className="main-credit-modal-title">💳 크레딧 충전</h3>
 
-                        <button className="main-credit-modal-close" onClick={() => setShowCreditModal(false)}>
-                            닫기
-                        </button>
-                    </div>
-                </div>
-            )}
+                            <p className="main-credit-modal-sub">
+                                현재 잔액:{' '}
+                                <strong className="main-credit-modal-strong">
+                                    {userCredit.toLocaleString()} 크레딧
+                                </strong>
+                            </p>
+
+                            <div className="main-credit-pkg-grid">
+                                {CREDIT_PACKAGES.map((pkg) => (
+                                    <button
+                                        key={pkg.price}
+                                        className="main-credit-pkg-btn"
+                                        onClick={() => {
+                                            if (
+                                                window.confirm(
+                                                    `${pkg.label} 결제 시 ${pkg.credit.toLocaleString()} 크레딧이 충전됩니다.\n진행하시겠습니까?`,
+                                                )
+                                            ) {
+                                                handleChargeCredit(pkg.credit, `${pkg.label} 크레딧 패키지 구매`);
+                                            }
+                                        }}
+                                    >
+                                        <div className="main-credit-pkg-credit">{pkg.credit.toLocaleString()}</div>
+                                        <div className="main-credit-pkg-unit">크레딧</div>
+                                        <div className="main-credit-pkg-label">{pkg.label}</div>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <p className="main-credit-modal-tip">💡 크레딧은 채팅 상담, 서비스 이용 등에 사용됩니다.</p>
+
+                            <button className="main-credit-modal-close" onClick={() => setShowCreditModal(false)}>
+                                닫기
+                            </button>
+                        </div>
+                    </div>,
+                    document.body,
+                )}
         </div>
     );
 }

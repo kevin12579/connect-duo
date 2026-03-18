@@ -18,7 +18,6 @@ export function formatResponseSpeed(minutes) {
     const mins = Math.max(0, Math.floor(Number(minutes) || 0));
 
     if (mins === 0) return '측정 중';
-    if (mins < 5) return '⚡ 빠른 응답';
 
     const h = Math.floor(mins / 60);
     const m = mins % 60;

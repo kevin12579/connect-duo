@@ -384,3 +384,105 @@
         padding: 18px;
     }
 }
+
+/* =========================================
+   SearchTool Mobile Responsive
+========================================= */
+@media (max-width: 480px) {
+    .search-tool-inner {
+        height: 360px;
+        border-radius: 0 0 18px 18px;
+    }
+
+    .chat-window {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .empty-chat {
+        padding: 0 8px;
+    }
+
+    .empty-chat p {
+        font-size: 0.92rem;
+        margin-bottom: 6px;
+        line-height: 1.45;
+    }
+
+    .empty-chat span {
+        font-size: 0.8rem;
+        line-height: 1.45;
+    }
+
+    .message-bubble {
+        max-width: 94%;
+        gap: 8px;
+    }
+
+    .avatar {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+    }
+
+    .avatar-img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .sender {
+        font-size: 0.73rem;
+        margin-bottom: 4px;
+    }
+
+    .text {
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) {
+        font-size: 0.84rem;
+        line-height: 1.65;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) h1 {
+        font-size: 1rem;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) h2 {
+        font-size: 0.95rem;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) h3 {
+        font-size: 0.9rem;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) table {
+        font-size: 0.76rem;
+    }
+
+    :is(.chat-answer, .message-bubble.assistant .text) th,
+    :is(.chat-answer, .message-bubble.assistant .text) td {
+        padding: 0.42rem 0.42rem;
+    }
+
+    .chat-input-area {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .chat-input-area input {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        min-width: 0;
+    }
+
+    .chat-input-area button {
+        padding: 0 14px;
+        font-size: 0.82rem;
+        white-space: nowrap;
+    }
+}

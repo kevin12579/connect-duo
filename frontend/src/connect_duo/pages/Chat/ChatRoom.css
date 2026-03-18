@@ -62,7 +62,7 @@
     box-shadow: none;
 }
 .cr-back:hover {
-    background: rgba(43, 111, 224, 0.1);
+    background: rgba(43, 111, 224, 0.15);
 }
 
 .cr-backIcon {
@@ -97,7 +97,7 @@
     font-size: 12px;
     font-weight: 900;
     color: #fff;
-    background: #e53935;
+    background: #d94b47;
     padding: 3px 10px;
     border-radius: 999px;
     letter-spacing: 0.3px;
@@ -117,13 +117,13 @@
     padding: 5px 11px;
     border-radius: 999px;
     background: #ffffff;
-    border: 1.8px solid #c7d9f3;
+    border: 1.8px solid #bfd3ee;
 }
 .cr-status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #cbd5e1;
+    background: #b3c0d3;
     transition: background 0.3s ease;
 }
 .cr-status-text {
@@ -135,7 +135,7 @@
     background: #22c55e;
 }
 .is-online .cr-status-text {
-    color: #1a9a45;
+    color: #2f8b57;
 }
 
 .cr-response-speed {
@@ -149,39 +149,44 @@
     color: #1a9a45;
 }
 .speed-normal .cr-status-dot {
-    background: #f59e0b;
+    background: #3b82f6;
 }
 .speed-normal .cr-status-text {
-    color: #b77907;
+    color: #2b6fe0;
 }
 .speed-slow .cr-status-dot {
-    background: #ef4444;
+    background: #e54848;
 }
+
 .speed-slow .cr-status-text {
-    color: #c22a2a;
+    color: #c83a3a;
 }
 .speed-unknown .cr-status-dot {
-    background: #cbd5e1;
+    background: #94a3b8;
 }
+
 .speed-unknown .cr-status-text {
-    color: #7c8ea9;
+    color: #64748b;
 }
 
 /* 요금 / 무료 뱃지 */
 .cr-rate-tag {
-    background: #fff8e1;
-    border-color: #ffe082;
+    background: #f8efd6;
+    border-color: #e6c16a;
 }
+
 .cr-rate-tag .cr-status-text {
-    color: #e65100;
+    color: #b97918;
     font-weight: 900;
 }
 .cr-free-tag {
-    background: #e8f5e9;
-    border-color: #a5d6a7;
+    background: #e6f0ff;
+    border-color: #6fa6eb;
+    color: #2a64b4;
 }
+
 .cr-free-tag .cr-status-text {
-    color: #2e7d32;
+    color: #2a64b4;
     font-weight: 900;
 }
 
@@ -219,6 +224,19 @@
 .cr-menuIcon.isOn {
     background: #f3f8ff;
     border-color: #7fa8f0;
+}
+
+.cr-hIconImg {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    display: block;
+    filter: invert(28%) sepia(68%) saturate(1126%) hue-rotate(198deg) brightness(94%) contrast(91%);
+}
+
+.cr-hIcon:hover .cr-hIconImg,
+.cr-hIcon.isOn .cr-hIconImg {
+    filter: invert(24%) sepia(71%) saturate(1324%) hue-rotate(201deg) brightness(90%) contrast(95%);
 }
 
 /* 검색바 */
@@ -322,8 +340,8 @@
     pointer-events: none;
 }
 .cr-hl {
-    background: #fcedc2;
-    color: #222d38;
+    background: #ffe99a;
+    color: #263457;
     padding: 0 3px;
     border-radius: 7px;
 }
@@ -334,8 +352,8 @@
 .cr-taxPanel {
     flex: 0 0 auto;
     margin: 10px clamp(16px, 3vw, 82px) 0;
-    background: linear-gradient(135deg, #f0f6ff 0%, #e8f2ff 100%);
-    border: 2px solid #b7cff6;
+    background: linear-gradient(135deg, #e3edf9 0%, #dbe8f7 100%);
+    border: 2px solid #a9c4ee;
     border-radius: 22px;
     padding: 16px 20px;
     animation: cr-slideDown 0.2s ease;
@@ -394,17 +412,20 @@
 .cr-taxName {
     font-size: 17px;
     font-weight: 900;
-    color: #18478b;
+    color: #143f7c;
 }
+
 .cr-taxCompany {
     font-size: 13px;
-    font-weight: 700;
-    color: #3d5c8a;
+    font-weight: 730;
+    color: #355784;
 }
+
 .cr-taxBio {
     font-size: 12.5px;
-    color: #556a8b;
+    color: #4b6488;
     line-height: 1.5;
+    font-weight: 550;
 }
 .cr-taxCats {
     display: flex;
@@ -415,8 +436,12 @@
 .cr-taxCat {
     font-size: 11px;
     font-weight: 800;
-    background: #2b6fe0;
-    color: #fff;
+
+    background: #f8fbff;      /* 흰색 + 살짝 블루톤 */
+    color: #2f5fa8;           /* 네이비 블루 */
+
+    border: 1.4px solid #84a2dc; /* 연한 네이비 보더 */
+
     padding: 3px 10px;
     border-radius: 999px;
 }
@@ -431,30 +456,49 @@
     align-items: center;
     gap: 8px;
     padding: 7px 12px;
-    background: #fff;
-    border: 1.5px solid #cfe0f5;
+    background: #f8fbff;
+    border: 1.5px solid #bfd3ee;
     border-radius: 12px;
 }
 .cr-taxStatIcon {
     font-size: 15px;
     flex-shrink: 0;
+    
 }
 .cr-taxStatLabel {
     font-size: 12px;
-    color: #7a8fa8;
+    color: #647b9d;
     font-weight: 800;
 }
+
 .cr-taxStatVal {
     font-size: 13px;
     font-weight: 900;
-    color: #1a3a6b;
+    color: #2a5f9e;
     margin-left: auto;
 }
 .cr-taxStatVal.is-free {
-    color: #2e7d32;
+    color:  #255fb0;
 }
 .cr-taxStatVal.is-online-text {
-    color: #1a9a45;
+    color: #2f8b57;
+}
+
+
+.cr-taxStateDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.cr-taxStateDot.is-online {
+    background: #2fb36a;
+}
+
+.cr-taxStateDot.is-offline {
+    background: #667fad;
 }
 
 /* =========================
@@ -466,85 +510,123 @@
     align-items: center;
     justify-content: space-between;
     margin: 10px clamp(16px, 3vw, 82px) 0;
-    background: linear-gradient(90deg, #1a3a6b 0%, #1e4d8c 100%);
+
+    /* 핵심: 배경은 훨씬 옅게 */
+    background: linear-gradient(180deg, #eef4ff 0%, #e4ecfa 100%);
+
+    /* 보더는 네이비 베이스 유지 */
+    border: 1.8px solid #264f8d;
     border-radius: 16px;
-    padding: 10px 20px;
+
+    padding: 12px 20px;
     gap: 12px;
     flex-wrap: wrap;
+
+    box-shadow: 0 6px 18px rgba(38, 79, 141, 0.08);
 }
+
 .cr-billingLeft {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
     flex-wrap: wrap;
 }
+
 .cr-billingItem {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 2px;
+    min-width: 78px;
 }
+
 .cr-billingLabel {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 700;
+    font-size: 11px;
+    color: #5d6f8e;
+    font-weight: 800;
     white-space: nowrap;
+    letter-spacing: -0.1px;
 }
+
+/* 숫자 공통 */
 .cr-billingVal {
     font-size: 18px;
     font-weight: 900;
-    color: #fff;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
+    color: #1f3f73;
 }
+
+/* 상담 시간 */
+.cr-billingItem:first-child .cr-billingVal {
+    color: #23477f;
+}
+
+/* 다음 결제 / 다음 입금 시간 */
+.cr-billingItem:nth-child(3) .cr-billingVal {
+    color: #2f6fd4;
+}
+
+/* 세무사 입금 예정 */
+.cr-billingVal-income {
+    color: #2f6fd4 !important;
+}
+
 .cr-billingVal.is-urgent {
-    color: #ff6b6b;
+    color: #d44b4b;
     animation: cr-pulse 0.8s infinite alternate;
 }
-/* ✅ 세무사 입금 표시 - 녹색 */
-.cr-billingVal-income {
-    color: #4ade80 !important;
-}
+
 @keyframes cr-pulse {
     from {
         opacity: 1;
     }
     to {
-        opacity: 0.6;
+        opacity: 0.68;
     }
 }
+
 .cr-billingDivider {
     width: 1px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.2);
+    height: 34px;
+    background: rgba(46, 81, 136, 0.16);
     flex-shrink: 0;
 }
+
+/* 오프라인 - 타이머 정지 */
 .cr-billingPause {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.65);
-    font-weight: 700;
-    padding: 4px 10px;
-    background: rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    font-weight: 800;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #294d84 0%, #1f3e6d 100%);
+    border: 1px solid rgba(24, 48, 88, 0.25);
     border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(31, 62, 109, 0.14);
 }
+
 .cr-billingRight {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 2px;
 }
+
 .cr-creditLabel {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 700;
+    font-size: 11px;
+    color: #5d6f8e;
+    font-weight: 800;
 }
+
 .cr-creditVal {
     font-size: 18px;
     font-weight: 900;
-    color: #ffe082;
+    color: #c79b2f;
 }
+
 .cr-creditVal.is-low {
-    color: #ff6b6b;
+    color:  #e07a3a;
 }
 
 /* 무료 크레딧 표시 바 */
@@ -554,20 +636,32 @@
     align-items: center;
     gap: 10px;
     margin: 10px clamp(16px, 3vw, 82px) 0;
-    background: #f0f6ff;
-    border: 1.5px solid #b7cff6;
+
+    /* 살짝 더 블루톤 */
+    background: #edf5ff;
+
+    /* 배경 대비 맞게 조금 더 또렷 */
+    border: 1.5px solid #9cbcf0;
+
     border-radius: 12px;
     padding: 8px 18px;
 }
+
 .cr-creditOnlyBar .cr-creditLabel {
     font-size: 12px;
-    color: #556a8b;
+
+    /* 기존 #4f6383에서 살짝만 선명 */
+    color: #465f84;
+
     font-weight: 800;
 }
+
 .cr-creditOnlyBar .cr-creditVal {
     font-size: 15px;
     font-weight: 900;
-    color: #1a3a6b;
+
+    /* 기존 #1a457f보다 약간 또렷 */
+    color: #1c4d8f;
 }
 
 /* 결제 알림 토스트 */
@@ -610,14 +704,20 @@
     min-height: 0;
 }
 .cr-chat::-webkit-scrollbar {
-    width: 11px;
+width: 11px;
 }
+
 .cr-chat::-webkit-scrollbar-thumb {
-    background: rgba(120, 150, 200, 0.35);
-    border-radius: 999px;
+background: rgba(110, 145, 200, 0.60);
+border-radius: 999px;
 }
+
+.cr-chat::-webkit-scrollbar-thumb:hover {
+background: rgba(110, 145, 200, 0.75);
+}
+
 .cr-chat::-webkit-scrollbar-track {
-    background: transparent;
+background: transparent;
 }
 
 .cr-systemRow {
@@ -693,11 +793,11 @@
     color: #134e85;
     font-weight: 850;
 }
+/* 상대방 말풍선 */
 .cr-bubbleOther {
-    background: #e8f2ff;
-    border-color: #a8c5f7;
-    color: #224169;
-    font-weight: 780;
+    background: #f0f1ff;
+    border-color: #bcc4f5;
+    color: #3c416e;
 }
 .cr-text {
     white-space: pre-wrap;
@@ -707,7 +807,7 @@
     margin-top: 12px;
     font-size: 13px;
     opacity: 1;
-    color: #5f7498;
+    color: #516686;
     font-weight: 850;
 }
 .cr-timeMe {
@@ -716,11 +816,18 @@
 .cr-timeOther {
     text-align: left;
 }
-.cr-readStatus {
+.cr-readStatus.is-unread {
     margin-left: 8px !important;
     font-weight: 900 !important;
     font-size: 12px !important;
     color: #2b6fe0 !important;
+}
+
+.cr-readStatus.is-read {
+    margin-left: 8px !important;
+    font-weight: 900 !important;
+    font-size: 12px !important;
+    color: #445fb3 !important;
 }
 
 .cr-sideLabel {
@@ -753,8 +860,8 @@
     display: block;
     border-radius: 20px;
     background: #ffffff;
-    border: 2px solid #cfe0f5;
-    box-shadow: 0 4px 14px rgba(80, 170, 255, 0.12);
+    border: 2px solid  #cfe1fb ;
+    box-shadow: 0 4px 14px rgba(95, 155, 235, 0.10);
 }
 
 .cr-fileCard {
@@ -762,7 +869,7 @@
     padding: 15px;
     border-radius: 19px;
     background: #ffffff;
-    border: 2px solid #cfe0f5;
+    border: 2px solid #cfe1fb ;
     overflow: hidden;
     margin-top: 6px;
 }
@@ -793,7 +900,7 @@
     font-size: 14px;
     font-weight: 900;
     background: #ffffff;
-    border: 2px solid #cfe0f5;
+    border: 2px solid #bfd3ee;
     color: #2b6fe0;
     white-space: nowrap;
 }
@@ -1084,6 +1191,70 @@
 }
 
 /* =========================
+   상대방 말풍선 / 파일카드만 톤 다운
+   - 내가 보낸 쪽은 그대로
+========================= */
+
+/* 상대방 메시지 아이콘 보라 필터 */
+.cr-rowOther .cr-txtCornerIcon {
+    filter: saturate(0.45) brightness(1.08) hue-rotate(28deg);
+}
+
+/* 상대방 이미지 */
+.cr-rowOther .cr-img {
+    background: #f7f8ff;
+    border-color: #d5daf8;
+    box-shadow: 0 4px 14px rgba(130,135,190,0.10);
+}
+
+/* 상대방 파일 카드 */
+.cr-rowOther .cr-fileCard {
+    background: #fafbff;
+    border-color: #d9ddf8;
+}
+
+/* TXT / FILE 뱃지 */
+.cr-rowOther .cr-fileBadge {
+    background: #ffffff;
+    border-color: #ccd6f6;
+    color: #4a4f7c;
+}
+
+/* 파일명 */
+.cr-rowOther .cr-fileTitle {
+    color: #2f3461;
+}
+
+/* 다운로드 / 열기 버튼 */
+.cr-rowOther .cr-downloadBtn,
+.cr-rowOther .cr-openBtn {
+    background: #ffffff;
+    border-color: #b0b6f0;
+    color: #444a86;
+    box-shadow: none;
+}
+.cr-rowOther .cr-downloadBtn:hover,
+.cr-rowOther .cr-openBtn:hover {
+    background: #7d86e8;
+    border-color: #7d86e8;
+    color: #ffffff;
+}
+
+/* 파일 상세 텍스트 */
+.cr-rowOther .cr-fileLabel {
+    color: #6e7398;
+}
+
+.cr-rowOther .cr-fileValue {
+    color: #3d4271;
+}
+
+/* 시간 */
+.cr-rowOther .cr-timeOther {
+    color: #535b87;
+}
+
+/* =========================
    Responsive
 ========================= */
 @media (max-width: 1440px) {
@@ -1161,5 +1332,598 @@
     .cr-backIcon {
         width: 22px;
         height: 22px;
+    }
+}
+
+/* =========================================
+   ChatRoom Mobile Full Downscale
+   기준: 360~480
+========================================= */
+@media (max-width: 480px) {
+    .cr-page {
+        padding: 0;
+        background: #dfe6ef;
+        min-height: 100dvh;
+    }
+
+    .cr-wrap {
+        width: 100vw;
+        height: 100dvh;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        padding: 8px 0 8px 0;
+        box-shadow: none;
+    }
+
+    /* =========================
+       Header
+    ========================= */
+    .cr-header {
+        padding: 0 10px 10px;
+        gap: 8px;
+        min-height: auto;
+        border-bottom: 1.4px solid rgba(183, 207, 246, 0.95);
+    }
+
+    .cr-back {
+        padding: 4px;
+        margin-right: 4px;
+        border-radius: 10px;
+    }
+
+    .cr-backIcon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .cr-header-info {
+        gap: 4px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .cr-title {
+        font-size: 1.05rem;
+        gap: 6px;
+        line-height: 1.2;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    .cr-closedBadge {
+        font-size: 0.62rem;
+        padding: 2px 7px;
+    }
+
+    .cr-header-meta {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .cr-status-tag {
+        gap: 5px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border-width: 1.5px;
+    }
+
+    .cr-status-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .cr-status-text,
+    .cr-taxStatLabel,
+    .cr-taxStatVal,
+    .cr-billingLabel,
+    .cr-creditLabel {
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    .cr-status-text {
+        font-size: 0.68rem;
+    }
+
+    .cr-response-speed {
+        padding-left: 8px;
+        border-left-width: 1px;
+    }
+
+    .cr-headerActions {
+        gap: 6px;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+
+    .cr-hIcon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        font-size: 16px;
+        border-width: 1.6px;
+    }
+
+    .cr-hIconImg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* 검색 헤더 */
+    .cr-searchBar {
+        gap: 8px;
+        padding-left: 0;
+        min-width: 0;
+    }
+
+    .cr-searchInput {
+        height: 38px;
+        border-radius: 12px;
+        font-size: 0.88rem;
+        padding: 0 12px;
+        border-width: 1.6px;
+    }
+
+    .cr-searchX {
+        width: 40px;
+        height: 38px;
+        border-radius: 12px;
+        font-size: 18px;
+        border-width: 1.6px;
+    }
+
+    .cr-searchMeta {
+        gap: 8px;
+    }
+
+    .cr-hitCount {
+        height: 38px;
+        min-width: 54px;
+        padding: 0 10px;
+        font-size: 0.78rem;
+        border-width: 1.6px;
+    }
+
+    .cr-searchNav {
+        gap: 8px;
+    }
+
+    .cr-navBtn {
+        width: 40px;
+        height: 38px;
+        border-radius: 11px;
+        border-width: 1.6px;
+    }
+
+    .cr-navIcon {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* =========================
+       세무사 정보 패널
+    ========================= */
+    .cr-taxPanel {
+        margin: 8px 10px 0;
+        padding: 10px 12px;
+        border-radius: 16px;
+        border-width: 1.6px;
+    }
+
+    .cr-taxPanel-inner {
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .cr-taxPanel-left {
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .cr-taxAvatar,
+    .cr-taxAvatarFallback {
+        width: 44px;
+        height: 44px;
+    }
+
+    .cr-taxAvatarFallback {
+        font-size: 18px;
+    }
+
+    .cr-taxInfo {
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .cr-taxName {
+        font-size: 0.94rem;
+        line-height: 1.25;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    .cr-taxCompany {
+        font-size: 0.74rem;
+        line-height: 1.35;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    .cr-taxBio {
+        font-size: 0.72rem;
+        line-height: 1.4;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    .cr-taxCats {
+        gap: 4px;
+        margin-top: 3px;
+    }
+
+    .cr-taxCat {
+        font-size: 0.66rem;
+        padding: 3px 8px;
+    }
+
+    .cr-taxPanel-right {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .cr-taxStat {
+        gap: 6px;
+        padding: 6px 9px;
+        border-radius: 10px;
+        min-width: 0;
+    }
+
+    .cr-taxStatIcon {
+        font-size: 12px;
+    }
+
+    .cr-taxStatLabel {
+        font-size: 0.68rem;
+    }
+
+    .cr-taxStatVal {
+        font-size: 0.74rem;
+        line-height: 1.3;
+        min-width: 0;
+        text-align: right;
+    }
+
+    .cr-taxStateDot {
+        width: 6px;
+        height: 6px;
+    }
+
+    /* =========================
+       결제 / 크레딧 바
+    ========================= */
+    .cr-billingBar {
+        margin: 8px 10px 0;
+        padding: 9px 10px;
+        border-radius: 12px;
+        gap: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        border-width: 1.5px;
+    }
+
+    .cr-billingLeft {
+        gap: 8px;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .cr-billingItem {
+        min-width: 64px;
+        gap: 1px;
+    }
+
+    .cr-billingLabel {
+        font-size: 0.62rem;
+    }
+
+    .cr-billingVal {
+        font-size: 0.95rem;
+        line-height: 1.15;
+    }
+
+    .cr-billingDivider {
+        height: 24px;
+    }
+
+    .cr-billingPause {
+        font-size: 0.62rem;
+        padding: 4px 8px;
+    }
+
+    .cr-billingRight {
+        align-items: flex-start;
+        width: 100%;
+        gap: 1px;
+    }
+
+    .cr-creditLabel {
+        font-size: 0.62rem;
+    }
+
+    .cr-creditVal {
+        font-size: 0.95rem;
+        line-height: 1.15;
+    }
+
+    .cr-creditOnlyBar {
+        margin: 8px 10px 0;
+        padding: 8px 10px;
+        border-radius: 12px;
+        gap: 8px;
+    }
+
+    .cr-creditOnlyBar .cr-creditLabel {
+        font-size: 0.68rem;
+    }
+
+    .cr-creditOnlyBar .cr-creditVal {
+        font-size: 0.88rem;
+    }
+
+    .cr-billingAlert {
+        margin: 8px 10px 0;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 0.76rem;
+        line-height: 1.35;
+    }
+
+    /* =========================
+       Chat body
+    ========================= */
+    .cr-chat {
+        margin: 8px 10px 10px;
+        padding: 10px;
+        border-radius: 18px;
+        border-width: 1.8px;
+    }
+
+    .cr-dayPill {
+        margin: 12px auto;
+        padding: 6px 11px;
+        font-size: 0.68rem;
+        border-radius: 999px;
+    }
+
+    .cr-systemRow {
+        margin: 16px 0;
+    }
+
+    .cr-systemPill {
+        padding: 8px 11px;
+        font-size: 0.76rem;
+        line-height: 1.45;
+    }
+
+    .cr-row {
+        margin-bottom: 14px;
+    }
+
+    .cr-bubbleWrap {
+        gap: 6px;
+        max-width: 100%;
+    }
+
+    .cr-bubble {
+        max-width: 82vw;
+        padding: 12px 14px;
+        border-radius: 18px;
+        font-size: 0.86rem;
+        line-height: 1.5;
+        border-width: 1.6px;
+    }
+
+    .cr-time {
+        margin-top: 8px;
+        font-size: 0.68rem;
+    }
+
+    .cr-readStatus.is-unread,
+    .cr-readStatus.is-read {
+        font-size: 0.62rem !important;
+        margin-left: 5px !important;
+    }
+
+    .cr-sideLabel {
+        font-size: 0.64rem;
+        padding-bottom: 4px;
+    }
+
+    /* 이미지/파일 */
+    .cr-img {
+        max-height: 180px;
+        border-radius: 14px;
+        border-width: 1.6px;
+    }
+
+    .cr-fileCard {
+        padding: 10px;
+        border-radius: 14px;
+        border-width: 1.6px;
+    }
+
+    .cr-txtCornerIcon {
+        top: 10px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .cr-fileTopRow {
+        gap: 8px;
+        margin-bottom: 8px;
+        padding-right: 42px;
+    }
+
+    .cr-fileBadge {
+        padding: 3px 8px;
+        font-size: 0.68rem;
+        border-width: 1.5px;
+    }
+
+    .cr-fileTitle {
+        font-size: 0.82rem;
+    }
+
+    .cr-fileActions {
+        gap: 8px;
+        padding-right: 0;
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+
+    .cr-downloadBtn,
+    .cr-openBtn {
+        height: 34px;
+        padding: 0 12px;
+        font-size: 0.74rem;
+        border-width: 1.5px;
+    }
+
+    .cr-fileSub {
+        gap: 4px;
+    }
+
+    .cr-fileSubRow {
+        gap: 6px;
+    }
+
+    .cr-fileLabel,
+    .cr-fileValue {
+        font-size: 0.68rem;
+        line-height: 1.35;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+
+    /* =========================
+       첨부 패널
+    ========================= */
+    .cr-attachPanel {
+        margin: 8px 10px 10px;
+        padding: 10px;
+        gap: 10px;
+        border-radius: 14px;
+        border-width: 1.5px;
+    }
+
+    .cr-attachItem {
+        min-width: 0;
+        padding: 12px 10px;
+        border-radius: 14px;
+        gap: 8px;
+        font-size: 0.82rem;
+        border-width: 1.5px;
+    }
+
+    .cr-attachIcon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        border-width: 1.5px;
+    }
+
+    .cr-attachImg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .cr-attachText {
+        font-size: 0.78rem;
+    }
+
+    /* =========================
+       입력바
+    ========================= */
+    .cr-inputBar {
+        margin: 0 10px;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 16px;
+        border-width: 1.8px;
+    }
+
+    .cr-plus {
+        width: 34px;
+        height: 34px;
+        font-size: 22px;
+        border-width: 1.6px;
+    }
+
+    .cr-textarea {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .cr-send {
+        width: 52px;
+        height: 34px;
+        border-radius: 12px;
+        font-size: 0.86rem;
+        letter-spacing: 0;
+    }
+
+    /* =========================
+       메뉴
+    ========================= */
+    .cr-menuOverlay {
+        padding: 16px;
+        border-radius: 0;
+    }
+
+    .cr-menuSheet {
+        width: min(92vw, 360px);
+        border-radius: 18px;
+        padding: 20px 12px;
+        gap: 12px;
+        border-width: 1.6px;
+    }
+
+    .cr-leaveBtn,
+    .cr-cancelBtn {
+        height: 44px;
+        border-radius: 14px;
+        font-size: 0.92rem;
+    }
+
+    .cr-loading {
+        padding: 28px 0;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cr-chat::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .cr-chat::-webkit-scrollbar-thumb {
+        background: rgba(110, 145, 200, 0.58);
+        border-radius: 999px;
+    }
+
+    .cr-chat::-webkit-scrollbar-thumb:hover {
+        background: rgba(110, 145, 200, 0.72);
+    }
+
+    .cr-chat {
+        scrollbar-width: thin;
     }
 }

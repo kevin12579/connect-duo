@@ -74,9 +74,9 @@ exports.uploadFiles = async (req, res) => {
                 senderType: me.user_type, // ★ 파일 업로드도 동일하게 전달
                 content: '파일을 전송했습니다.',
                 fileUrl,
-                fileName: file.originalname,
-                fileSize: file.size,
-                fileMime: file.mimetype,
+                fileName: file.originalname || file.filename,
+                fileSize: file.size || 0,
+                fileMime: file.mimetype || '',
             });
 
             io.to(String(roomId)).emit('receive_message', msg);

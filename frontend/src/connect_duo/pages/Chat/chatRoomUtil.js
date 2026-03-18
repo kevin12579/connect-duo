@@ -48,11 +48,9 @@ export function mapRowToUiMessage(row, myId, absolutizeFileUrl) {
         } catch {}
     }
 
-    // type normalize
     let type = String(row.type ?? row.message_type ?? row.messageType ?? 'TEXT').toUpperCase();
     if (!['TEXT', 'FILE', 'IMAGE', 'SYSTEM'].includes(type)) type = 'TEXT';
 
-    // url이 있는데 TEXT로 오면 확장자로 보정
     if (absUrl && type === 'TEXT') {
         const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(String(fileName));
         type = isImg ? 'IMAGE' : 'FILE';
@@ -116,16 +114,15 @@ export function isTxtLike(m) {
     return name.endsWith('.txt') || mime === 'text/plain';
 }
 
+function stripStoredFilePrefix(name) {
+    return String(name || '').replace(/^\d{10,}_/, '');
+}
+
 export function displayFileTitle(m) {
-    const raw = m?.fileName || '파일';
+    const raw = stripStoredFilePrefix(m?.fileName || '파일');
     return isTxtLike(m) ? raw.replace(/\.txt$/i, '') : raw;
 }
 
-/**
- * ✅ TXT 뷰어 URL 생성
- * - fileUrl의 마지막 파일명을 가져와 decode->encode(1회)로 정규화
- * - origin 기준 /uploads/{filename} 로 붙임
- */
 export function getTxtViewerUrl(fileUrl) {
     const u = String(fileUrl || '');
     if (!u) return '';
@@ -141,35 +138,30 @@ export function getTxtViewerUrl(fileUrl) {
         return encodeURIComponent(decoded);
     };
 
-    // 브라우저면 origin 기준으로 안전 조립
     if (typeof window !== 'undefined') {
         try {
             const url = new URL(u, window.location.origin);
             const filename = getFilename(url.pathname);
             return `${url.origin}/uploads/${filename}`;
         } catch {
-            // 상대/깨진 url도 filename만 뽑아서 origin에 붙임
             const filename = getFilename(u);
             return `${window.location.origin}/uploads/${filename}`;
         }
     }
 
-    // SSR/Node 환경: 그냥 /uploads/filename 형태
     const filename = getFilename(u);
     return `/uploads/${filename}`;
 }
 
-// ✅ 다운로드 파일명 안전 처리(슬래시/특수문자)
 function safeDownloadName(name) {
     const raw = String(name || 'download');
     return raw.replace(/[\\/:*?"<>|]/g, '_');
 }
 
-// ✅ Content-Disposition에서 파일명 추출(있으면 우선)
 function extractFilenameFromDisposition(disposition) {
     const d = String(disposition || '');
     if (!d) return '';
-    // filename*=UTF-8''...
+
     const m1 = d.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
     if (m1?.[1]) {
         try {
@@ -178,12 +170,13 @@ function extractFilenameFromDisposition(disposition) {
             return m1[1];
         }
     }
-    // filename="..."
+
     const m2 = d.match(/filename\s*=\s*"([^"]+)"/i);
     if (m2?.[1]) return m2[1];
-    // filename=...
+
     const m3 = d.match(/filename\s*=\s*([^;]+)/i);
     if (m3?.[1]) return m3[1].trim();
+
     return '';
 }
 
@@ -195,14 +188,15 @@ export async function downloadFile(url, fileName) {
         err.code = 410;
         throw err;
     }
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const blob = await res.blob();
 
-    // ✅ 서버가 파일명을 내려주면 그걸 우선
     const dispo = res.headers.get('content-disposition');
     const fromHeader = extractFilenameFromDisposition(dispo);
-    const finalName = safeDownloadName(fromHeader || fileName || 'download');
+    const cleanedName = stripStoredFilePrefix(fromHeader || fileName || 'download');
+    const finalName = safeDownloadName(cleanedName);
 
     const a = document.createElement('a');
     const objectUrl = URL.createObjectURL(blob);
@@ -225,10 +219,12 @@ export function extractMessagesSafely(res, extractMessagesFromAxiosResponse) {
         const x = extractMessagesFromAxiosResponse(res);
         if (Array.isArray(x)) return x;
     }
+
     const data = res?.data?.data;
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.messages)) return data.messages;
     if (Array.isArray(res?.data?.messages)) return res.data.messages;
+
     return [];
 }
 
