@@ -16,8 +16,8 @@ const creditRouter = require('./src/routes/creditRouter'); // ★ 추가
 const socketHandler = require('./src/services/chatSocket');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-const address = process.env.ADDRESS || 'localhost';
-const port = process.env.PORT || 7777;
+const address = process.env.ADDRESS || 'http://localhost:7777';
+
 const app = express();
 const server = http.createServer(app);
 
@@ -53,5 +53,5 @@ app.use('/api/credit', creditRouter); // ★ 추가
 socketHandler(io);
 
 server.listen(port, address, () => {
-    console.log(`Server running at http://${address}:${port}`);
+    console.log(`Server running at ${address}`);
 });
