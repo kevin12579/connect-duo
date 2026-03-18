@@ -11,7 +11,7 @@
 
 ## 데모 배포
 
-- (작업 중)
+- https://connect-fu5mq9m4k-kevin12579s-projects.vercel.app/
 
 ---
 
