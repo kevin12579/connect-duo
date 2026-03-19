@@ -9,6 +9,14 @@ const pool = mysql.createPool({
     database: process.env.DB_DATABASE,
     connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
     waitForConnections: true,
+
+    ssl: {
+        rejectUnauthorized: false // 클라우드 DB 인증서를 신뢰하도록 설정
+    },
+    // --- SSL 설정 끝 ---
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 module.exports = pool;
