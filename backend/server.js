@@ -17,6 +17,8 @@ const socketHandler = require('./src/services/chatSocket');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
+const PORT = process.env.PORT || 7777;
+
 const app = express();
 const server = http.createServer(app);
 
@@ -51,4 +53,6 @@ app.use('/api/credit', creditRouter); // ★ 추가
 
 socketHandler(io);
 
-console.log(`Server is running`);
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Server is successfully running on port ${PORT}`);
+});
