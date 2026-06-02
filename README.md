@@ -82,7 +82,7 @@ npm start
 **AI & Data**
 
 ![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
-![Google Gemini](https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![GPT-4o mini](https://img.shields.io/badge/GPT--4o_mini-412991?style=for-the-badge&logo=openai&logoColor=white)
 
 **Tools**
 
@@ -95,7 +95,7 @@ npm start
 
 | 기능 | 설명 |
 |------|------|
-| **AI 세무 상담** | 국가법령정보 API + Gemini AI 기반 RAG, 24시간 신속·정확한 세무 답변 제공 |
+| **AI 세무 상담** | 국가법령정보 API + GPT-4o mini 기반 RAG, 24시간 신속·정확한 세무 답변 제공 |
 | **세무사 랭킹** | 만족도·재상담률·응답속도 등 지표 기반 신뢰 랭킹으로 세무사 검색·비교 |
 | **실시간 1:1 채팅** | Socket.io 기반 전문가와의 비대면 실시간 상담 및 이력 관리 |
 
